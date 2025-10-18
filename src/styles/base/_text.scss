@@ -1,0 +1,17 @@
+@use './mixin' as *;
+
+.ellipsis-1 {
+  @include text-ellipsis(1);
+}
+
+.ellipsis-2 {
+  @include text-ellipsis(2);
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+.size-20 {
+  font-size: 20px !important;
+}

@@ -1,0 +1,93 @@
+@use 'variables' as *;
+
+// Text color classes
+.text-white {
+  color: $color-white;
+}
+
+.text-black {
+  color: $color-black;
+}
+
+.text-dark {
+  color: $color-text-dark;
+}
+
+.text-light {
+  color: $color-text-light;
+}
+
+.text-muted {
+  color: $color-text-muted;
+}
+
+.text-red {
+  color: $color-red !important;
+}
+
+// Background color classes
+.bg-white {
+  background-color: $color-white;
+}
+
+.bg-black {
+  background-color: $color-black;
+}
+
+.bg-gray-light {
+  background-color: $color-gray-light;
+}
+
+.bg-gray-dark {
+  background-color: $color-gray-dark;
+}
+
+.bg-primary {
+  background-color: $color-primary;
+}
+
+.bg-secondary {
+  background-color: $color-secondary;
+}
+
+.bg-success {
+  background-color: $color-success;
+}
+
+.bg-danger {
+  background-color: $color-danger;
+}
+
+.bg-warning {
+  background-color: $color-warning;
+}
+
+.bg-info {
+  background-color: $color-info;
+}
+
+.bg-light {
+  background-color: $color-light;
+}
+
+.bg-dark {
+  background-color: $color-dark;
+}
+
+//text align
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+
+.container {
+  padding: 56px 205px;
+}
