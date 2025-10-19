@@ -5,7 +5,6 @@ import LoginPage from '../pages/LoginPage';
 import AdminReportsPage from '../pages/AdminReportsPage';
 import ProductsPage from '../pages/ProductsPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
-import RegisterPage from '@/pages/RegisterPage';
 
 export interface RouteConfig {
   path: string;
@@ -35,14 +34,6 @@ export const publicRoutes: RouteConfig[] = [
     path: '/login',
     label: 'Đăng nhập',
     component: LoginPage,
-    showInMenu: false,
-    requiresLayout: false,
-  },
-  
-  {
-    path: '/login',
-    label: 'Đăng ký',
-    component: RegisterPage,
     showInMenu: false,
     requiresLayout: false,
   },

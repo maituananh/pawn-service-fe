@@ -28,6 +28,15 @@ const AppHeader = () => {
 
   return (
     <Header
+      // style={{
+      //   backgroundColor: '#fff',
+      //   padding: '0 24px',
+      //   display: 'flex',
+      //   alignItems: 'center',
+      //   justifyContent: 'space-between',
+      //   borderBottom: '1px solid #f0f0f0',
+      //   height: 64,
+      // }}
       className='bg-white flex-row align-center justify-between'
     >
       <div className="flex-centered">
@@ -39,6 +48,7 @@ const AppHeader = () => {
       <Menu
         mode="horizontal"
         items={menuItems}
+        className='flex-1'
       />
     </Header>
   );

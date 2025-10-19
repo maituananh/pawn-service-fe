@@ -8,10 +8,11 @@ const { Paragraph, Text } = Typography;
 const AppFooter = () => {
   return (
     <Footer className='bg-black'>
-      <Flex align="middle" justify="space-between" >
+      <Flex align="middle">
         <div className='pt-4 footer-left'>
           <Text className='size-20 text-white'>Luôn an tâm vì tài sản được niêm phong bằng tem vỡ và bảo quản với quy trình chuyên nghiệp.</Text>
           <List
+
             dataSource={[
               'Thời gian tối thiểu 3 tháng và tối đa 12 tháng',
               'Lãi suất vay trong hạn 30%/năm (2.5%/tháng với khoản vay dài hạn)',
