@@ -8,5 +8,7 @@
       "@assets/*": ["assets/*"]
     },
     "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 }
