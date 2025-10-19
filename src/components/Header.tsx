@@ -2,7 +2,7 @@ import { Layout, Menu, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import logoImage from '../assets/images/logo.png';
 import { publicRoutes, privateRoutes } from '../router/router.config';
-import { useAuth } from '../hooks/useAuth';
+import useAuth from '@/hooks/useAuth';
 const { Header } = Layout;
 const { Title } = Typography;
 
