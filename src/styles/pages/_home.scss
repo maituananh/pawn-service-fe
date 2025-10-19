@@ -1,0 +1,39 @@
+.steps-wrapper {
+  .step-item {
+    text-align: center;
+
+    .step-image {
+      width: 100%;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+
+    .step-desc {
+      background-color: #f7f2f2;
+      min-height: 60px !important;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+
+      h5 {
+        margin-bottom: 4px;
+        margin-top: 0;
+      }
+
+      .ant-typography {
+        margin-bottom: 0;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  .step-item.step-product {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 0;
+  }
+
+  .step-item.step-product:hover {
+    box-shadow: 0 4px 4px red;
+  }
+}

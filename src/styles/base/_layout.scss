@@ -1,0 +1,121 @@
+/* Dùng để đặt display thành block */
+.d-block {
+  display: block;
+}
+
+/* Dùng để đặt display thành inline-block */
+.d-inline-block {
+  display: inline-block;
+}
+
+/* Dùng để đặt display thành flex */
+.d-flex {
+  display: flex;
+}
+
+/* Dùng để đặt display thành inline-flex */
+.d-inline-flex {
+  display: inline-flex;
+}
+
+/* Dùng để đặt display thành none */
+.d-none {
+  display: none;
+}
+
+// ======= Flexbox Utilities =======
+
+/* Căn giữa nội dung trong một flex container */
+.flex-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Căn giữa nội dung theo chiều ngang trong một flex container */
+.flex-row-centered {
+  display: flex;
+  justify-content: center;
+}
+
+/* Căn giữa nội dung theo chiều dọc trong một flex container */
+.flex-column-centered {
+  display: flex;
+  align-items: center;
+}
+
+/* Cấu hình flex-direction thành column */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cấu hình flex-direction thành row */
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+/* Cấu hình flex-direction thành row-reverse */
+.flex-row-reverse {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+/* Cấu hình flex-direction thành column-reverse */
+.flex-column-reverse {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+// ======= Flexbox Alignment Utilities =======
+
+/* Căn giữa nội dung theo chiều ngang và dọc */
+.justify-center {
+  justify-content: center;
+}
+
+/* Căn đều giữa các phần tử */
+.justify-between {
+  justify-content: space-between;
+}
+
+/* Căn đều các phần tử với khoảng cách đều nhau */
+.justify-around {
+  justify-content: space-around;
+}
+
+/* Căn phần tử ở đầu theo chiều ngang */
+.justify-start {
+  justify-content: flex-start;
+}
+
+/* Căn phần tử ở cuối theo chiều ngang */
+.justify-end {
+  justify-content: flex-end;
+}
+
+/* Căn phần tử ở đầu theo chiều dọc */
+.align-start {
+  align-items: flex-start;
+}
+
+/* Căn phần tử ở cuối theo chiều dọc */
+.align-end {
+  align-items: flex-end;
+}
+
+/* Căn phần tử ở giữa theo chiều dọc */
+.align-center {
+  align-items: center;
+}
+
+/* Căng phần tử dọc theo chiều dọc */
+.align-stretch {
+  align-items: stretch;
+}
+
+/* Căng phần tử theo chiều ngang */
+.align-baseline {
+  align-items: baseline;
+}
