@@ -1,0 +1,40 @@
+.login-page {
+  min-height: 100vh;
+  background-image: url('../../assets/images/bg-login.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 24px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 480px) {
+  .login-box {
+    padding: 16px;
+  }
+
+  .login-box .ant-btn {
+    font-size: 13px;
+    height: 40px;
+  }
+
+  .login-social {
+    flex-direction: column;
+  }
+
+  .login-social .ant-btn {
+    width: 100%;
+  }
+}
