@@ -40,7 +40,7 @@ export const publicRoutes: RouteConfig[] = [
   },
   
   {
-    path: '/register',
+    path: '/login',
     label: 'Đăng ký',
     component: RegisterPage,
     showInMenu: false,
