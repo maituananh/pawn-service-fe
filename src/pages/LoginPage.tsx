@@ -1,46 +1,112 @@
-import { Card, Col, Row, Typography, Space, List } from 'antd'
+import React from 'react';
 import {
-  SearchOutlined,
-  UploadOutlined,
-  CheckCircleOutlined,
-  DollarCircleOutlined,
-  HomeOutlined,
-  MobileOutlined,
-  CameraOutlined,
-  LaptopOutlined,
-  GoldOutlined,
-  CarOutlined,
-  AppleOutlined,
-  ClockCircleOutlined,
-  SafetyOutlined,
-} from '@ant-design/icons'
+  Button,
+  Form,
+  Input,
+  Typography,
+  Divider,
+  Flex,
+} from 'antd';
+import {
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+  FacebookFilled,
+} from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import googleIcon from '../assets/icons/google.svg';
 
-const { Title, Paragraph, Text } = Typography
+const { Title, Text, Link } = Typography;
 
-const steps = [
-  { icon: <UploadOutlined style={{ fontSize: 40 }} />, title: 'Bước 1', desc: 'Gửi thông tin tài sản' },
-  { icon: <SearchOutlined style={{ fontSize: 40 }} />, title: 'Bước 2', desc: 'Nhận định giá' },
-  { icon: <DollarCircleOutlined style={{ fontSize: 40 }} />, title: 'Bước 3', desc: 'Thẩm định giá & nhận tiền' },
-  { icon: <CheckCircleOutlined style={{ fontSize: 40 }} />, title: 'Bước 4', desc: 'Hoàn trả & nhận lại tài sản' },
-]
+const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
 
-const assets = [
-  { icon: <CarOutlined style={{ fontSize: 30 }} />, label: 'Các loại xe máy' },
-  { icon: <CameraOutlined style={{ fontSize: 30 }} />, label: 'Đồ công nghệ' },
-  { icon: <GoldOutlined style={{ fontSize: 30 }} />, label: 'Kim cương, đá quý' },
-  { icon: <ClockCircleOutlined style={{ fontSize: 30 }} />, label: 'Đồng hồ' },
-  { icon: <HomeOutlined style={{ fontSize: 30 }} />, label: 'Nhà cửa' },
-  { icon: <GoldOutlined style={{ fontSize: 30 }} />, label: 'Vàng bạc' },
-  { icon: <LaptopOutlined style={{ fontSize: 30 }} />, label: 'Máy tính, laptop' },
-  { icon: <MobileOutlined style={{ fontSize: 30 }} />, label: 'Điện thoại' },
-]
+  const onFinish = (values: any) => {
+    console.log('Đăng nhập:', values);
+  };
 
-const LoginPage = () => {
+  const handleLoginGoogle = () => {
+    console.log('Đăng nhập bằng Google');
+  };
+
+  const handleLoginFacebook = () => {
+    console.log('Đăng nhập bằng Facebook');
+  };
+
   return (
-    <div style={{ padding: '24px', maxWidth: 1200, margin: 'auto' }}>
-      Login
-    </div>
-  )
-}
+    <div className="login-page">
+      <div className="login-box">
+        <Title level={3} style={{ textAlign: 'center' }}>Đăng nhập</Title>
 
-export default LoginPage
+        <Form layout="vertical" onFinish={onFinish}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              { required: true, message: 'Vui lòng nhập email!' },
+              { type: 'email', message: 'Email không hợp lệ!' },
+            ]}
+          >
+            <Input placeholder="Nhập email của bạn" />
+          </Form.Item>
+
+          <Form.Item
+            label="Mật khẩu"
+            name="password"
+            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+          >
+            <Input.Password
+              placeholder="Nhập mật khẩu"
+              iconRender={(visible) =>
+                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+              }
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Đăng nhập
+            </Button>
+          </Form.Item>
+        </Form>
+
+        <Divider plain>Hoặc đăng nhập bằng</Divider>
+
+        <Flex className="login-social" gap={12}>
+          <Button
+            icon={
+              <img
+                src={googleIcon}
+                alt="Google"
+                style={{
+                  width: '1em',
+                  height: '1em',
+                  verticalAlign: 'middle',
+                  marginRight: 4,
+                }}
+              />
+            }
+            block
+            onClick={handleLoginGoogle}
+          >
+            Google
+          </Button>
+          <Button
+            icon={<FacebookFilled style={{ color: '#1877F2' }} />}
+            block
+            onClick={handleLoginFacebook}
+          >
+            Facebook
+          </Button>
+        </Flex>
+
+        <Divider />
+        <div style={{ textAlign: 'center' }}>
+          <Text>Bạn chưa có tài khoản?</Text>{' '}
+          <Link onClick={() => navigate('/register')}>Đăng ký ngay</Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoginPage;
