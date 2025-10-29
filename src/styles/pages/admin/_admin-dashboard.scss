@@ -1,0 +1,166 @@
+@use '../../base/variables' as *;
+
+.admin-dashboard-page {
+  .stats-cards {
+    margin-bottom: 24px;
+
+    .ant-card {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .ant-statistic-title {
+      color: #acacac;
+    }
+
+    .ant-statistic-content-prefix {
+      font-size: 24px;
+      padding: 8px;
+      border-radius: 50%;
+      background-color: #e6f7ff;
+      color: #1890ff;
+      margin-right: 12px;
+    }
+  }
+
+  .chart-card,
+  .table-card {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    .chart-header,
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 24px 24px 0;
+      gap: 16px;
+
+      >div:first-child {
+        flex-shrink: 0;
+      }
+
+      >.ant-space,
+      >div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+        flex: 1;
+        justify-content: flex-end;
+      }
+
+      .chart-tabs {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .export-button {
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 767px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        padding: 16px 16px 0;
+
+        >div:first-child {
+          align-self: flex-start;
+        }
+
+        >.ant-space,
+        >div:last-child {
+          flex-direction: column;
+          align-items: stretch;
+          width: 100%;
+        }
+
+        .ant-tabs,
+        .chart-tabs {
+          width: 100%;
+          order: 2;
+        }
+
+        .ant-tabs-nav {
+          margin-bottom: 0 !important;
+          width: 100%;
+        }
+
+        .ant-tabs-nav-wrap {
+          display: block !important;
+          overflow-x: auto !important;
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        }
+
+        .ant-tabs-nav-list {
+          display: flex !important;
+          flex: none !important;
+          width: max-content;
+          flex-wrap: nowrap !important;
+          padding-bottom: 4px;
+        }
+
+        .export-button {
+          order: 3;
+          align-self: flex-end;
+        }
+      }
+    }
+  }
+
+  .chart-card {
+    .ant-card-body {
+      padding: 0 24px 24px;
+
+      @media (max-width: 767px) {
+        padding: 0 16px 16px;
+      }
+    }
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 300px;
+  }
+
+  .table-card {
+    .ant-card-body {
+      padding: 0 24px 24px;
+
+      @media (max-width: 767px) {
+        padding: 0 16px 16px;
+      }
+    }
+
+    .ant-table-thead>tr>th {
+      background-color: #fafafa;
+      white-space: nowrap;
+    }
+
+    .ant-table-tbody>tr>td {
+      white-space: nowrap;
+    }
+
+    .ant-tag {
+      min-width: 80px;
+      text-align: center;
+      border-radius: 4px;
+    }
+
+    .ant-table-wrapper {
+      overflow-x: auto;
+    }
+  }
+
+  @media (max-width: 767px) {
+    padding: 16px;
+  }
+}

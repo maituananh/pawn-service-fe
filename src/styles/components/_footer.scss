@@ -1,7 +1,43 @@
-.ant-layout-footer {
+.app-footer {
   padding: 28px 43px 50px 16px;
+
+  .footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
 
   .footer-left {
     max-width: 1000px;
+
+    .ant-list-item {
+      border-block-end: none;
+      padding-block: 4px;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+    }
+  }
+
+  .footer-right {
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 32px 16px;
+
+    .footer-content {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer-left {
+      .ant-list {
+        text-align: left;
+        display: inline-block;
+      }
+    }
   }
 }

@@ -2,3 +2,12 @@
 @use 'products';
 @use 'product-detail';
 @use 'login';
+@use 'payment';
+@use 'product-cart';
+@use './admin/admin-customer';
+@use './admin/admin-customers';
+@use './admin/admin-dashboard';
+@use './admin/admin-orders-report';
+@use './admin/admin-products';
+@use './admin/admin-product-detail';
+@use './admin/admin-product-create';

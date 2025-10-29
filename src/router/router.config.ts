@@ -1,11 +1,16 @@
-// src/router/router.config.ts
 import HomePage from '../pages/HomePage';
-import { UserRole } from '../hooks/useAuth'; // Import kiểu UserRole
 import LoginPage from '../pages/LoginPage';
-import AdminReportsPage from '../pages/AdminReportsPage';
 import ProductsPage from '../pages/ProductsPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
 import RegisterPage from '@/pages/RegisterPage';
+import { UserRole } from '@/type/user.type';
+import AdminDashboardPage from '@/pages/Admin/AdminDashboardPage';
+import AdminCustomersPage from '@/pages/Admin/AdminCustomersPage';
+import AdminCustomerDetailPage from '@/pages/Admin/AdminCustomerDetailPage';
+import AdminProductsPage from '@/pages/Admin/AdminProductsPage';
+import AdminProductDetailPage from '@/pages/Admin/AdminProductDetailPage';
+import AdminProductCreatePage from '@/pages/Admin/AdminProductCreatePage';
+import AdminOrderReportPage from '@/pages/Admin/AdminOdersReportPage';
 
 export interface RouteConfig {
   path: string;
@@ -38,7 +43,6 @@ export const publicRoutes: RouteConfig[] = [
     showInMenu: false,
     requiresLayout: false,
   },
-  
   {
     path: '/register',
     label: 'Đăng ký',
@@ -47,19 +51,63 @@ export const publicRoutes: RouteConfig[] = [
     requiresLayout: false,
   },
   {
-  path: '/products/:id',
-  label: 'Chi tiết sản phẩm',
-  component: ProductDetailPage,
-  showInMenu: false,    
-  requiresLayout: true,
-}
+    path: '/products/:id',
+    label: 'Chi tiết sản phẩm',
+    component: ProductDetailPage,
+    showInMenu: false,
+    requiresLayout: true,
+  }
 ];
 
 export const privateRoutes: RouteConfig[] = [
   {
-    path: '/settings',
-    label: 'Cài đặt',
-    component: AdminReportsPage,
+    path: '/admin/dashboard',
+    label: 'Dashboard',
+    component: AdminDashboardPage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['admin'],
+  },
+  {
+    path: '/admin/customers',
+    label: 'Khách hàng',
+    component: AdminCustomersPage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['admin'],
+  },
+  {
+    path: '/admin/customers/:id',
+    label: 'Chi tiết khách hàng',
+    component: AdminCustomerDetailPage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['admin'],
+  }, {
+    path: '/admin/products',
+    label: 'Quản lý sản phẩm',
+    component: AdminProductsPage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['admin'],
+  }, {
+    path: '/admin/products/:id',
+    label: 'Chi tiết sản phẩm',
+    component: AdminProductDetailPage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['admin'],
+  }, {
+    path: '/admin/products/new',
+    label: 'Thêm mới sản phẩm',
+    component: AdminProductCreatePage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['admin'],
+  }, {
+    path: '/admin/oders-report',
+    label: 'Quản lý đơn',
+    component: AdminOrderReportPage,
     showInMenu: true,
     requiresLayout: true,
     roles: ['admin'],

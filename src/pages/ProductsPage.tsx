@@ -1,67 +1,69 @@
-import { useState } from 'react';
-import { Input, Checkbox, Button, Pagination, Flex } from 'antd';
+import { useState, useMemo } from 'react';
+import { Input, Checkbox, Button, Pagination, Spin, Alert } from 'antd';
 import { Link } from 'react-router-dom';
+import { useProducts } from '@/hooks/useProducts';
 import { PRODUCT_TYPE_1_OPTIONS } from '@/constants';
+import { Product } from '@/type/product.type';
 
-const allProducts = [
-  {
-    id: 1,
-    name: 'Winner X 2021',
-    image: '/images/winnerx.jpg',
-    price: '20.000.000 VND',
-    category: 'Xe Máy',
-  },
-  ...Array.from({ length: 15 }, (_, i) => ({
-    id: i + 2,
-    name: 'Máy ảnh',
-    image: '/images/mayanh.jpg',
-    price: '10.000.000 VND',
-    category: 'Máy Ảnh',
-  })),
-];
+const ProductsPage = () => {
+  const { products, isLoading, isError, error } = useProducts();
 
-const ProductPage = () => {
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
-  const [checked, setChecked] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(15);
+  const [checkedCategories, setCheckedCategories] = useState<string[]>([]);
+  const [searchText, setSearchText] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesCategory =
+        checkedCategories.length === 0 || checkedCategories.includes(product.category);
+      const matchesSearch =
+        searchText === '' || product.name.toLowerCase().includes(searchText.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, checkedCategories, searchText]);
+
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return filteredProducts.slice(start, end);
+  }, [filteredProducts, currentPage, pageSize]);
+
+  const handleCategoryChange = (checkedValues: string[]) => {
+    setCheckedCategories(checkedValues);
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (page: number, pageSize?: number) => {
     setCurrentPage(page);
     if (pageSize) setPageSize(pageSize);
   };
 
-  const handleCategoryChange = (checkedValues: any) => {
-    setChecked(checkedValues);
-    const filtered = allProducts.filter(
-      (product) =>
-        checkedValues.length === 0 || checkedValues.includes(product.category)
-    );
-    setFilteredProducts(filtered);
-    setCurrentPage(1); // Reset về trang 1 khi lọc
+  const handleClearFilters = () => {
+    setCheckedCategories([]);
+    setSearchText('');
+    setCurrentPage(1);
   };
 
-  const totalItems = filteredProducts.length;
-
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  if (isLoading) return <Spin tip="Loading products..." />;
+  if (isError) return <Alert message="Error" description={(error as Error).message} type="error" />;
 
   return (
     <div className="product-page-container bg-white">
       <div className="sidebar bg-gray-light p-5">
         <div className="mb-5">
-          <p className="text-bold mb-2 mt-0">Giá, VND</p>
-          <Flex>
-            <Input placeholder="Min" className="price-input" />
-            <Input placeholder="Max" className="price-input ml-3" />
-          </Flex>
+          <p className="text-bold mb-2 mt-0">Search</p>
+          <Input
+            placeholder="Search product"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
         </div>
+
         <Checkbox.Group
           className="flex-column mb-5"
+          value={checkedCategories}
           onChange={handleCategoryChange}
-          value={checked}
         >
           <label className="text-bold mb-2">Loại sản phẩm</label>
           {PRODUCT_TYPE_1_OPTIONS.map((opt) => (
@@ -70,44 +72,15 @@ const ProductPage = () => {
             </div>
           ))}
         </Checkbox.Group>
-        <Checkbox.Group
-          className="flex-column mb-5"
-          onChange={handleCategoryChange}
-          value={checked}
-        >
-          <label className="text-bold mb-2">Loại sản phẩm</label>
-          {PRODUCT_TYPE_1_OPTIONS.map((opt) => (
-            <div key={opt.value} style={{ marginBottom: 8 }}>
-              <Checkbox value={opt.value}>{opt.label}</Checkbox>
-            </div>
-          ))}
-        </Checkbox.Group>
-        <Checkbox.Group
-          className="flex-column mb-5"
-          onChange={handleCategoryChange}
-          value={checked}
-        >
-          <label className="text-bold mb-2">Loại sản phẩm</label>
-          {PRODUCT_TYPE_1_OPTIONS.map((opt) => (
-            <div key={opt.value} style={{ marginBottom: 8 }}>
-              <Checkbox value={opt.value}>{opt.label}</Checkbox>
-            </div>
-          ))}
-        </Checkbox.Group>
-        <Button className="clear-button" onClick={() => {
-          setChecked([]);
-          setFilteredProducts(allProducts);
-          setCurrentPage(1);
-        }}>
+
+        <Button className="clear-button" onClick={handleClearFilters}>
           Clear
         </Button>
       </div>
+
       <div className="content">
-        <div className="top-bar">
-          <Input.Search placeholder="Search" style={{ width: 250 }} />
-        </div>
         <div className="product-grid">
-          {paginatedProducts.map((product) => (
+          {paginatedProducts.map((product: Product) => (
             <Link
               to={`/products/${product.id}`}
               key={product.id}
@@ -121,11 +94,12 @@ const ProductPage = () => {
             </Link>
           ))}
         </div>
+
         <div className="pagination-container">
           <Pagination
             current={currentPage}
             pageSize={pageSize}
-            total={totalItems}
+            total={filteredProducts.length}
             onChange={handlePageChange}
             showSizeChanger={false}
           />
@@ -135,4 +109,4 @@ const ProductPage = () => {
   );
 };
 
-export default ProductPage;
+export default ProductsPage;

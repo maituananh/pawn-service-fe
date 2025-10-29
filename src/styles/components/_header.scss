@@ -1,12 +1,104 @@
-@use '../base/variables' as *;
+.app-header {
+  background-color: white !important;
+  padding: 0 24px;
+  border-bottom: 1px solid #f0f0f0;
 
-.ant-layout-header {
-  border-bottom: 1px solid $color-black;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  z-index: 100;
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  .logo-image {
+    height: 32px;
+    margin-right: 12px;
+  }
+
+  .logo-title {
+    margin-bottom: 0 !important;
+    white-space: nowrap;
+  }
+}
+
+.menu-container.desktop-menu {
+  overflow: visible;
+  flex: 1;
 
   .ant-menu {
-    border: none;
-    font-size: 20px;
+    justify-content: flex-end;
+  }
+}
+
+.header-menu {
+  border-bottom: none;
+  background: none;
+  line-height: inherit;
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  .ant-menu-item,
+  .ant-menu-submenu {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .ant-menu-overflow {
+    display: flex !important;
+    overflow: visible !important;
+  }
+
+  ul.ant-menu-horizontal {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: max-content !important;
+    min-width: max-content !important;
+  }
+}
+
+.auth-section {
+  flex-shrink: 0;
+}
+
+.mobile-menu-icon {
+  display: none !important;
+  font-size: 20px;
+}
+
+.mobile-drawer {
+  .ant-drawer-body {
+    padding: 0;
+  }
+
+  .ant-menu-inline {
+    border-right: none;
+  }
+
+  .drawer-auth-section {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 991px) {
+  .app-header .header-content {
+    justify-content: space-between;
+  }
+
+  .desktop-menu,
+  .auth-section {
+    display: none !important;
+  }
+
+  .mobile-menu-icon {
+    display: inline-block !important;
   }
 }

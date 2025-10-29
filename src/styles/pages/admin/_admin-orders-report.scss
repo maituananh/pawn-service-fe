@@ -1,0 +1,63 @@
+@use '../../base/variables' as *;
+
+.orders-report-page {
+  .orders-table-card {
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+    }
+
+    .ant-card-body {
+      padding: 0 24px 24px;
+    }
+
+    .ant-table-thead>tr>th {
+      background-color: #fafafa;
+      white-space: nowrap;
+    }
+
+    .ant-table-tbody>tr>td {
+      white-space: nowrap;
+    }
+
+    .ant-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .ant-tag {
+      min-width: 80px;
+      text-align: center;
+      border-radius: 4px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    padding: 16px;
+
+    .order-table-card {
+      .table-toolbar {
+        padding: 16px 16px 0;
+      }
+
+      .ant-card-body {
+        padding: 0 16px 16px;
+      }
+
+      .ant-table-wrapper {
+        overflow-x: auto;
+      }
+    }
+  }
+}

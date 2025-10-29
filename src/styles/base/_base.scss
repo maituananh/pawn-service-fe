@@ -25,6 +25,10 @@
   color: $color-red !important;
 }
 
+.text-blue {
+  color: $color-blue;
+}
+
 // Background color classes
 .bg-white {
   background-color: $color-white;
@@ -74,20 +78,17 @@
   background-color: $color-dark;
 }
 
-//text align
-.text-center {
-  text-align: center;
+.bg-red-dark {
+  background-color: $color-red-dark;
 }
 
-.text-left {
-  text-align: left;
+.radius-16 {
+  border-radius: 16px;
 }
-
-.text-right {
-  text-align: right;
-}
-
 
 .container {
-  padding: 56px 205px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 16px;
 }

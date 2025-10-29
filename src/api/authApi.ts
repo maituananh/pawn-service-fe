@@ -1,35 +1,26 @@
-// src/api/authApi.ts
-import axiosClient from "./axiosClient"; 
+import { LoginPayload, LoginResponse, UserProfile } from '@/type/user.type';
+import axiosClient from './axiosClient';
 
-// --- Định nghĩa Interfaces (CẦN EXPORT) ---
-export interface UserProfile {
-    id: number;
-    username: string; 
-    email: string;
-    role: 'admin' | 'user' | 'guest'; // Khắc phục lỗi 'role'
-}
-
-export interface LoginPayload {
-    username: string; // Khắc phục lỗi LoginPayload
-    password: string;
-}
-
-export interface LoginResponse {
-    access_token: string;
-    user: UserProfile; 
-}
-
-// --- Auth API Service ---
 const authApi = {
-    async login(payload: LoginPayload): Promise<LoginResponse> {
-        const responseData = await axiosClient.get<LoginResponse>("/products", payload);
-        return responseData as unknown as LoginResponse; 
+    login: async (payload: LoginPayload): Promise<LoginResponse> => {
+        const res = await axiosClient.post('/auth/token', payload);
+        return res.data;
     },
-    
-    async getProfile(): Promise<UserProfile> {
-        const responseData = await axiosClient.get<UserProfile>("/auth/profile");
-        return responseData as unknown as UserProfile;
-    }
+
+    logout: async (): Promise<void> => {
+        await axiosClient.post('/auth/logout');
+    },
+
+    getProfile: async (): Promise<UserProfile> => {
+        const res = await axiosClient.get('/users/me');
+        return res.data;
+    },
+
+    refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken?: string }> => {
+        const res = await axiosClient.post('/auth/refresh-token', { refreshToken }, { headers: { 'Content-Type': 'application/json' } }
+        );
+        return res.data;
+    },
 };
 
 export default authApi;

@@ -1,0 +1,43 @@
+.customers-page {
+  .stats-cards-customers {
+    margin-bottom: 24px;
+
+    .ant-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+    }
+
+    .ant-statistic-content-prefix {
+      font-size: 24px;
+      padding: 8px;
+      border-radius: 50%;
+      background-color: #e6f7ff;
+      color: #1890ff;
+    }
+  }
+
+  .customers-table-card {
+    border-radius: 8px;
+
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+    }
+
+    .ant-table-thead>tr>th {
+      background-color: #fafafa;
+    }
+
+    .ant-table-wrapper {
+      overflow-x: auto;
+    }
+  }
+}
