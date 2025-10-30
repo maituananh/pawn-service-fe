@@ -1,45 +1,86 @@
-import { Layout, Menu, Typography } from 'antd';
-import { Link } from 'react-router-dom';
+import useAuth from '@/hooks/useAuth';
+import { MenuOutlined } from '@ant-design/icons';
+import { Button, Drawer, Layout, Menu, Typography, type MenuProps } from 'antd';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import logoImage from '../assets/images/logo.png';
-import { publicRoutes, privateRoutes } from '../router/router.config';
-import { useAuth } from '../hooks/useAuth';
+
 const { Header } = Layout;
 const { Title } = Typography;
 
-const AppHeader = () => {
-  const { isAuthenticated, role } = useAuth();
-  const routes = isAuthenticated ? [...publicRoutes, ...privateRoutes] : publicRoutes;
-  const menuItems = routes
-    .filter(route =>
-      route.showInMenu &&
-      (!route.roles || route.roles.includes(role))
-    )
-    .map(route => ({
-      key: route.path,
-      label: <Link to={route.path}>{route.label}</Link>,
-    }));
+const AppHeader = ({ menuItems }: { menuItems: MenuProps['items'] }) => {
+  const { isAuthenticated, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
-  if (!isAuthenticated) {
-    menuItems.push({
-      key: 'login',
-      label: <Link to="/login">Đăng nhập</Link>,
-    });
-  }
+  const handleLogout = () => {
+    logout();
+  };
+
+  const showDrawer = () => setDrawerVisible(true);
+  const closeDrawer = () => setDrawerVisible(false);
+  const handleMenuClick = () => {
+    closeDrawer();
+  };
+
 
   return (
-    <Header
-      className='bg-white flex-row align-center justify-between'
-    >
-      <div className="flex-centered">
-        <img src={logoImage} alt="Logo Image" />
-        <Title level={4} className="ml-4 mb-0">
-          camdo<b>thaoquyen</b>
-        </Title>
+    <Header className="app-header">
+      <div className="header-content">
+        <div className="logo-section">
+          <img src={logoImage} alt="Logo" className="logo-image" />
+          <Title level={4} className="logo-title">
+            camdo<b>thaoquyen</b>
+          </Title>
+        </div>
+        <div className="menu-container desktop-menu">
+          <Menu
+            mode="horizontal"
+            items={menuItems}
+            selectedKeys={[location.pathname]}
+            className="header-menu"
+          />
+        </div>
+        <div className="auth-section">
+          {isAuthenticated ? (
+            <Button onClick={handleLogout}>Đăng xuất</Button>
+          ) : (
+            <Button type="primary" onClick={() => navigate('/login')}>
+              Đăng nhập
+            </Button>
+          )}
+        </div>
+        <Button
+          className="mobile-menu-icon"
+          type="text"
+          icon={<MenuOutlined />}
+          onClick={showDrawer}
+        />
+        <Drawer
+          title="Menu"
+          placement="right"
+          onClose={closeDrawer}
+          open={drawerVisible}
+          className="mobile-drawer"
+        >
+          <Menu
+            mode="inline"
+            items={menuItems}
+            selectedKeys={[location.pathname]}
+            onClick={handleMenuClick}
+          />
+          <div className="drawer-auth-section">
+            {isAuthenticated ? (
+              <Button onClick={handleLogout} style={{ width: '100%', marginTop: '16px' }}>Đăng xuất</Button>
+            ) : (
+              <Button type="primary" onClick={() => { navigate('/login'); closeDrawer(); }} style={{ width: '100%', marginTop: '16px' }}>
+                Đăng nhập
+              </Button>
+            )}
+          </div>
+        </Drawer>
       </div>
-      <Menu
-        mode="horizontal"
-        items={menuItems}
-      />
     </Header>
   );
 };

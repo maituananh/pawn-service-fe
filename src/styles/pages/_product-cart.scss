@@ -1,0 +1,28 @@
+.cart-page-container {
+  padding: 5rem 0;
+
+  .cart-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+
+    .footer-select-all,
+    .footer-checkout {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    // --- RESPONSIVE CHO MOBILE ---
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+
+      .footer-checkout {
+        justify-content: space-between;
+      }
+    }
+  }
+}

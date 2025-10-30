@@ -1,0 +1,73 @@
+@use '../../base/variables' as *;
+
+.admin-products-page {
+  .stats-cards-products {
+    margin-bottom: 24px;
+
+    .ant-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+    }
+
+    .ant-statistic-content-prefix {
+      font-size: 24px;
+      padding: 8px;
+      border-radius: 50%;
+      background-color: #e6f7ff;
+      color: #1890ff;
+    }
+  }
+
+  .products-table-card {
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 24px 24px 0;
+
+      .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        @media (max-width: 768px) {
+          /* Add responsive styles if needed */
+        }
+      }
+
+      @media (max-width: 992px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+    }
+
+    .ant-card-body {
+      padding: 0 24px 24px;
+    }
+
+    .ant-table-thead>tr>th {
+      background-color: $color-gray;
+      white-space: nowrap;
+    }
+
+    .ant-table-tbody>tr>td {
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .ant-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .ant-tag {
+      min-width: 8px;
+      text-align: center;
+    }
+  }
+}

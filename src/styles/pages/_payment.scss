@@ -1,0 +1,53 @@
+.payment-page-container {
+  max-width: 1440px;
+  padding: 56px 96px;
+
+  @media (max-width: 768px) {
+    padding: 24px 16px;
+  }
+
+  .order-summary {
+    .payment-product-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0f0f0;
+
+      .product-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+
+      .product-info {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .product-details {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .order-total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      font-size: 18px;
+
+      .total-price {
+        color: #d70018;
+      }
+    }
+  }
+
+  .payment-form-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}

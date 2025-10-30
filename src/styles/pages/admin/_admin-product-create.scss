@@ -1,0 +1,17 @@
+@use '../../base/variables' as *;
+
+.create-product-page {
+  .form-card {
+    margin-bottom: 24px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 32px;
+  }
+}

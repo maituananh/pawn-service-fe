@@ -1,75 +1,124 @@
-import { useParams } from 'react-router-dom';
-import { Button } from 'antd';
+import React, { useState } from 'react';
+import {
+  Row,
+  Col,
+  Typography,
+  Button,
+  InputNumber,
+  Divider,
+  List,
+  Card,
+  Space,
+} from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 
-const relatedProducts = [
-  { id: 1, name: 'Winner X 2021', image: '/images/winnerx.jpg', price: '20.000.000 vnd' },
-  { id: 2, name: 'Máy ảnh', image: '/images/mayanh.jpg', price: '10.000.000 vnd' },
-  { id: 3, name: 'Winner X 2021', image: '/images/winnerx.jpg', price: '20.000.000 vnd' },
-  { id: 4, name: 'Máy ảnh', image: '/images/mayanh.jpg', price: '10.000.000 vnd' },
+const { Title, Text, Paragraph } = Typography;
+const { Meta } = Card;
+
+const mainProductData = {
+  id: 1,
+  name: 'Điện thoại iPhone 17 Pro',
+  currentPrice: 10000000,
+  originalPrice: 20000000,
+  quantity: 2,
+  description: ['Màu đỏ', 'Như mới 99%', 'Không có sạc đi kèm'],
+  images: [
+    'https://via.placeholder.com/600x600/FF6347/FFFFFF?text=Product+1',
+    'https://via.placeholder.com/600x600/4682B4/FFFFFF?text=Product+2',
+    'https://via.placeholder.com/600x600/32CD32/FFFFFF?text=Product+3',
+    'https://via.placeholder.com/600x600/FFD700/FFFFFF?text=Product+4',
+  ],
+};
+
+const relatedProductsData = [
+  { id: 10, name: 'Winner X 2021', price: '20.000.000 vnd', image: 'https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Bike' },
+  { id: 11, name: 'Máy ảnh', price: '10.000.000 vnd', image: 'https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Camera' },
+  { id: 12, name: 'Winner X 2021', price: '20.000.000 vnd', image: 'https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Bike' },
+  { id: 13, name: 'Máy ảnh', price: '10.000.000 vnd', image: 'https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Camera' },
+  { id: 14, name: 'Máy ảnh', price: '10.000.000 vnd', image: 'https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Camera' },
+  { id: 15, name: 'Winner X 2021', price: '20.000.000 vnd', image: 'https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Bike' },
 ];
 
-const ProductDetailPage = () => {
-  const { id } = useParams(); // future use
-  // Fake data — in thực tế sẽ fetch từ API theo `id`
-
-  const product = {
-    name: 'Điện thoại IPhone 17 Pro',
-    image: '/images/iphone.jpg',
-    images: [
-      '/images/iphone.jpg',
-      '/images/iphone.jpg',
-      '/images/iphone.jpg',
-      '/images/iphone.jpg',
-    ],
-    price: '10.000.000 vnd',
-    oldPrice: '20.000.000 vnd',
-    description: ['Màu đỏ', 'Như mới 99%', 'Không có sạc đi kèm'],
-  };
+const ProductDetailPage: React.FC = () => {
+  const [selectedImage, setSelectedImage] = useState(mainProductData.images[0]);
+  const [quantity, setQuantity] = useState(1);
 
   return (
     <div className="product-detail-page">
-      <div className="product-detail">
-        <div className="image-section">
-          <div className="thumbnails">
-            {product.images.map((img, idx) => (
-              <img key={idx} src={img} alt="thumb" />
+      <Row gutter={[32, 32]} className="main-product-section">
+        <Col xs={24} md={12} className="image-gallery">
+          <div className="thumbnail-list">
+            {mainProductData.images.map((img, index) => (
+              <div
+                key={index}
+                className={`thumbnail-item ${selectedImage === img ? 'thumbnail-item--active' : ''}`}
+                onClick={() => setSelectedImage(img)}
+              >
+                <img src={img} alt={`thumbnail ${index + 1}`} />
+              </div>
             ))}
           </div>
-          <div className="main-image">
-            <img src={product.image} alt={product.name} />
+          <div className="main-image-container">
+            <img src={selectedImage} alt="Main product" className="main-image" />
           </div>
-        </div>
-        <div className="info-section">
-          <h2>{product.name}</h2>
-          <div className="price">
-            <span className="current">{product.price}</span>
-            <span className="old">{product.oldPrice}</span>
+        </Col>
+        <Col xs={24} md={12} className="product-info">
+          <Title level={2}>{mainProductData.name}</Title>
+          <div className="price-section">
+            <Text className="current-price">
+              {mainProductData.currentPrice.toLocaleString()} vnd
+            </Text>
+            <Text delete className="original-price">
+              {mainProductData.originalPrice.toLocaleString()} vnd
+            </Text>
           </div>
-          <div className="description">
-            <p><b>Mô tả:</b></p>
+          <div className="quantity-section">
+            <Text strong>Số lượng: </Text>
+            <InputNumber min={1} max={mainProductData.quantity} defaultValue={1} onChange={(value) => setQuantity(value || 1)} />
+          </div>
+          <div className="description-section">
+            <Text strong>Mô tả:</Text>
             <ul>
-              {product.description.map((desc, idx) => (
-                <li key={idx}>{desc}</li>
+              {mainProductData.description.map((item, index) => (
+                <li key={index}>{item}</li>
               ))}
             </ul>
           </div>
-          <div className="actions">
-            <Button type="primary" className="add-to-cart">Thêm vào giỏ hàng</Button>
-            <Button danger className="buy-now">Mua ngay</Button>
-          </div>
-        </div>
-      </div>
-      <div className="related-section">
-        <h3>Những sản phẩm liên quan</h3>
-        <div className="related-grid">
-          {relatedProducts.map((item) => (
-            <div key={item.id} className="related-card">
-              <img src={item.image} alt={item.name} />
-              <div className="name">{item.name}</div>
-              <div className="price">{item.price}</div>
-            </div>
-          ))}
-        </div>
+          <Space className="action-buttons" size="middle">
+            <Button size="large" icon={<ShoppingCartOutlined />} className="btn-add-to-cart">
+              Thêm vào giỏ hàng
+            </Button>
+            <Button type="primary" size="large" danger className="btn-buy-now">
+              Mua ngay
+            </Button>
+          </Space>
+        </Col>
+      </Row>
+      <Divider />
+      <div className="related-products-section">
+        <Title level={3}>Những sản phẩm liên quan</Title>
+        <List
+          grid={{
+            gutter: 16,
+            xs: 2,
+            sm: 3,
+            md: 4,
+            lg: 6,
+            xl: 6,
+            xxl: 6,
+          }}
+          dataSource={relatedProductsData}
+          renderItem={(item) => (
+            <List.Item>
+              <Card
+                hoverable
+                cover={<img alt={item.name} src={item.image} />}
+              >
+                <Meta title={item.name} description={item.price} />
+              </Card>
+            </List.Item>
+          )}
+        />
       </div>
     </div>
   );
