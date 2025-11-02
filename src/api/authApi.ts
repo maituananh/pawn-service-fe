@@ -1,5 +1,5 @@
 import { LoginPayload, LoginResponse, UserProfile } from '@/type/user.type';
-import axiosClient from './axiosClient';
+import axiosClient, { axiosRefresh } from './axiosClient';
 
 const authApi = {
     login: async (payload: LoginPayload): Promise<LoginResponse> => {
@@ -17,7 +17,7 @@ const authApi = {
     },
 
     refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken?: string }> => {
-        const res = await axiosClient.post('/auth/refresh-token', { refreshToken }, { headers: { 'Content-Type': 'application/json' } }
+        const res = await axiosRefresh.post('/auth/refresh-token', { refreshToken }, { headers: { 'Content-Type': 'application/json' } }
         );
         return res.data;
     },

@@ -1,13 +1,20 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 import authApi from './authApi';
+
 export type CustomAxiosInstance = AxiosInstance & {
     get: <T = any>(url: string, config?: any) => Promise<T>;
     post: <T = any>(url: string, data?: any, config?: any) => Promise<T>;
     put: <T = any>(url: string, data?: any, config?: any) => Promise<T>;
     delete: <T = any>(url: string, config?: any) => Promise<T>;
 };
+
 const axiosClient = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: 'http://localhost:8080/api',
+    headers: { 'Content-Type': 'application/json' },
+});
+
+export const axiosRefresh = axios.create({
+    baseURL: 'http://localhost:8080/api',
     headers: { 'Content-Type': 'application/json' },
 });
 
@@ -38,16 +45,21 @@ axiosClient.interceptors.response.use(
     async (error: AxiosError & { config?: any }) => {
         const originalRequest = error.config;
 
-        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+        if (
+            (error.response?.status === 401 || error.response?.status === 403) &&
+            !originalRequest._retry
+        ) {
             originalRequest._retry = true;
 
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
-                }).then(token => {
-                    originalRequest.headers['Authorization'] = `Bearer ${token}`;
-                    return axiosClient(originalRequest);
-                });
+                })
+                    .then(token => {
+                        originalRequest.headers['Authorization'] = `Bearer ${token}`;
+                        return axiosClient(originalRequest);
+                    })
+                    .catch(err => Promise.reject(err));
             }
 
             isRefreshing = true;
@@ -55,18 +67,25 @@ axiosClient.interceptors.response.use(
                 const refreshToken = localStorage.getItem('refresh_token');
                 if (!refreshToken) throw new Error('No refresh token');
 
-                const { accessToken, refreshToken: newRefreshToken } = await authApi.refreshToken(refreshToken);
+                const response = await authApi.refreshToken(refreshToken);
+                const { accessToken, refreshToken: newRefreshToken } = response;
+
+                if (!accessToken) throw new Error('No access token returned');
+
                 localStorage.setItem('access_token', accessToken);
                 if (newRefreshToken) localStorage.setItem('refresh_token', newRefreshToken);
 
                 processQueue(null, accessToken);
+
                 originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
                 return axiosClient(originalRequest);
             } catch (err) {
+                console.error('❌ Refresh token failed, logging out...');
                 processQueue(err, null);
+
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
-                // window.location.href = '/login';
+                window.location.href = '/login';
                 return Promise.reject(err);
             } finally {
                 isRefreshing = false;
@@ -76,16 +95,5 @@ axiosClient.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
-// axiosClient.interceptors.response.use(
-//     (res: AxiosResponse<any>) => res.data,
-//     (error: AxiosError<any>) => {
-//         if (error.response?.status === 401) {
-//             console.error("Token invalid or expired. Logging out...");
-//             localStorage.removeItem("access_token");
-//         }
-//         return Promise.reject(error.response?.data || error);
-//     }
-// );
 
 export default axiosClient as CustomAxiosInstance;
