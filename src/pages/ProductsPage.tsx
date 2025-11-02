@@ -87,7 +87,12 @@ const ProductsPage = () => {
               className="product-card-link"
             >
               <div className="product-card">
-                <img src={product.image} alt={product.name} />
+                {
+                  product.images.map((image, index) => (
+                    <img src={image.url} alt={image.url} key={image.url + index + image.id} loading="lazy" />
+                  ))
+                }
+
                 <div className="name ellipsis-1">{product.name}</div>
                 <div className="price">{product.price}</div>
               </div>

@@ -29,7 +29,7 @@ const useAuth = () => {
                 queryClient.setQueryData<UserProfile>(AUTH_QUERY_KEY, user);
                 console.log("user", user);
 
-                if (user.role === 'admin') {
+                if (user.role === 'ADMIN') {
                     navigate('/admin');
                 } else {
                     navigate('/');
