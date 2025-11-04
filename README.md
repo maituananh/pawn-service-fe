@@ -1,17 +1,57 @@
-# pawn-service-fe
-# React + Vite
+# Pawn service
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project will build a website (Pawn-service)
 
-Currently, two official plugins are available:
+## Acknowledgements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Backend:
 
-## React Compiler
+- Java 21
+- Spring boot
+- Mysql
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Front-end
 
-## Expanding the ESLint configuration
+- Reactjs
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Documentation
+
+[Front-end](git@github.com:maituananh/pawn-service-fe.git)
+
+[Back-end uses anhkiet-branch branch](https://github.com/maituananh/front-app)
+
+## Installation
+
+Clone the project
+
+```bash
+  git clone git@github.com:maituananh/pawn-service-fe.git
+```
+
+Go to the project directory
+
+```bash
+  cd pawn-service-fe
+```
+
+Install dependencies
+
+```bash
+  npm i
+```
+
+Start the server
+
+```bash
+  npm run dev
+```
+
+## Deployment
+
+```bash
+How to do CI/CD?
+1. Install docker on VPS
+2. Create developer user: sudo addUser developer
+3. Allow docker for developer user: sudo usermod -aG docker developer
+4. Run github-runner by background: nohup ./run.sh > runner.log 2>&1 &
+```
