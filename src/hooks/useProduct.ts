@@ -1,4 +1,4 @@
-import productsApi from '@/api/productApi';
+import productsApi from '@/api/productsApi';
 import { Product } from '@/type/product.type';
 import { useQuery } from '@tanstack/react-query';
 

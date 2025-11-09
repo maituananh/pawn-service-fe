@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import authApi from './authApi';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const REFRESH_URL = import.meta.env.VITE_API_REFRESH_URL || '';
 
 export type CustomAxiosInstance = AxiosInstance & {
     get: <T = any>(url: string, config?: any) => Promise<T>;
@@ -9,12 +11,12 @@ export type CustomAxiosInstance = AxiosInstance & {
 };
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' },
 });
 
 export const axiosRefresh = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: REFRESH_URL,
     headers: { 'Content-Type': 'application/json' },
 });
 

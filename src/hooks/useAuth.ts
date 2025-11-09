@@ -27,10 +27,8 @@ const useAuth = () => {
             try {
                 const user = await authApi.getProfile();
                 queryClient.setQueryData<UserProfile>(AUTH_QUERY_KEY, user);
-                console.log("user", user);
-
                 if (user.role === 'ADMIN') {
-                    navigate('/admin');
+                    navigate('/');
                 } else {
                     navigate('/');
                 }

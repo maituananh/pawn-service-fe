@@ -11,6 +11,7 @@ import AdminProductsPage from '@/pages/Admin/AdminProductsPage';
 import AdminProductDetailPage from '@/pages/Admin/AdminProductDetailPage';
 import AdminProductCreatePage from '@/pages/Admin/AdminProductCreatePage';
 import AdminOrderReportPage from '@/pages/Admin/AdminOdersReportPage';
+import MyProfilePage from '@/pages/MyProfilePage';
 
 export interface RouteConfig {
   path: string;
@@ -61,6 +62,14 @@ export const publicRoutes: RouteConfig[] = [
 
 export const privateRoutes: RouteConfig[] = [
   {
+    path: '/my-profile',
+    label: 'My profile',
+    component: MyProfilePage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['admin'],
+  },
+  {
     path: '/admin/dashboard',
     label: 'Dashboard',
     component: AdminDashboardPage,
@@ -80,7 +89,7 @@ export const privateRoutes: RouteConfig[] = [
     path: '/admin/customers/:id',
     label: 'Chi tiết khách hàng',
     component: AdminCustomerDetailPage,
-    showInMenu: true,
+    showInMenu: false,
     requiresLayout: true,
     roles: ['admin'],
   }, {
@@ -94,14 +103,14 @@ export const privateRoutes: RouteConfig[] = [
     path: '/admin/products/:id',
     label: 'Chi tiết sản phẩm',
     component: AdminProductDetailPage,
-    showInMenu: true,
+    showInMenu: false,
     requiresLayout: true,
     roles: ['admin'],
   }, {
     path: '/admin/products/new',
     label: 'Thêm mới sản phẩm',
     component: AdminProductCreatePage,
-    showInMenu: true,
+    showInMenu: false,
     requiresLayout: true,
     roles: ['admin'],
   }, {

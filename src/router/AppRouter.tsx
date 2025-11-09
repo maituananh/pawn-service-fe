@@ -16,6 +16,7 @@ import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
 import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
 import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
 import AdminOrderReportPage from "@/pages/Admin/AdminOdersReportPage";
+import MyProfilePage from "@/pages/MyProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +40,13 @@ export const router = createBrowserRouter([
     path: "/login",
     children: [
       { index: true, element: <LoginPage /> },
+    ],
+  },
+  {
+    path: "/my-profile",
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <MyProfilePage /> },
     ],
   },
   {

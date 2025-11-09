@@ -16,6 +16,11 @@ const authApi = {
         return res.data;
     },
 
+    updateProfile: async (payload: Partial<UserProfile>): Promise<UserProfile> => {
+        const { data } = await axiosClient.put<UserProfile>('/users/me', payload);
+        return data;
+    },
+
     refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken?: string }> => {
         const res = await axiosRefresh.post('/auth/refresh-token', { refreshToken }, { headers: { 'Content-Type': 'application/json' } }
         );
