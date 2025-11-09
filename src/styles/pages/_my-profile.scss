@@ -1,0 +1,23 @@
+.my-profile-page .profile-card {
+  background: #fff;
+}
+
+.ant-form-item-label>label {
+  font-weight: 500;
+  color: #222;
+}
+
+@media (max-width: 768px) {
+  .my-profile-page .profile-card {
+    padding: 16px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 12px;
+  }
+
+  .ant-avatar {
+    width: 80px !important;
+    height: 80px !important;
+  }
+}

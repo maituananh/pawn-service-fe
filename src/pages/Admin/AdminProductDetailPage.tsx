@@ -10,40 +10,51 @@ import {
   Card,
   Typography,
   Avatar,
+  message,
+  Spin,
 } from 'antd';
+import dayjs from 'dayjs';
+import { useProduct } from '@/hooks/useProduct';
+import { useNavigate, useParams } from 'react-router-dom';
+import productsApi from '@/api/productsApi';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-// --- Dữ liệu giả để điền vào form (mô phỏng trạng thái "edit") ---
-const initialProductData = {
-  productName: 'Macbook Pro 14 inch',
-  pawnPrice: '15.000.000',
-  sellPrice: '20.000.000',
-  category: 'laptop',
-  brand: 'Apple',
-  quantity: 1,
-  status: 'in_stock',
-  customerName: 'Nguyễn Văn A',
-  customerPhone: '0987654321',
-  customerAddress: '123 Đường ABC, Quận 1, TP. HCM',
-};
-
 const AdminProductDetailPage: React.FC = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
+  const { id } = useParams<{ id: string }>();
+  const productId = Number(id);
+
+  const { data: product, isLoading, isError } = useProduct(productId);
+
   useEffect(() => {
-    form.setFieldsValue(initialProductData);
-  }, [initialProductData])
-  const onFinish = (values: any) => {
-    console.log('Form values submitted:', values);
+    if (product) {
+      form.setFieldsValue({
+        name: product.name,
+      });
+    }
+  }, [product, form]);
+
+  const onFinish = async (values: any) => {
+    try {
+      await productsApi.update(productId, values);
+      message.success('Cập nhật sản phẩm thành công!');
+    } catch (error) {
+      message.error('Cập nhật sản phẩm thất bại!');
+    }
   };
+
+  if (isLoading) return <Spin size="large" />;
+  if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
 
   return (
     <div className="product-detail-page">
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Card title={<Title level={5}>Thông tin sản phẩm</Title>} className="form-card">
           <Row gutter={[24, 0]}>
-            <Col xs={24} lg={8}><Form.Item label="Tên sản phẩm" name="productName"><Input /></Form.Item></Col>
+            <Col xs={24} lg={8}><Form.Item label="Tên sản phẩm" name="name"><Input /></Form.Item></Col>
             <Col xs={24} lg={8}><Form.Item label="Giá cầm" name="pawnPrice"><Input /></Form.Item></Col>
             <Col xs={24} lg={8}><Form.Item label="Giá bán" name="sellPrice"><Input /></Form.Item></Col>
             <Col xs={24} lg={8}><Form.Item label="Danh mục" name="category"><Select><Option value="laptop">Laptop</Option></Select></Form.Item></Col>
@@ -86,7 +97,7 @@ const AdminProductDetailPage: React.FC = () => {
           </div>
         </Card>
         <div className="action-buttons">
-          <Button size="large">Cancel</Button>
+          <Button size="large" onClick={() => navigate('/admin/products', { replace: true })}>Cancel</Button>
           <Button type="primary" size="large" className='bg-success' htmlType="submit">Save</Button>
         </div>
       </Form>

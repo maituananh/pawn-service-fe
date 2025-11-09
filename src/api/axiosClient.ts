@@ -9,7 +9,7 @@ export type CustomAxiosInstance = AxiosInstance & {
 };
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: 'https://nevertheless-carmen-trail-announce.trycloudflare.com/api',
     headers: { 'Content-Type': 'application/json' },
 });
 

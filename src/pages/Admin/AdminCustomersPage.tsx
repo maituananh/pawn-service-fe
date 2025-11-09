@@ -12,6 +12,7 @@ import {
   Space,
   Tag,
   type TableProps,
+  Spin,
 } from 'antd';
 import {
   UsergroupAddOutlined,
@@ -22,6 +23,8 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useUsers } from '@/hooks/useUsers';
+import { UserProfile } from '@/type/user.type';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -34,21 +37,11 @@ interface CustomerDataType {
   country: string;
 }
 
-const customersData: CustomerDataType[] = [
-  { key: '1', name: 'Jane Cooper', company: 'Microsoft', phone: '(225) 555-0118', email: 'jane@microsoft.com', country: 'United States' },
-  { key: '2', name: 'Floyd Miles', company: 'Yahoo', phone: '(205) 555-0100', email: 'floyd@yahoo.com', country: 'Kiribati' },
-  { key: '3', name: 'Ronald Richards', company: 'Adobe', phone: '(302) 555-0107', email: 'ronald@adobe.com', country: 'Israel' },
-  { key: '4', name: 'Marvin McKinney', company: 'Tesla', phone: '(252) 555-0126', email: 'marvin@tesla.com', country: 'Iran' },
-  { key: '5', name: 'Jerome Bell', company: 'Google', phone: '(629) 555-0129', email: 'jerome@google.com', country: 'Réunion' },
-  { key: '6', name: 'Kathryn Murphy', company: 'Microsoft', phone: '(406) 555-0120', email: 'kathryn@microsoft.com', country: 'Curaçao' },
-  { key: '7', name: 'Jacob Jones', company: 'Yahoo', phone: '(208) 555-0112', email: 'jacob@yahoo.com', country: 'Brazil' },
-  { key: '8', name: 'Kristin Watson', company: 'Facebook', phone: '(704) 555-0127', email: 'kristin@facebook.com', country: 'Åland Islands' },
-];
-
 const AdminCustomersPage: React.FC = () => {
   const navigate = useNavigate();
+  const { users, isLoading, isError, error, refetch } = useUsers();
 
-  const columns: TableProps<CustomerDataType>['columns'] = [
+  const columns: TableProps<UserProfile>['columns'] = [
     { title: 'Tên khách hàng', dataIndex: 'name', key: 'name' },
     { title: 'Company', dataIndex: 'company', key: 'company' },
     { title: 'Điện thoại', dataIndex: 'phone', key: 'phone' },
@@ -57,14 +50,14 @@ const AdminCustomersPage: React.FC = () => {
     {
       title: 'Action',
       key: 'action',
-      render: (_: any, record: { key: string }) => (
+      render: (_: any, record: { id: string }) => (
         <Space size="middle">
           <Button
             type="text"
             icon={<EditOutlined />}
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/admin/customers / ${record.key}`);
+              navigate(`/admin/customers / ${record.id}`);
             }}
           />
           <Button
@@ -73,13 +66,16 @@ const AdminCustomersPage: React.FC = () => {
             icon={<DeleteOutlined />}
             onClick={(e) => {
               e.stopPropagation();
-              console.log('Delete user:', record.key);
+              console.log('Delete user:', record.id);
             }}
           />
         </Space>
       ),
     },
   ];
+
+  if (isLoading) return <Spin size="large" />;
+  if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
 
   return (
     <div className="customers-page">
@@ -116,10 +112,10 @@ const AdminCustomersPage: React.FC = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={customersData}
+          dataSource={users}
           pagination={{
             position: ['bottomCenter'],
-            total: customersData.length,
+            total: users.length,
             showTotal: (total, range) => `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
             showSizeChanger: false
           }}

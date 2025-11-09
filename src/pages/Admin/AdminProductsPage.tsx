@@ -11,6 +11,9 @@ import {
   Select,
   Space,
   Tag,
+  Spin,
+  message,
+  Popconfirm,
 } from 'antd';
 import {
   UsergroupAddOutlined,
@@ -18,47 +21,95 @@ import {
   DesktopOutlined,
   SearchOutlined,
   PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useProducts } from '@/hooks/useProducts';
+import { Product } from '@/type/product.type';
+import productsApi from '@/api/productsApi';
 
 const { Title } = Typography;
 const { Option } = Select;
 
-const productsData = [
-  { key: '1', productName: 'Jane Cooper', price: '10.000.000', ownerPhone: '(225) 555-0118', ownerName: 'Nguyễn Văn Hùng', type: 'Điện thoại', status: 'Active' },
-  { key: '2', productName: 'Floyd Miles', price: '10.000.000', ownerPhone: '(205) 555-0100', ownerName: 'floyd@yahoo.com', type: 'Laptop', status: 'Inactive' },
-  { key: '3', productName: 'Ronald Richards', price: '10.000.000', ownerPhone: '(302) 555-0107', ownerName: 'ronald@adobe.com', type: 'Xe Máy', status: 'Inactive' },
-  { key: '4', productName: 'Marvin McKinney', price: '10.000.000', ownerPhone: '(252) 555-0126', ownerName: 'marvin@tesla.com', type: 'Laptop', status: 'Active' },
-  { key: '5', productName: 'Jerome Bell', price: '10.000.000', ownerPhone: '(629) 555-0129', ownerName: 'jerome@google.com', type: 'Laptop', status: 'Active' },
-  { key: '6', productName: 'Kathryn Murphy', price: '10.000.000', ownerPhone: '(406) 555-0120', ownerName: 'kathryn@microsoft.com', type: 'Laptop', status: 'Active' },
-  { key: '7', productName: 'Jacob Jones', price: '10.000.000', ownerPhone: '(208) 555-0112', ownerName: 'jacob@yahoo.com', type: 'Laptop', status: 'Active' },
-  { key: '8', productName: 'Kristin Watson', price: '10.000.000', ownerPhone: '(704) 555-0127', ownerName: 'kristin@facebook.com', type: 'Laptop', status: 'Inactive' },
-  ...Array.from({ length: 15 }, (_, i) => ({
-    key: 8 + i, productName: 'Jane Cooper', price: '10.000.000', ownerPhone: '(225) 555-0118', ownerName: 'Nguyễn Văn Hùng', type: 'Điện thoại', status: 'Active'
-  })),
-];
-
-const columns = [
-  { title: 'Tên sản phẩm', dataIndex: 'productName', key: 'productName' },
-  { title: 'Giá', dataIndex: 'price', key: 'price' },
-  { title: 'SĐT Người sở hữu', dataIndex: 'ownerPhone', key: 'ownerPhone' },
-  { title: 'Người sở hữu', dataIndex: 'ownerName', key: 'ownerName' },
-  { title: 'Loại', dataIndex: 'type', key: 'type' },
-  {
-    title: 'Trạng thái',
-    dataIndex: 'status',
-    key: 'status',
-    render: (status: string) => (
-      <Tag color={status === 'Active' ? 'success' : 'error'}>{status}</Tag>
-    ),
-  },
-];
-
 const AdminProductsPage: React.FC = () => {
   const navigate = useNavigate();
-  const handleRowClick = (record: { key: string | number }) => {
-    navigate(`/admin/products/${record.key}`);
+  const { products, isLoading, isError, error, refetch } = useProducts();
+
+  const handleRowClick = (record: Product) => {
+    navigate(`/admin/products/${record.id}`);
   };
+
+  const handleEdit = (id: number) => {
+    navigate(`/admin/products/${id}`);
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await productsApi.delete(id);
+      message.success('Đã xóa sản phẩm thành công!');
+      refetch();
+    } catch (err) {
+      message.error('Xóa sản phẩm thất bại!');
+    }
+  };
+
+  const columns = [
+    { title: 'Tên sản phẩm', dataIndex: 'name', key: 'productName' },
+    { title: 'Giá', dataIndex: 'price', key: 'price' },
+    { title: 'SĐT Người sở hữu', dataIndex: 'ownerPhone', key: 'ownerPhone' },
+    { title: 'Người sở hữu', dataIndex: 'ownerName', key: 'ownerName' },
+    { title: 'Loại', dataIndex: 'type', key: 'type' },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: string) => (
+        <Tag color={status === 'Active' ? 'success' : 'error'}>{status}</Tag>
+      ),
+    },
+    {
+      title: 'Hành động',
+      key: 'actions',
+      render: (_: any, record: Product) => (
+        <Space>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEdit(record.id);
+            }}
+          >
+            Sửa
+          </Button>
+          <Popconfirm
+            title="Bạn có chắc muốn xóa sản phẩm này không?"
+            okText="Xóa"
+            cancelText="Hủy"
+            onConfirm={(e) => {
+              e?.stopPropagation();
+              handleDelete(record.id);
+            }}
+            onCancel={(e) => e?.stopPropagation()}
+          >
+            <Button
+              type="link"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={(e) => e.stopPropagation()}
+            >
+              Xóa
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  if (isLoading) return <Spin size="large" />;
+  if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
+
   return (
     <div className="admin-products-page">
       <Row gutter={[24, 24]} className="stats-cards-products">
@@ -86,13 +137,13 @@ const AdminProductsPage: React.FC = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={productsData}
+          dataSource={products}
           onRow={(record) => ({
             onClick: () => handleRowClick(record),
           })}
           pagination={{
             position: ['bottomCenter'],
-            total: productsData.length,
+            total: products.length,
             showTotal: (total, range) => `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
             showSizeChanger: false
           }}

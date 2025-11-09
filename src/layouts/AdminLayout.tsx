@@ -140,6 +140,15 @@ const AdminLayout = () => {
           items={menuItems}
           onClick={handleMenuClick}
         />
+        <div className="drawer-auth-section">
+          {isAuthenticated ? (
+            <Button onClick={handleLogout} style={{ width: '100%', marginTop: '16px' }}>Đăng xuất</Button>
+          ) : (
+            <Button type="primary" onClick={() => { navigate('/login'); closeDrawer(); }} style={{ width: '100%', marginTop: '16px' }}>
+              Đăng nhập
+            </Button>
+          )}
+        </div>
       </Drawer>
     </Layout>
   );

@@ -3,13 +3,13 @@ import AppHeader from '../components/Header';
 import AppFooter from '../components/Footer';
 import { Link, Outlet } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
-import { publicRoutes } from '@/router/router.config';
+import { privateRoutes, publicRoutes } from '@/router/router.config';
 
 const { Content } = Layout;
 
 const MainLayout = () => {
   const { role } = useAuth();
-  const menuItems = publicRoutes
+  const menuItems = [...publicRoutes, ...privateRoutes]
     .filter(route =>
       route.showInMenu &&
       (!route.roles || route.roles.includes(role))
