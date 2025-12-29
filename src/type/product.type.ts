@@ -7,6 +7,10 @@ export interface Product {
   name: string;
   price: number;
   description?: any;
+  quantity: number;
+  startDate: string;
+  endDate: string;
+  type: string;
 }
 
 export interface ProductCreateRequest {

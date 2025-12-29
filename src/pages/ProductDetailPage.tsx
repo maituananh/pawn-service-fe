@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
   Row,
   Col,
@@ -11,24 +11,13 @@ import {
   Space,
 } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
+import productsApi from '@/api/productsApi';
+import { useParams } from 'react-router-dom';
+import { Product } from '@/type/product.type';
+import { useQuery } from '@tanstack/react-query';
 
 const { Title, Text, Paragraph } = Typography;
 const { Meta } = Card;
-
-const mainProductData = {
-  id: 1,
-  name: 'Điện thoại iPhone 17 Pro',
-  currentPrice: 10000000,
-  originalPrice: 20000000,
-  quantity: 2,
-  description: ['Màu đỏ', 'Như mới 99%', 'Không có sạc đi kèm'],
-  images: [
-    'https://via.placeholder.com/600x600/FF6347/FFFFFF?text=Product+1',
-    'https://via.placeholder.com/600x600/4682B4/FFFFFF?text=Product+2',
-    'https://via.placeholder.com/600x600/32CD32/FFFFFF?text=Product+3',
-    'https://via.placeholder.com/600x600/FFD700/FFFFFF?text=Product+4',
-  ],
-};
 
 const relatedProductsData = [
   { id: 10, name: 'Winner X 2021', price: '20.000.000 vnd', image: 'https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Bike' },
@@ -40,48 +29,53 @@ const relatedProductsData = [
 ];
 
 const ProductDetailPage: React.FC = () => {
-  const [selectedImage, setSelectedImage] = useState(mainProductData.images[0]);
+  const { id } = useParams();
+
   const [quantity, setQuantity] = useState(1);
+
+  const { data: product, isLoading, isError } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => productsApi.getById(Number(id)),
+    enabled: !!id,
+  });
 
   return (
     <div className="product-detail-page">
       <Row gutter={[32, 32]} className="main-product-section">
         <Col xs={24} md={12} className="image-gallery">
           <div className="thumbnail-list">
-            {mainProductData.images.map((img, index) => (
+            {/* {product.images.map((img, index) => (
               <div
-                key={index}
-                className={`thumbnail-item ${selectedImage === img ? 'thumbnail-item--active' : ''}`}
-                onClick={() => setSelectedImage(img)}
+                key={img.id}
+                className={`thumbnail-item ${selectedImage === img.url ? 'thumbnail-item--active' : ''}`}
+                onClick={() => setSelectedImage(img.url)}
               >
-                <img src={img} alt={`thumbnail ${index + 1}`} />
+                <img src={img.url} alt={`thumbnail ${index + 1}`} />
               </div>
-            ))}
+            ))} */}
           </div>
           <div className="main-image-container">
-            <img src={selectedImage} alt="Main product" className="main-image" />
+            <img src={product?.images[0].url} alt="Main product" className="main-image" />
           </div>
         </Col>
         <Col xs={24} md={12} className="product-info">
-          <Title level={2}>{mainProductData.name}</Title>
+          <Title level={2}>{product?.name}</Title>
           <div className="price-section">
             <Text className="current-price">
-              {mainProductData.currentPrice.toLocaleString()} vnd
+              {product?.price.toLocaleString()} vnd
             </Text>
             <Text delete className="original-price">
-              {mainProductData.originalPrice.toLocaleString()} vnd
+              {product?.price.toLocaleString()} vnd
             </Text>
           </div>
           <div className="quantity-section">
             <Text strong>Số lượng: </Text>
-            <InputNumber min={1} max={mainProductData.quantity} defaultValue={1} onChange={(value) => setQuantity(value || 1)} />
+            <InputNumber min={1} max={product?.quantity} defaultValue={1} onChange={(value) => setQuantity(value || 1)} />
           </div>
           <div className="description-section">
             <Text strong>Mô tả:</Text>
             <ul>
-              {mainProductData.description.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
+              {product?.description}
             </ul>
           </div>
           <Space className="action-buttons" size="middle">
