@@ -1,27 +1,22 @@
 import productsApi from "@/api/productsApi";
+import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/type/product.type";
 import {
   DeleteOutlined,
-  DesktopOutlined,
   EditOutlined,
   PlusOutlined,
   SearchOutlined,
-  ShoppingOutlined,
-  UsergroupAddOutlined,
 } from "@ant-design/icons";
 import {
   Button,
   Card,
-  Col,
   Input,
   message,
   Popconfirm,
-  Row,
   Select,
   Space,
   Spin,
-  Statistic,
   Table,
   Tag,
   Typography,
@@ -112,35 +107,7 @@ const AdminProductsPage: React.FC = () => {
 
   return (
     <div className="admin-products-page">
-      <Row gutter={[24, 24]} className="stats-cards-products">
-        <Col xs={24} sm={12} lg={8}>
-          <Card>
-            <Statistic
-              title="Tổng khách"
-              value={5423}
-              prefix={<UsergroupAddOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={8}>
-          <Card>
-            <Statistic
-              title="Tổng sản phẩm"
-              value={1893}
-              prefix={<ShoppingOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={24} lg={8}>
-          <Card>
-            <Statistic
-              title="Tài khoản hoạt động"
-              value={189}
-              prefix={<DesktopOutlined />}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <DashboardStatsFeature rowClassName="stats-cards-products" />
       <Card className="products-table-card">
         <div className="table-toolbar mb-6">
           <Title level={5} className="mt-0">
