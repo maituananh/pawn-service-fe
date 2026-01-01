@@ -1,35 +1,26 @@
-import { useState, useMemo } from 'react';
-import { Input, Checkbox, Button, Pagination, Spin, Alert } from 'antd';
-import { Link } from 'react-router-dom';
-import { useProducts } from '@/hooks/useProducts';
-import { PRODUCT_TYPE_1_OPTIONS } from '@/constants';
-import { Product } from '@/type/product.type';
+import { useCategories } from "@/hooks/useCategories";
+import { useProducts } from "@/hooks/useProducts";
+import { Product } from "@/type/product.type";
+import { Alert, Button, Checkbox, Input, Pagination } from "antd";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const ProductsPage = () => {
-  const { products, isLoading, isError, error } = useProducts();
+  const { categories } = useCategories();
 
-  const [checkedCategories, setCheckedCategories] = useState<string[]>([]);
-  const [searchText, setSearchText] = useState('');
+  const [checkedCategories, setCheckedCategories] = useState<number[]>([]);
+  const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesCategory =
-        checkedCategories.length === 0 || checkedCategories.includes(product.category);
-      const matchesSearch =
-        searchText === '' || product.name.toLowerCase().includes(searchText.toLowerCase());
-      return matchesCategory && matchesSearch;
-    });
-  }, [products, checkedCategories, searchText]);
+  const { productsPage, isLoading, isError, error } = useProducts({
+    page: currentPage,
+    size: pageSize,
+    name: searchText,
+    categoryIds: checkedCategories,
+  });
 
-  const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    const end = start + pageSize;
-    return filteredProducts.slice(start, end);
-  }, [filteredProducts, currentPage, pageSize]);
-
-  const handleCategoryChange = (checkedValues: string[]) => {
+  const handleCategoryChange = (checkedValues: number[]) => {
     setCheckedCategories(checkedValues);
     setCurrentPage(1);
   };
@@ -41,12 +32,19 @@ const ProductsPage = () => {
 
   const handleClearFilters = () => {
     setCheckedCategories([]);
-    setSearchText('');
+    setSearchText("");
     setCurrentPage(1);
   };
 
-  if (isLoading) return <Spin tip="Loading products..." />;
-  if (isError) return <Alert message="Error" description={(error as Error).message} type="error" />;
+  // if (isLoading) return <Spin tip="Loading products..." />;
+  if (isError)
+    return (
+      <Alert
+        message="Error"
+        description={(error as Error).message}
+        type="error"
+      />
+    );
 
   return (
     <div className="product-page-container bg-white">
@@ -66,9 +64,9 @@ const ProductsPage = () => {
           onChange={handleCategoryChange}
         >
           <label className="text-bold mb-2">Loại sản phẩm</label>
-          {PRODUCT_TYPE_1_OPTIONS.map((opt) => (
-            <div key={opt.value} style={{ marginBottom: 8 }}>
-              <Checkbox value={opt.value}>{opt.label}</Checkbox>
+          {categories.map((opt) => (
+            <div key={opt.id} style={{ marginBottom: 8 }}>
+              <Checkbox value={opt.id}>{opt.name}</Checkbox>
             </div>
           ))}
         </Checkbox.Group>
@@ -80,14 +78,19 @@ const ProductsPage = () => {
 
       <div className="content">
         <div className="product-grid">
-          {paginatedProducts.map((product: Product) => (
+          {productsPage?.data?.map((product: Product) => (
             <Link
               to={`/products/${product.id}`}
               key={product.id}
               className="product-card-link"
             >
               <div className="product-card">
-                <img src={product.image} alt={product.image} key={product.image} loading="lazy" />
+                <img
+                  src={product.image}
+                  alt={product.image}
+                  key={product.image}
+                  loading="lazy"
+                />
                 <div className="name ellipsis-1">{product.name}</div>
                 <div className="price">{product.price}</div>
               </div>
@@ -99,7 +102,7 @@ const ProductsPage = () => {
           <Pagination
             current={currentPage}
             pageSize={pageSize}
-            total={filteredProducts.length}
+            total={productsPage?.totalElements}
             onChange={handlePageChange}
             showSizeChanger={false}
           />
