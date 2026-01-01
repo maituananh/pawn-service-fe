@@ -1,6 +1,6 @@
 import statisticApi from "@/api/statisticApi";
 import StatisticCard from "@/components/StatisticCard";
-import { StatisticResponse } from "@/type/statistic.type";
+import { Statistic } from "@/type/statistic.type";
 import {
   DesktopOutlined,
   ShoppingOutlined,
@@ -16,7 +16,7 @@ export default function DashboardStatsFeature({
 }: {
   rowClassName?: string;
 }) {
-  const { data } = useQuery<StatisticResponse>({
+  const { data } = useQuery<Statistic>({
     queryKey: STATISTICS_QUERY_KEY,
     queryFn: statisticApi.getStatistics,
     retry: 1,
