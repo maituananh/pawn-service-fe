@@ -1,40 +1,40 @@
-import React from 'react';
+import productsApi from "@/api/productsApi";
+import { useProducts } from "@/hooks/useProducts";
+import { Product } from "@/type/product.type";
 import {
-  Row,
-  Col,
-  Card,
-  Typography,
-  Statistic,
+  DeleteOutlined,
+  DesktopOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  ShoppingOutlined,
+  UsergroupAddOutlined,
+} from "@ant-design/icons";
+import {
   Button,
-  Table,
+  Card,
+  Col,
   Input,
-  Select,
-  Space,
-  Tag,
-  Spin,
   message,
   Popconfirm,
-} from 'antd';
-import {
-  UsergroupAddOutlined,
-  ShoppingOutlined,
-  DesktopOutlined,
-  SearchOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useProducts } from '@/hooks/useProducts';
-import { Product } from '@/type/product.type';
-import productsApi from '@/api/productsApi';
+  Row,
+  Select,
+  Space,
+  Spin,
+  Statistic,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const AdminProductsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { products, isLoading, isError, error, refetch } = useProducts();
+  const { productsPage, isLoading, isError, error, refetch } = useProducts();
 
   const handleRowClick = (record: Product) => {
     navigate(`/admin/products/${record.id}`);
@@ -47,30 +47,30 @@ const AdminProductsPage: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await productsApi.delete(id);
-      message.success('Đã xóa sản phẩm thành công!');
+      message.success("Đã xóa sản phẩm thành công!");
       refetch();
     } catch (err) {
-      message.error('Xóa sản phẩm thất bại!');
+      message.error("Xóa sản phẩm thất bại!");
     }
   };
 
   const columns = [
-    { title: 'Tên sản phẩm', dataIndex: 'name', key: 'productName' },
-    { title: 'Giá', dataIndex: 'price', key: 'price' },
-    { title: 'SĐT Người sở hữu', dataIndex: 'ownerPhone', key: 'ownerPhone' },
-    { title: 'Người sở hữu', dataIndex: 'ownerName', key: 'ownerName' },
-    { title: 'Loại', dataIndex: 'type', key: 'type' },
+    { title: "Tên sản phẩm", dataIndex: "name", key: "productName" },
+    { title: "Giá", dataIndex: "price", key: "price" },
+    { title: "SĐT Người sở hữu", dataIndex: "ownerPhone", key: "ownerPhone" },
+    { title: "Người sở hữu", dataIndex: "ownerName", key: "ownerName" },
+    { title: "Loại", dataIndex: "type", key: "type" },
     {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
       render: (status: string) => (
-        <Tag color={status === 'Active' ? 'success' : 'error'}>{status}</Tag>
+        <Tag color={status === "Active" ? "success" : "error"}>{status}</Tag>
       ),
     },
     {
-      title: 'Hành động',
-      key: 'actions',
+      title: "Hành động",
+      key: "actions",
       render: (_: any, record: Product) => (
         <Space>
           <Button
@@ -113,18 +113,44 @@ const AdminProductsPage: React.FC = () => {
   return (
     <div className="admin-products-page">
       <Row gutter={[24, 24]} className="stats-cards-products">
-        <Col xs={24} sm={12} lg={8}><Card><Statistic title="Tổng khách" value={5423} prefix={<UsergroupAddOutlined />} /></Card></Col>
-        <Col xs={24} sm={12} lg={8}><Card><Statistic title="Tổng sản phẩm" value={1893} prefix={<ShoppingOutlined />} /></Card></Col>
-        <Col xs={24} sm={24} lg={8}><Card><Statistic title="Tài khoản hoạt động" value={189} prefix={<DesktopOutlined />} /></Card></Col>
+        <Col xs={24} sm={12} lg={8}>
+          <Card>
+            <Statistic
+              title="Tổng khách"
+              value={5423}
+              prefix={<UsergroupAddOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={8}>
+          <Card>
+            <Statistic
+              title="Tổng sản phẩm"
+              value={1893}
+              prefix={<ShoppingOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={24} lg={8}>
+          <Card>
+            <Statistic
+              title="Tài khoản hoạt động"
+              value={189}
+              prefix={<DesktopOutlined />}
+            />
+          </Card>
+        </Col>
       </Row>
       <Card className="products-table-card">
         <div className="table-toolbar mb-6">
-          <Title level={5} className="mt-0">Tất cả sản phẩm</Title>
+          <Title level={5} className="mt-0">
+            Tất cả sản phẩm
+          </Title>
           <Space className="toolbar-actions">
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => navigate('/admin/products/create')}
+              onClick={() => navigate("/admin/products/create")}
             >
               Mới
             </Button>
@@ -137,15 +163,16 @@ const AdminProductsPage: React.FC = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={products}
+          dataSource={productsPage?.data}
           onRow={(record) => ({
             onClick: () => handleRowClick(record),
           })}
           pagination={{
-            position: ['bottomCenter'],
-            total: products.length,
-            showTotal: (total, range) => `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
-            showSizeChanger: false
+            position: ["bottomCenter"],
+            total: productsPage?.totalElements,
+            showTotal: (total, range) =>
+              `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
+            showSizeChanger: false,
           }}
         />
       </Card>
