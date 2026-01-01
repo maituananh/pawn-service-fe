@@ -1,30 +1,25 @@
-import React from 'react';
+import DashboardStatsFeature from "@/features/DashboardStatsFeature";
+import { useUsers } from "@/hooks/useUsers";
+import { UserProfile } from "@/type/user.type";
 import {
-  Row,
-  Col,
-  Card,
-  Typography,
-  Statistic,
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import {
   Button,
-  Table,
+  Card,
   Input,
   Select,
   Space,
-  Tag,
-  type TableProps,
   Spin,
-} from 'antd';
-import {
-  UsergroupAddOutlined,
-  ShoppingOutlined,
-  DesktopOutlined,
-  SearchOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useUsers } from '@/hooks/useUsers';
-import { UserProfile } from '@/type/user.type';
+  Table,
+  Tag,
+  Typography,
+  type TableProps,
+} from "antd";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -41,15 +36,15 @@ const AdminCustomersPage: React.FC = () => {
   const navigate = useNavigate();
   const { users, isLoading, isError, error, refetch } = useUsers();
 
-  const columns: TableProps<UserProfile>['columns'] = [
-    { title: 'Tên khách hàng', dataIndex: 'name', key: 'name' },
-    { title: 'Company', dataIndex: 'company', key: 'company' },
-    { title: 'Điện thoại', dataIndex: 'phone', key: 'phone' },
-    { title: 'Email', dataIndex: 'email', key: 'email' },
-    { title: 'Địa chỉ', dataIndex: 'country', key: 'country' },
+  const columns: TableProps<UserProfile>["columns"] = [
+    { title: "Tên khách hàng", dataIndex: "name", key: "name" },
+    { title: "Company", dataIndex: "company", key: "company" },
+    { title: "Điện thoại", dataIndex: "phone", key: "phone" },
+    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Địa chỉ", dataIndex: "country", key: "country" },
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (_: any, record: { id: string }) => (
         <Space size="middle">
           <Button
@@ -66,7 +61,7 @@ const AdminCustomersPage: React.FC = () => {
             icon={<DeleteOutlined />}
             onClick={(e) => {
               e.stopPropagation();
-              console.log('Delete user:', record.id);
+              console.log("Delete user:", record.id);
             }}
           />
         </Space>
@@ -79,23 +74,7 @@ const AdminCustomersPage: React.FC = () => {
 
   return (
     <div className="customers-page">
-      <Row gutter={[24, 24]} className="stats-cards-customers">
-        <Col xs={24} sm={12} lg={8}>
-          <Card>
-            <Statistic title="Tổng khách" value={5423} prefix={<UsergroupAddOutlined />} />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={8}>
-          <Card>
-            <Statistic title="Tổng sản phẩm" value={1893} prefix={<ShoppingOutlined />} />
-          </Card>
-        </Col>
-        <Col xs={24} sm={24} lg={8}>
-          <Card>
-            <Statistic title="Tài khoản hoạt động" value={189} prefix={<DesktopOutlined />} />
-          </Card>
-        </Col>
-      </Row>
+      <DashboardStatsFeature rowClassName="stats-cards-customers" />
       <Card className="customers-table-card">
         <div className="table-toolbar">
           <div>
@@ -114,10 +93,11 @@ const AdminCustomersPage: React.FC = () => {
           columns={columns}
           dataSource={users}
           pagination={{
-            position: ['bottomCenter'],
+            position: ["bottomCenter"],
             total: users.length,
-            showTotal: (total, range) => `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
-            showSizeChanger: false
+            showTotal: (total, range) =>
+              `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
+            showSizeChanger: false,
           }}
         />
       </Card>
