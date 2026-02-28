@@ -73,10 +73,9 @@ const AdminProductCreatePage: React.FC = () => {
         endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
 
         categoryId: Number(values.categoryId),
+        type: values.type,
         code: values.code,
         customerId: Number(values.customerId),
-
-        type: values.type,
         dailyProfit: Number(values.dailyInterest),
 
         quantity: Number(values.quantity),
@@ -123,8 +122,8 @@ const AdminProductCreatePage: React.FC = () => {
               >
                 <Select
                   placeholder="Chọn thể loại"
-                  disabled={!selectedType}
-                  options={filteredCategories?.map((item: any) => ({
+                  loading={isLoading}
+                  options={categories.map((item) => ({
                     label: item.name,
                     value: item.id,
                   }))}
@@ -136,9 +135,7 @@ const AdminProductCreatePage: React.FC = () => {
               <Form.Item
                 label="Loại sản phẩm"
                 name="type"
-                rules={[
-                  { required: true, message: "Vui lòng chọn loại sản phẩm" },
-                ]}
+                rules={[{ required: true }]}
               >
                 <Select
                   placeholder="Chọn loại"
