@@ -1,22 +1,22 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 
+import AdminLayout from "@/layouts/AdminLayout";
+import AdminCustomerDetailPage from "@/pages/Admin/AdminCustomerDetailPage";
+import AdminCustomersPage from "@/pages/Admin/AdminCustomersPage";
+import AdminDashboardPage from "@/pages/Admin/AdminDashboardPage";
+import AdminOrderReportPage from "@/pages/Admin/AdminOdersReportPage";
+import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
+import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
+import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
+import CartPage from "@/pages/CartPage";
+import MyProfilePage from "@/pages/MyProfilePage";
+import ProductDetailPage from "@/pages/ProductDetailPage";
+import ProductsPage from "@/pages/ProductsPage";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
-import ProductsPage from "@/pages/ProductsPage";
-import ProductDetailPage from "@/pages/ProductDetailPage";
 import { PrivateRoute } from "./PrivateRoute";
-import CartPage from "@/pages/CartPage";
-import AdminLayout from "@/layouts/AdminLayout";
-import AdminDashboardPage from "@/pages/Admin/AdminDashboardPage";
-import AdminCustomersPage from "@/pages/Admin/AdminCustomersPage";
-import AdminCustomerDetailPage from "@/pages/Admin/AdminCustomerDetailPage";
-import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
-import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
-import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
-import AdminOrderReportPage from "@/pages/Admin/AdminOdersReportPage";
-import MyProfilePage from "@/pages/MyProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -28,26 +28,18 @@ export const router = createBrowserRouter([
       { path: "products/:id", element: <ProductDetailPage /> },
       {
         path: "mycart",
-        element: (
-          <PrivateRoute
-            element={<CartPage />}
-          />
-        ),
+        element: <PrivateRoute element={<CartPage />} />,
       },
     ],
   },
   {
     path: "/login",
-    children: [
-      { index: true, element: <LoginPage /> },
-    ],
+    children: [{ index: true, element: <LoginPage /> }],
   },
   {
     path: "/my-profile",
     element: <MainLayout />,
-    children: [
-      { index: true, element: <MyProfilePage /> },
-    ],
+    children: [{ index: true, element: <MyProfilePage /> }],
   },
   {
     path: "*",
@@ -60,55 +52,32 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       {
         path: "dashboard",
-        element: (
-          <PrivateRoute
-            element={<AdminDashboardPage />}
-          />
-        ),
+        element: <PrivateRoute element={<AdminDashboardPage />} />,
       },
       {
         path: "customers",
-        element: (
-          <PrivateRoute
-            element={<AdminCustomersPage />}
-          />
-        ),
-      }, {
+        element: <PrivateRoute element={<AdminCustomersPage />} />,
+      },
+      {
         path: "customers/:id",
-        element: (
-          <PrivateRoute
-            element={<AdminCustomerDetailPage />}
-          />
-        ),
-      }, {
+        element: <PrivateRoute element={<AdminCustomerDetailPage />} />,
+      },
+      {
         path: "products",
-        element: (
-          <PrivateRoute
-            element={<AdminProductsPage />}
-          />
-        ),
-      }, {
+        element: <PrivateRoute element={<AdminProductsPage />} />,
+      },
+      {
         path: "products/:id",
-        element: (
-          <PrivateRoute
-            element={<AdminProductDetailPage />}
-          />
-        ),
-      }, {
+        element: <PrivateRoute element={<AdminProductDetailPage />} />,
+      },
+      {
         path: "products/create",
-        element: (
-          <PrivateRoute
-            element={<AdminProductCreatePage />}
-          />
-        ),
-      }, {
+        element: <PrivateRoute element={<AdminProductCreatePage />} />,
+      },
+      {
         path: "orders-report",
-        element: (
-          <PrivateRoute
-            element={<AdminOrderReportPage />}
-          />
-        ),
-      }
+        element: <PrivateRoute element={<AdminOrderReportPage />} />,
+      },
     ],
   },
 ]);

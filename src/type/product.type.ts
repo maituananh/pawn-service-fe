@@ -14,11 +14,16 @@ export interface Product {
 }
 
 export interface ProductCreateRequest {
-  id?: number;
   name: string;
   price: number;
-  startDay: string;
+  startDate: string;
   endDate: string;
+  categoryId: number;
+  code: string;
+  customerId: number;
+  dailyProfit: number;
+  quantity: number;
+  description: string;
   type: string;
   imageIds: number[];
 }
