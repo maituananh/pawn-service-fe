@@ -1,106 +1,80 @@
-import React, { useEffect } from 'react';
-import {
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Button,
-  Row,
-  Col,
-  Card,
-  Typography,
-  Avatar,
-  message,
-  Spin,
-} from 'antd';
-import dayjs from 'dayjs';
-import { useProduct } from '@/hooks/useProduct';
-import { useNavigate, useParams } from 'react-router-dom';
+import fileApi from '@/api/filesApi';
 import productsApi from '@/api/productsApi';
-
-const { Title, Text } = Typography;
-const { Option } = Select;
+import ProductForm from '@/components/admin/ProductForm';
+import { useProduct } from '@/hooks/useProduct';
+import { message, Spin, UploadFile } from 'antd';
+import dayjs from 'dayjs';
+import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const AdminProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
-  const [form] = Form.useForm();
   const { id } = useParams<{ id: string }>();
   const productId = Number(id);
+  const [loading, setLoading] = useState(false);
 
-  const { data: product, isLoading, isError } = useProduct(productId);
+  // 1. Fetch dữ liệu sản phẩm từ API
+  const { data: product, isLoading, isError, refetch } = useProduct(productId);
 
-  useEffect(() => {
-    if (product) {
-      form.setFieldsValue({
-        name: product.name,
-      });
-    }
-  }, [product, form]);
-
-  const onFinish = async (values: any) => {
+  // 2. Hàm xử lý Update (giữ nguyên logic upload ảnh nếu có thay đổi)
+  const handleUpdate = async (values: any, fileList: UploadFile[]) => {
+    console.log("handleUpdate")
     try {
-      await productsApi.update(productId, values);
+      setLoading(true);
+
+      // Phân loại: Ảnh nào đã có ID (cũ), ảnh nào là File Object (mới)
+      const oldImageIds = fileList
+        .filter((f) => !f.originFileObj && f.uid)
+        .map((f) => Number(f.uid));
+
+      const newFiles = fileList.filter((f) => f.originFileObj);
+
+      const newImageIds = await Promise.all(
+        newFiles.map(async (f) => {
+          const res = await fileApi.upload(f.originFileObj as File);
+          return res.id;
+        })
+      );
+
+      const payload = {
+        ...values,
+        price: Number(values.price),
+        categoryId: Number(values.categoryId),
+        dailyProfit: Number(values.dailyProfit || 0),
+        quantity: Number(values.quantity || 0),
+        startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
+        endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
+        imageIds: [...oldImageIds, ...newImageIds],
+      };
+
+      await productsApi.update(productId, payload);
       message.success('Cập nhật sản phẩm thành công!');
+      refetch(); // Tải lại dữ liệu mới nhất
     } catch (error) {
-      message.error('Cập nhật sản phẩm thất bại!');
+      console.error("Update Error:", error);
+      message.error('Cập nhật thất bại!');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (isLoading) return <Spin size="large" />;
+  if (isLoading) return (
+    <div style={{ textAlign: 'center', padding: '50px' }}>
+      <Spin size="large" tip="Đang tải dữ liệu..." />
+    </div>
+  );
+
   if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
 
   return (
-    <div className="product-detail-page">
-      <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Card title={<Title level={5}>Thông tin sản phẩm</Title>} className="form-card">
-          <Row gutter={[24, 0]}>
-            <Col xs={24} lg={8}><Form.Item label="Tên sản phẩm" name="name"><Input /></Form.Item></Col>
-            <Col xs={24} lg={8}><Form.Item label="Giá cầm" name="pawnPrice"><Input /></Form.Item></Col>
-            <Col xs={24} lg={8}><Form.Item label="Giá bán" name="sellPrice"><Input /></Form.Item></Col>
-            <Col xs={24} lg={8}><Form.Item label="Danh mục" name="category"><Select><Option value="laptop">Laptop</Option></Select></Form.Item></Col>
-            <Col xs={24} lg={8}><Form.Item label="Ngày bắt đầu cầm:" name="startDate"><DatePicker style={{ width: '100%' }} /></Form.Item></Col>
-            <Col xs={24} lg={8}><Form.Item label="Ngày kết thúc cầm:" name="endDate"><DatePicker style={{ width: '100%' }} /></Form.Item></Col>
-            <Col xs={24} lg={8}>
-              <Row gutter={[24, 0]}>
-                <Col span={24}><Form.Item label="Thương hiệu" name="brand"><Input /></Form.Item></Col>
-                <Col span={24}><Form.Item label="Số lượng" name="quantity"><Input /></Form.Item></Col>
-                <Col span={24}><Form.Item label="Trạng thái" name="status"><Select><Option value="in_stock">Còn hàng</Option></Select></Form.Item></Col>
-              </Row>
-            </Col>
-            <Col xs={24} lg={16}>
-              <Form.Item label="Mô tả" name="description"><Input.TextArea rows={8} /></Form.Item>
-            </Col>
-          </Row>
-        </Card>
-        <Card title={<Title level={5}>Hình ảnh</Title>} className="form-card">
-          <div className="image-gallery">
-            <div className="main-image">
-              <img src="https://via.placeholder.com/400x250/E8E8E8/AAAAAA?text=Main+Image" alt="Main product" />
-            </div>
-            <div className="thumbnail-images">
-              <div className="thumbnail-placeholder" />
-              <div className="thumbnail-placeholder" />
-              <div className="thumbnail-placeholder" />
-              <div className="thumbnail-placeholder" />
-            </div>
-          </div>
-        </Card>
-        <Card title={<Title level={5}>Thông tin khách hàng</Title>} className="form-card">
-          <div className="customer-info-container">
-            <div className="customer-details-form">
-              <Row gutter={24}>
-                <Col xs={24} md={12}><Form.Item label="Tên" name="customerName"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="Điện thoại" name="customerPhone"><Input /></Form.Item></Col>
-                <Col xs={24}><Form.Item label="Địa chỉ" name="customerAddress"><Input /></Form.Item></Col>
-              </Row>
-            </div>
-          </div>
-        </Card>
-        <div className="action-buttons">
-          <Button size="large" onClick={() => navigate('/admin/products', { replace: true })}>Cancel</Button>
-          <Button type="primary" size="large" className='bg-success' htmlType="submit">Save</Button>
-        </div>
-      </Form>
+    <div className="product-detail-page" style={{ padding: '24px' }}>
+      <ProductForm
+        isEdit={true}
+        initialData={product} // Truyền toàn bộ object product vào
+        onFinish={handleUpdate}
+        onCancel={() => navigate('/admin/products')}
+        loading={loading}
+      />
     </div>
   );
 };

@@ -16,6 +16,9 @@ export type UserProfile = {
   email: string;
   role: string;
   avatarUrl: string;
+  phone: string;
+  address: string;
+  cardId: string;
 };
 
 export type UserRole = UserProfile['role']; 

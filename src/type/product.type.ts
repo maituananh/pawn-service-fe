@@ -1,7 +1,10 @@
 export interface Product {
+  code: string;
+  dailyProfit: any;
+  user?: any;
   oldPrice: any;
   images: any;
-  category: string;
+  category: string | any;
   image: string;
   id: number;
   name: string;

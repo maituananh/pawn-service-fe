@@ -9,6 +9,7 @@ const { Content } = Layout;
 
 const MainLayout = () => {
   const { role } = useAuth();
+
   const menuItems = [...publicRoutes, ...privateRoutes]
     .filter(
       (route) =>
