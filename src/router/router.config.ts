@@ -1,17 +1,18 @@
-import HomePage from '../pages/HomePage';
-import LoginPage from '../pages/LoginPage';
-import ProductsPage from '../pages/ProductsPage';
-import ProductDetailPage from '../pages/ProductDetailPage';
+import AdminCustomerDetailPage from '@/pages/Admin/AdminCustomerDetailPage';
+import AdminCustomersPage from '@/pages/Admin/AdminCustomersPage';
+import AdminDashboardPage from '@/pages/Admin/AdminDashboardPage';
+import AdminOrderReportPage from '@/pages/Admin/AdminOdersReportPage';
+import AdminProductCreatePage from '@/pages/Admin/AdminProductCreatePage';
+import AdminProductDetailPage from '@/pages/Admin/AdminProductDetailPage';
+import AdminProductsPage from '@/pages/Admin/AdminProductsPage';
+import CartPage from '@/pages/CartPage';
+import MyProfilePage from '@/pages/MyProfilePage';
 import RegisterPage from '@/pages/RegisterPage';
 import { UserRole } from '@/type/user.type';
-import AdminDashboardPage from '@/pages/Admin/AdminDashboardPage';
-import AdminCustomersPage from '@/pages/Admin/AdminCustomersPage';
-import AdminCustomerDetailPage from '@/pages/Admin/AdminCustomerDetailPage';
-import AdminProductsPage from '@/pages/Admin/AdminProductsPage';
-import AdminProductDetailPage from '@/pages/Admin/AdminProductDetailPage';
-import AdminProductCreatePage from '@/pages/Admin/AdminProductCreatePage';
-import AdminOrderReportPage from '@/pages/Admin/AdminOdersReportPage';
-import MyProfilePage from '@/pages/MyProfilePage';
+import HomePage from '../pages/HomePage';
+import LoginPage from '../pages/LoginPage';
+import ProductDetailPage from '../pages/ProductDetailPage';
+import ProductsPage from '../pages/ProductsPage';
 
 export interface RouteConfig {
   path: string;
@@ -67,7 +68,7 @@ export const privateRoutes: RouteConfig[] = [
     component: MyProfilePage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN', 'CUSTOMER'],
   },
   {
     path: '/admin/dashboard',
@@ -75,7 +76,7 @@ export const privateRoutes: RouteConfig[] = [
     component: AdminDashboardPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN'],
   },
   {
     path: '/admin/customers',
@@ -83,7 +84,7 @@ export const privateRoutes: RouteConfig[] = [
     component: AdminCustomersPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN'],
   },
   {
     path: '/admin/customers/:id',
@@ -91,34 +92,42 @@ export const privateRoutes: RouteConfig[] = [
     component: AdminCustomerDetailPage,
     showInMenu: false,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN'],
   }, {
     path: '/admin/products',
     label: 'Quản lý sản phẩm',
     component: AdminProductsPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN'],
   }, {
     path: '/admin/products/:id',
     label: 'Chi tiết sản phẩm',
     component: AdminProductDetailPage,
     showInMenu: false,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN'],
   }, {
     path: '/admin/products/new',
     label: 'Thêm mới sản phẩm',
     component: AdminProductCreatePage,
     showInMenu: false,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN'],
   }, {
     path: '/admin/oders-report',
     label: 'Quản lý đơn',
     component: AdminOrderReportPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['admin'],
+    roles: ['ADMIN'],
+  },
+  {
+    path: '/mycart',
+    label: 'Giỏ hàng',
+    component: CartPage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ['CUSTOMER', 'ADMIN'],
   },
 ];

@@ -1,6 +1,6 @@
-import productsApi from "@/api/productsApi";
+import { useCart } from "@/hooks/useCart";
+import { useProduct } from "@/hooks/useProduct"; // Sử dụng hook bạn đã viết
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
 import {
   Button,
   Card,
@@ -8,14 +8,16 @@ import {
   Divider,
   InputNumber,
   List,
+  message,
   Row,
   Space,
+  Spin,
   Typography,
 } from "antd";
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { Meta } = Card;
 
 const relatedProductsData = [
@@ -43,39 +45,47 @@ const relatedProductsData = [
     price: "10.000.000 vnd",
     image: "https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Camera",
   },
-  {
-    id: 14,
-    name: "Máy ảnh",
-    price: "10.000.000 vnd",
-    image: "https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Camera",
-  },
-  {
-    id: 15,
-    name: "Winner X 2021",
-    price: "20.000.000 vnd",
-    image: "https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Bike",
-  },
 ];
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
-
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const {
-    data: product,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["product", id],
-    queryFn: () => productsApi.getById(Number(id)),
-    enabled: !!id,
-  });
+  const { data: product, isLoading, isError } = useProduct(Number(id));
+  const { addToCart, isAdding } = useCart();
+
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    addToCart(
+      { productId: product.id, quantity },
+      {
+        onSuccess: () => {
+          messageApi.success(`Đã thêm ${quantity} ${product.name} vào giỏ hàng!`);
+        },
+        onError: () => {
+          messageApi.error("Có lỗi xảy ra, vui lòng thử lại sau.");
+        },
+      }
+    );
+  };
+
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '50px' }}><Spin size="large" /></div>;
+  if (isError || !product) return <div>Không tìm thấy sản phẩm</div>;
 
   return (
     <div className="product-detail-page">
+      {contextHolder}
+      <Button
+        type="link"
+        onClick={() => navigate('/products')} // Quay lại trang trước đó trong lịch sử trình duyệt
+        style={{ marginBottom: 16, padding: 0 }}
+      >
+        Quay lại danh sách
+      </Button>
       <Row gutter={[32, 32]} className="main-product-section">
         <Col xs={24} md={12}>
           <Row gutter={16}>
@@ -143,28 +153,36 @@ const ProductDetailPage: React.FC = () => {
             <Text className="current-price">
               {product?.price.toLocaleString()} vnd
             </Text>
-            <Text delete className="original-price">
+            {/* Nếu API không trả về oldPrice, tạm thời hiển thị giá hiện tại như giao diện cũ */}
+            <Text delete className="original-price" style={{ marginLeft: 10 }}>
               {product?.price.toLocaleString()} vnd
             </Text>
           </div>
-          <div className="quantity-section">
-            <Text strong>Số lượng: </Text>
+          <div className="quantity-section" style={{ margin: '16px 0' }}>
+            <Text strong>Số lượng muốn đặt: </Text>
             <InputNumber
               min={1}
               max={product?.quantity}
               defaultValue={1}
               onChange={(value) => setQuantity(value || 1)}
             />
+            <Text strong>Số lượng hiện có: {product?.quantity}</Text>
           </div>
           <div className="description-section">
             <Text strong>Mô tả:</Text>
-            <ul>{product?.description}</ul>
+            <ul>
+              <li>Loại: {product?.type}</li>
+              <li>Danh mục: {product?.category?.name}</li>
+              <li>Mã sản phẩm: {product?.code}</li>
+            </ul>
           </div>
-          <Space className="action-buttons" size="middle">
+          <Space className="action-buttons" size="middle" style={{ marginTop: 20 }}>
             <Button
               size="large"
               icon={<ShoppingCartOutlined />}
               className="btn-add-to-cart"
+              onClick={handleAddToCart}
+              loading={isAdding}
             >
               Thêm vào giỏ hàng
             </Button>

@@ -6,42 +6,67 @@ import {
   Card,
   Col,
   DatePicker,
-  Form, Input, InputNumber,
-  Radio,
+  Form,
+  Input,
+  InputNumber,
   Row,
   Select,
-  Typography, Upload,
-  UploadFile
+  Typography,
+  Upload,
+  UploadFile,
 } from "antd";
 import dayjs from "dayjs";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const { Title } = Typography;
 
 interface ProductFormProps {
-  initialData?: any; // Dùng cho trang Detail/Edit
+  initialData?: any;
   loading?: boolean;
   onFinish: (values: any, fileList: UploadFile[]) => Promise<void>;
   onCancel: () => void;
   isEdit?: boolean;
 }
 
+const SaveButton = ({ form, loading, fileList }: { form: any; loading: boolean; fileList: any[] }) => {
+  const [submittable, setSubmittable] = useState(false);
+  const values = Form.useWatch([], form);
+
+  useEffect(() => {
+    form
+      .validateFields({ validateOnly: true })
+      .then(
+        () => setSubmittable(true),
+        () => setSubmittable(false)
+      );
+  }, [values, form, fileList]);
+
+  return (
+    <Button
+      type="primary"
+      size="large"
+      htmlType="submit"
+      loading={loading}
+      disabled={!submittable}
+      style={submittable ? { backgroundColor: '#52c41a', borderColor: '#52c41a' } : {}}
+    >
+      Save
+    </Button>
+  );
+};
+
 const ProductForm: React.FC<ProductFormProps> = ({
   initialData,
   loading,
   onFinish,
   onCancel,
-  isEdit = false
+  isEdit = false,
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const { categories } = useCategories();
   const { users } = useUsers();
 
-  // Watcher để filter category theo type
-  const selectedType = Form.useWatch("type", form);
-
-  // Hàm bổ trợ để fill data vào các ô Địa chỉ, CCCD, SĐT
   const fillCustomerFields = (userId: any) => {
     if (!userId || !users) return;
     const user = users.find((u: any) => Number(u.id) === Number(userId));
@@ -60,50 +85,39 @@ const ProductForm: React.FC<ProductFormProps> = ({
         ...initialData,
         startDate: initialData.startDate ? dayjs(initialData.startDate) : null,
         endDate: initialData.endDate ? dayjs(initialData.endDate) : null,
-        dailyProfit: initialData.dailyProfit,
-        // GIỮ NGUYÊN ÉP CỨNG THEO YÊU CẦU
-        customerId: 1,
-        categoryId: 1,
+        customerId: initialData.customerId || 1,
+        categoryId: initialData.categoryId || 1,
       };
 
       form.setFieldsValue(formattedData);
 
-      // Tự động fill thông tin chi tiết khách hàng dựa trên ID ép cứng (1)
-      if (users?.length > 0) {
-        fillCustomerFields(1);
-      }
-
-      // Xử lý hiển thị ảnh cũ
-      if (initialData.images && Array.isArray(initialData.images)) {
-        const formattedFiles: UploadFile[] = initialData.images.map((img: any) => ({
+      if (initialData.images) {
+        const formattedFiles = initialData.images.map((img: any) => ({
           uid: img.id.toString(),
-          name: `Image-${img.id}`,
-          status: 'done',
+          name: img.name || `Image-${img.id}`,
+          status: "done",
           url: img.url,
         }));
         setFileList(formattedFiles);
+        form.setFieldsValue({ images: formattedFiles });
       }
     }
-  }, [initialData, form, users]); // Thêm users vào đây để khi list user load xong sẽ fill được data ngay
+  }, [initialData, form]);
 
-  const filteredCategories = useMemo(() => {
-    if (!categories || !selectedType) return [];
-    return categories.filter((item: any) => item.type === selectedType);
-  }, [categories, selectedType]);
-
-  const handleBeforeUpload = () => false;
-  const handleChange = ({ fileList }: any) => {
-    setFileList(fileList.slice(0, 4));
-  };
-
-  const handleUserSelect = (value: any) => {
-    fillCustomerFields(value);
+  const handleUploadChange = ({ fileList: newFileList }: any) => {
+    setFileList(newFileList);
+    form.setFieldsValue({ images: newFileList });
+    form.validateFields(['images']);
   };
 
   return (
-    <Form form={form} layout="vertical" onFinish={(values) => onFinish(values, fileList)}
-      onFinishFailed={(errorInfo) => console.log("Lỗi Validate Form:", errorInfo)}>
-      <Card title={<Title level={5}>{isEdit ? "Chi tiết sản phẩm" : "Tạo sản phẩm mới"}</Title>} className="form-card">
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={(values) => onFinish(values, fileList)}
+      validateTrigger={["onChange", "onBlur"]}
+    >
+      <Card title={<Title level={5}>{isEdit ? "Chi tiết sản phẩm" : "Tạo sản phẩm mới"}</Title>}>
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item label="Tên sản phẩm" name="name" rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
@@ -112,12 +126,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </Col>
 
           <Col xs={24} md={12}>
-            <Form.Item label="Loại sản phẩm" name="type" rules={[{ required: true }]}>
+            <Form.Item label="Loại sản phẩm" name="type" rules={[{ required: true, message: "Chọn loại" }]}>
               <Select
                 placeholder="Chọn loại"
-                onChange={(value) => {
-                  form.setFieldValue("categoryId", undefined);
-                }}
+                onChange={() => form.setFieldValue("categoryId", undefined)}
               >
                 <Select.Option value="PHONE">Phone</Select.Option>
                 <Select.Option value="LAPTOP">Laptop</Select.Option>
@@ -128,93 +140,91 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </Col>
 
           <Col xs={24} md={12}>
-            <Form.Item label="Thể loại" name="categoryId" rules={[{ required: true }]}>
+            <Form.Item label="Thể loại" name="categoryId" rules={[{ required: true, message: "Vui lòng chọn thể loại" }]}>
               <Select
                 placeholder="Chọn thể loại"
-                disabled={!selectedType}
-                options={categories?.map((item: any) => ({
-                  label: item.name,
-                  value: item.id,
-                }))}
+                options={categories?.map((u: any) => ({ label: u.name, value: u.id }))}
               />
             </Form.Item>
           </Col>
 
           <Col xs={24} md={12}>
-            <Form.Item label="Mã sản phẩm" name="code"><Input /></Form.Item>
+            <Form.Item label="Mã sản phẩm" name="code" rules={[{ required: true, message: "Vui lòng nhập mã sản phẩm" }]}><Input /></Form.Item>
           </Col>
 
           <Col xs={24} md={12}>
-            <Form.Item label="Giá sản phẩm" name="price" rules={[{ required: true }, { type: "number", min: 0 }]}>
-              <InputNumber min={0} style={{ width: "100%" }} placeholder="10.000.000 vnd" />
+            <Form.Item label="Giá sản phẩm" name="price" rules={[{ required: true, message: "Nhập giá" }]}>
+              <InputNumber min={0} style={{ width: "100%" }} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
             </Form.Item>
           </Col>
 
           <Col xs={24} md={12}>
-            <Form.Item label="Hình ảnh sản phẩm">
+            <Form.Item
+              label="Hình ảnh sản phẩm (Phải có đủ 4 ảnh)"
+              name="images"
+              rules={[
+                {
+                  validator: (_, value) => {
+                    const currentFiles = form.getFieldValue('images') || [];
+                    if (currentFiles.length === 4) return Promise.resolve();
+                    return Promise.reject(new Error("Bạn phải chọn đúng chính xác 4 hình ảnh!"));
+                  },
+                },
+              ]}
+            >
               <Upload.Dragger
                 multiple
                 listType="picture"
                 fileList={fileList}
-                beforeUpload={handleBeforeUpload}
-                onChange={handleChange}
+                beforeUpload={() => false}
+                onChange={handleUploadChange}
               >
                 <p className="ant-upload-drag-icon"><InboxOutlined /></p>
-                <p>Kéo thả ảnh (Hãy chọn 4 ảnh)</p>
+                <p className="ant-upload-text">Kéo thả hoặc nhấn để chọn 4 ảnh</p>
               </Upload.Dragger>
             </Form.Item>
           </Col>
 
           <Col xs={24} md={6}>
-            <Form.Item label="Tiền lời 1 ngày" name="dailyProfit" rules={[{ required: true }, { type: "number", min: 0 }]}>
+            <Form.Item label="Tiền lời 1 ngày" name="dailyProfit" rules={[{ required: true }]}>
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
           </Col>
 
           <Col xs={24} md={6}>
             <Form.Item label="Số lượng" name="quantity" rules={[{ required: true }]}>
-              <InputNumber min={0} style={{ width: "100%" }} />
+              <InputNumber min={1} style={{ width: "100%" }} />
             </Form.Item>
           </Col>
 
           <Col xs={24} md={6}>
-            <Form.Item label="Ngày bắt đầu cầm" name="startDate" rules={[{ required: true }]}>
-              <DatePicker style={{ width: "100%" }} />
+            <Form.Item label="Ngày bắt đầu" name="startDate" rules={[{ required: true }]}>
+              <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
             </Form.Item>
           </Col>
 
           <Col xs={24} md={6}>
-            <Form.Item label="Ngày kết thúc cầm" name="endDate" rules={[{ required: true }]}>
-              <DatePicker style={{ width: "100%" }} />
+            <Form.Item label="Ngày kết thúc" name="endDate" rules={[{ required: true }]}>
+              <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
             </Form.Item>
           </Col>
 
           <Col xs={24}>
-            <Form.Item label="Mô tả" name="description"><Input.TextArea rows={4} /></Form.Item>
+            <Form.Item label="Mô tả" name="description"><Input.TextArea rows={3} /></Form.Item>
           </Col>
         </Row>
       </Card>
 
       <Card title={<Title level={5}>Thông tin khách hàng</Title>} style={{ marginTop: 20 }}>
-        <Form.Item name="customerType" initialValue="existing">
-          <Radio.Group>
-            <Radio value="existing">Đã có tài khoản</Radio>
-            <Radio value="new">Chưa có tài khoản</Radio>
-          </Radio.Group>
-        </Form.Item>
-
         <Row gutter={24}>
           <Col xs={24} md={12}>
             <Form.Item label="Tên khách hàng" name="customerId" rules={[{ required: true }]}>
               <Select
                 showSearch
                 placeholder="Chọn khách hàng"
-                onChange={handleUserSelect}
+                onChange={fillCustomerFields}
                 optionFilterProp="label"
-                options={users?.map((u: any) => ({
-                  label: u.name,
-                  value: u.id,
-                }))}
+                options={users?.map((u: any) => ({ label: u.name, value: u.id }))}
               />
             </Form.Item>
           </Col>
@@ -224,9 +234,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </Row>
       </Card>
 
-      <div className="action-buttons" style={{ marginTop: 24, textAlign: 'right' }}>
+      <div style={{ marginTop: 24, textAlign: 'right' }}>
         <Button size="large" onClick={onCancel} style={{ marginRight: 12 }}>Cancel</Button>
-        <Button type="primary" size="large" htmlType="submit" loading={loading} className="bg-success">Save</Button>
+        <SaveButton form={form} loading={!!loading} fileList={fileList} />
       </div>
     </Form>
   );

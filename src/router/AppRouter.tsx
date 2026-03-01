@@ -11,6 +11,7 @@ import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
 import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
 import CartPage from "@/pages/CartPage";
 import MyProfilePage from "@/pages/MyProfilePage";
+import PaymentSuccess from "@/pages/PaymentSuccess";
 import ProductDetailPage from "@/pages/ProductDetailPage";
 import ProductsPage from "@/pages/ProductsPage";
 import HomePage from "../pages/HomePage";
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
       {
         path: "mycart",
         element: <PrivateRoute element={<CartPage />} />,
+      },
+      {
+        path: "payment-success",
+        element: <PrivateRoute element={<PaymentSuccess />} />,
       },
     ],
   },

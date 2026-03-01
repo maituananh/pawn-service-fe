@@ -1,8 +1,8 @@
+import { LoginPayload, LoginResponse, UserProfile } from '@/type/user.type';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import authApi from '../api/authApi';
-import { LoginPayload, LoginResponse, UserProfile } from '@/type/user.type';
 
 const AUTH_QUERY_KEY = ['currentUser'];
 
@@ -51,8 +51,7 @@ const useAuth = () => {
     return {
         currentUser: currentUser ?? null,
         isAuthenticated: !!localStorage.getItem('access_token'),
-        // role: currentUser?.role,
-        role: 'admin',
+        role: currentUser?.role,
         login: loginMutation.mutateAsync,
         logout,
         isLoadingLogin: loginMutation.isPending || isFetching,
