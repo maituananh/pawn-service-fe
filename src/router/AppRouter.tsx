@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 
 import AdminLayout from "@/layouts/AdminLayout";
+import AdminCategoriesPage from "@/pages/Admin/AdminCategoriesPage";
+import AdminCategoryFormPage from "@/pages/Admin/AdminCategoryFormPage";
 import AdminCustomerDetailPage from "@/pages/Admin/AdminCustomerDetailPage";
 import AdminCustomersPage from "@/pages/Admin/AdminCustomersPage";
 import AdminDashboardPage from "@/pages/Admin/AdminDashboardPage";
@@ -71,6 +73,22 @@ export const router = createBrowserRouter([
         path: "products",
         element: <PrivateRoute element={<AdminProductsPage />} />,
       },
+
+      {
+        path: "categories",
+        element: <PrivateRoute element={<AdminCategoriesPage />} />,
+      },
+
+      {
+        path: "categories/new",
+        element: <PrivateRoute element={<AdminCategoryFormPage />} />,
+      },
+
+      {
+        path: "categories/:id",
+        element: <PrivateRoute element={<AdminCategoryFormPage />} />,
+      },
+
       {
         path: "products/:id",
         element: <PrivateRoute element={<AdminProductDetailPage />} />,

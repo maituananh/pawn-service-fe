@@ -1,4 +1,5 @@
-import { privateRoutes } from '@/router/router.config';
+import useAuth from "@/hooks/useAuth";
+import { privateRoutes } from "@/router/router.config";
 import {
   AppstoreOutlined,
   DownOutlined,
@@ -6,25 +7,26 @@ import {
   QuestionCircleOutlined,
   SearchOutlined,
   ShoppingOutlined,
-  UserOutlined
-} from '@ant-design/icons';
-import { Avatar, Button, Drawer, Input, Layout, Menu, Typography } from 'antd';
-import React, { useMemo, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import logoImage from '../assets/images/logo.png';
-import useAuth from '@/hooks/useAuth';
+  TagsOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Avatar, Button, Drawer, Input, Layout, Menu, Typography } from "antd";
+import { useMemo, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import logoImage from "../assets/images/logo.png";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
 
 const menuItems = privateRoutes
-  .filter(route => route.showInMenu && route.roles.includes('admin'))
-  .map(route => ({
+  .filter((route) => route.showInMenu && route.roles?.includes("ADMIN"))
+  .map((route) => ({
     key: route.path,
     icon: {
-      '/admin/dashboard': <AppstoreOutlined />,
-      '/admin/products': <ShoppingOutlined />,
-      '/admin/customers': <UserOutlined />,
+      "/admin/dashboard": <AppstoreOutlined />,
+      "/admin/products": <ShoppingOutlined />,
+      "/admin/customers": <UserOutlined />,
+      "/admin/categories": <TagsOutlined />,
     }[route.path] || <QuestionCircleOutlined />,
     label: route.label,
   }));
@@ -32,14 +34,14 @@ const menuItems = privateRoutes
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false); // State cho Sider desktop
-  const [drawerVisible, setDrawerVisible] = useState(false); // State cho Drawer mobile
+  const [collapsed, setCollapsed] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const activeMenuKey = useMemo(() => {
     const matchingPath = menuItems
-      .map(item => item.key as string)
+      .map((item) => item.key as string)
       .sort((a, b) => b.length - a.length)
-      .find(key => location.pathname.startsWith(key));
+      .find((key) => location.pathname.startsWith(key));
 
     return matchingPath ? [matchingPath] : [];
   }, [location.pathname]);
@@ -49,14 +51,16 @@ const AdminLayout = () => {
   };
 
   const handleLogout = () => {
-    logout()
-  }
+    logout();
+  };
 
   const showDrawer = () => setDrawerVisible(true);
   const closeDrawer = () => setDrawerVisible(false);
 
   return (
-    <Layout className={`admin-layout ${collapsed ? 'admin-layout-collapsed' : ''}`}>
+    <Layout
+      className={`admin-layout ${collapsed ? "admin-layout-collapsed" : ""}`}
+    >
       <Sider
         theme="light"
         className="admin-sider"
@@ -70,7 +74,11 @@ const AdminLayout = () => {
         <div className="sider-content">
           <div className="logo-section">
             <img src={logoImage} alt="Logo" className="logo-image" />
-            {!collapsed && <Title level={4} className="logo-title">camdo<b>TQ</b></Title>}
+            {!collapsed && (
+              <Title level={4} className="logo-title">
+                camdo<b>TQ</b>
+              </Title>
+            )}
           </div>
           <Menu
             mode="inline"
@@ -83,12 +91,14 @@ const AdminLayout = () => {
             {isAuthenticated ? (
               <Button onClick={handleLogout}>Đăng xuất</Button>
             ) : (
-              <Button type="primary" onClick={() => navigate('/login')}>
+              <Button type="primary" onClick={() => navigate("/login")}>
                 Đăng nhập
               </Button>
             )}
           </div>
-          <div className={`user-profile-section ${collapsed ? 'user-profile-collapsed' : ''}`}>
+          <div
+            className={`user-profile-section ${collapsed ? "user-profile-collapsed" : ""}`}
+          >
             <Avatar size={40} src="https://i.pravatar.cc/150?u=evano" />
             {!collapsed && (
               <>
@@ -112,7 +122,9 @@ const AdminLayout = () => {
           />
           <div className="mobile-logo-section">
             <img src={logoImage} alt="Logo" className="logo-image" />
-            <Title level={4} className="logo-title">camdo<b>TQ</b></Title>
+            <Title level={4} className="logo-title">
+              camdo<b>TQ</b>
+            </Title>
           </div>
           <div className="desktop-header-content">
             <Title level={4}>Xin chào Evano 👋,</Title>
@@ -124,7 +136,9 @@ const AdminLayout = () => {
           </div>
         </Header>
         <Content className="admin-content">
-          <div className="site-layout-background"><Outlet /></div>
+          <div className="site-layout-background">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
       <Drawer
@@ -142,9 +156,21 @@ const AdminLayout = () => {
         />
         <div className="drawer-auth-section">
           {isAuthenticated ? (
-            <Button onClick={handleLogout} style={{ width: '100%', marginTop: '16px' }}>Đăng xuất</Button>
+            <Button
+              onClick={handleLogout}
+              style={{ width: "100%", marginTop: "16px" }}
+            >
+              Đăng xuất
+            </Button>
           ) : (
-            <Button type="primary" onClick={() => { navigate('/login'); closeDrawer(); }} style={{ width: '100%', marginTop: '16px' }}>
+            <Button
+              type="primary"
+              onClick={() => {
+                navigate("/login");
+                closeDrawer();
+              }}
+              style={{ width: "100%", marginTop: "16px" }}
+            >
               Đăng nhập
             </Button>
           )}

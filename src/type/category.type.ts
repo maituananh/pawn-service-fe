@@ -1,16 +1,19 @@
 export interface Category {
   id: number;
   name: string;
-  note: string;
-  isActive: boolean;
+  description?: string;
+  note?: string;
+  status: boolean;
+  isActive?: boolean;
   createdAt: string;
-  updateAt: string;
+  updatedAt: string;
+  createdBy: string;
 }
 
 export interface CategoryCreateRequest {
-  id?: number;
   name: string;
   note: string;
   startDay: string;
   endDate: string;
+  isActive?: boolean;
 }
