@@ -1,5 +1,4 @@
 import categoriesApi from "@/api/categoriesApi";
-import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { useCategories } from "@/hooks/useCategories";
 import { Category } from "@/type/category.type";
 import {
@@ -69,14 +68,6 @@ const AdminCategoriesPage: React.FC = () => {
       render: (date: string) =>
         date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "-",
     },
-
-    {
-      title: "Ngày cập nhật",
-      dataIndex: "updateAt",
-      key: "updateAt",
-      render: (date: string) =>
-        date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "-",
-    },
     {
       title: "Trạng thái",
       dataIndex: "isActive",
@@ -132,8 +123,6 @@ const AdminCategoriesPage: React.FC = () => {
 
   return (
     <div className="admin-categories-page">
-      <DashboardStatsFeature rowClassName="stats-cards-categories" />
-
       <Card className="categories-table-card">
         <div className="table-toolbar mb-6">
           <Title level={5} className="mt-0">

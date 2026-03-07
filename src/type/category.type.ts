@@ -13,7 +13,5 @@ export interface Category {
 export interface CategoryCreateRequest {
   name: string;
   note: string;
-  startDay: string;
-  endDate: string;
   isActive?: boolean;
 }

@@ -1,19 +1,17 @@
 import categoriesApi from "@/api/categoriesApi";
 import { CategoryCreateRequest } from "@/type/category.type";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Card,
-  DatePicker,
   Form,
   Input,
   message,
   Space,
   Spin,
-  Switch,
   Typography,
 } from "antd";
-import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -26,20 +24,19 @@ const AdminCategoryFormPage: React.FC = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const isEdit = !!id;
+  const queryClient = useQueryClient();
   useEffect(() => {
     if (!isEdit) return;
 
     const fetchCategory = async () => {
       try {
         setLoading(true);
+
         const data = await categoriesApi.getById(Number(id));
 
         form.setFieldsValue({
           name: data.name,
-          note: data.note ?? data.description ?? "",
-          isActive: data.isActive ?? data.status ?? true,
-          startDay: data.createdAt ? dayjs(data.createdAt) : null,
-          endDate: data.updatedAt ? dayjs(data.updatedAt) : null,
+          note: data.note,
         });
       } catch (err) {
         message.error("Không tải được dữ liệu danh mục");
@@ -49,7 +46,7 @@ const AdminCategoryFormPage: React.FC = () => {
     };
 
     fetchCategory();
-  }, [id]);
+  }, [id, form]);
 
   const handleSubmit = async (values: any) => {
     try {
@@ -58,13 +55,12 @@ const AdminCategoryFormPage: React.FC = () => {
       const payload: CategoryCreateRequest = {
         name: values.name,
         note: values.note,
-        startDay: values.startDay?.format("YYYY-MM-DD"),
-        endDate: values.endDate?.format("YYYY-MM-DD"),
         isActive: values.isActive ?? true,
       };
 
       if (isEdit) {
         await categoriesApi.update(Number(id), payload);
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
         message.success("Cập nhật danh mục thành công!");
       } else {
         await categoriesApi.create(payload);
@@ -119,24 +115,6 @@ const AdminCategoryFormPage: React.FC = () => {
           >
             <TextArea rows={4} placeholder="Nhập ghi chú" />
           </Form.Item>
-          <Form.Item
-            label="Ngày bắt đầu"
-            name="startDay"
-            rules={[{ required: true, message: "Vui lòng chọn ngày bắt đầu" }]}
-          >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item
-            label="Ngày kết thúc"
-            name="endDate"
-            rules={[{ required: true, message: "Vui lòng chọn ngày kết thúc" }]}
-          >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item label="Trạng thái" name="isActive" valuePropName="checked">
-            <Switch checkedChildren="Hoạt động" unCheckedChildren="Đã khóa" />
-          </Form.Item>
-
           <Form.Item>
             <Button
               type="primary"
