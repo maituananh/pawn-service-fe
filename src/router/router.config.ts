@@ -1,18 +1,20 @@
-import AdminCustomerDetailPage from '@/pages/Admin/AdminCustomerDetailPage';
-import AdminCustomersPage from '@/pages/Admin/AdminCustomersPage';
-import AdminDashboardPage from '@/pages/Admin/AdminDashboardPage';
-import AdminOrderReportPage from '@/pages/Admin/AdminOdersReportPage';
-import AdminProductCreatePage from '@/pages/Admin/AdminProductCreatePage';
-import AdminProductDetailPage from '@/pages/Admin/AdminProductDetailPage';
-import AdminProductsPage from '@/pages/Admin/AdminProductsPage';
-import CartPage from '@/pages/CartPage';
-import MyProfilePage from '@/pages/MyProfilePage';
-import RegisterPage from '@/pages/RegisterPage';
-import { UserRole } from '@/type/user.type';
-import HomePage from '../pages/HomePage';
-import LoginPage from '../pages/LoginPage';
-import ProductDetailPage from '../pages/ProductDetailPage';
-import ProductsPage from '../pages/ProductsPage';
+import AdminCategoriesPage from "@/pages/Admin/AdminCategoriesPage";
+import AdminCategoryFormPage from "@/pages/Admin/AdminCategoryFormPage";
+import AdminCustomerDetailPage from "@/pages/Admin/AdminCustomerDetailPage";
+import AdminCustomersPage from "@/pages/Admin/AdminCustomersPage";
+import AdminDashboardPage from "@/pages/Admin/AdminDashboardPage";
+import AdminOrderReportPage from "@/pages/Admin/AdminOdersReportPage";
+import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
+import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
+import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
+import CartPage from "@/pages/CartPage";
+import MyProfilePage from "@/pages/MyProfilePage";
+import RegisterPage from "@/pages/RegisterPage";
+import { UserRole } from "@/type/user.type";
+import HomePage from "../pages/HomePage";
+import LoginPage from "../pages/LoginPage";
+import ProductDetailPage from "../pages/ProductDetailPage";
+import ProductsPage from "../pages/ProductsPage";
 
 export interface RouteConfig {
   path: string;
@@ -25,109 +27,139 @@ export interface RouteConfig {
 
 export const publicRoutes: RouteConfig[] = [
   {
-    path: '/',
-    label: 'Trang chủ',
+    path: "/",
+    label: "Trang chủ",
     component: HomePage,
     showInMenu: true,
     requiresLayout: true,
   },
   {
-    path: '/products',
-    label: 'Đang thanh lý',
+    path: "/products",
+    label: "Đang thanh lý",
     component: ProductsPage,
     showInMenu: true,
     requiresLayout: true,
   },
   {
-    path: '/login',
-    label: 'Đăng nhập',
+    path: "/login",
+    label: "Đăng nhập",
     component: LoginPage,
     showInMenu: false,
     requiresLayout: false,
   },
   {
-    path: '/register',
-    label: 'Đăng ký',
+    path: "/register",
+    label: "Đăng ký",
     component: RegisterPage,
     showInMenu: false,
     requiresLayout: false,
   },
   {
-    path: '/products/:id',
-    label: 'Chi tiết sản phẩm',
+    path: "/products/:id",
+    label: "Chi tiết sản phẩm",
     component: ProductDetailPage,
     showInMenu: false,
     requiresLayout: true,
-  }
+  },
 ];
 
 export const privateRoutes: RouteConfig[] = [
   {
-    path: '/my-profile',
-    label: 'My profile',
+    path: "/my-profile",
+    label: "My profile",
     component: MyProfilePage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['ADMIN', 'CUSTOMER'],
+    roles: ["ADMIN", "CUSTOMER"],
   },
   {
-    path: '/admin/dashboard',
-    label: 'Dashboard',
+    path: "/admin/dashboard",
+    label: "Dashboard",
     component: AdminDashboardPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['ADMIN'],
+    roles: ["ADMIN"],
   },
   {
-    path: '/admin/customers',
-    label: 'Khách hàng',
+    path: "/admin/customers",
+    label: "Khách hàng",
     component: AdminCustomersPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['ADMIN'],
+    roles: ["ADMIN"],
   },
   {
-    path: '/admin/customers/:id',
-    label: 'Chi tiết khách hàng',
+    path: "/admin/customers/:id",
+    label: "Chi tiết khách hàng",
     component: AdminCustomerDetailPage,
     showInMenu: false,
     requiresLayout: true,
-    roles: ['ADMIN'],
-  }, {
-    path: '/admin/products',
-    label: 'Quản lý sản phẩm',
+    roles: ["ADMIN"],
+  },
+  {
+    path: "/admin/products",
+    label: "Quản lý sản phẩm",
     component: AdminProductsPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['ADMIN'],
-  }, {
-    path: '/admin/products/:id',
-    label: 'Chi tiết sản phẩm',
+    roles: ["ADMIN"],
+  },
+  {
+    path: "/admin/categories",
+    label: "Danh mục",
+    component: AdminCategoriesPage,
+    showInMenu: true,
+    requiresLayout: true,
+    roles: ["ADMIN"],
+  },
+
+  {
+    path: "/admin/categories/new",
+    label: "Tạo danh mục",
+    component: AdminCategoryFormPage,
+    showInMenu: false,
+    requiresLayout: true,
+    roles: ["ADMIN"],
+  },
+  {
+    path: "/admin/categories/:id",
+    label: "Cập nhật danh mục",
+    component: AdminCategoryFormPage,
+    showInMenu: false,
+    requiresLayout: true,
+    roles: ["ADMIN"],
+  },
+
+  {
+    path: "/admin/products/:id",
+    label: "Chi tiết sản phẩm",
     component: AdminProductDetailPage,
     showInMenu: false,
     requiresLayout: true,
-    roles: ['ADMIN'],
-  }, {
-    path: '/admin/products/new',
-    label: 'Thêm mới sản phẩm',
+    roles: ["ADMIN"],
+  },
+  {
+    path: "/admin/products/new",
+    label: "Thêm mới sản phẩm",
     component: AdminProductCreatePage,
     showInMenu: false,
     requiresLayout: true,
-    roles: ['ADMIN'],
-  }, {
-    path: '/admin/oders-report',
-    label: 'Quản lý đơn',
+    roles: ["ADMIN"],
+  },
+  {
+    path: "/admin/orders-report",
+    label: "Quản lý đơn",
     component: AdminOrderReportPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['ADMIN'],
+    roles: ["ADMIN"],
   },
   {
-    path: '/mycart',
-    label: 'Giỏ hàng',
+    path: "/mycart",
+    label: "Giỏ hàng",
     component: CartPage,
     showInMenu: true,
     requiresLayout: true,
-    roles: ['CUSTOMER', 'ADMIN'],
+    roles: ["CUSTOMER", "ADMIN"],
   },
 ];
