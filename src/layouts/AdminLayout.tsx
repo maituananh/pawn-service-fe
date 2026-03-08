@@ -19,7 +19,12 @@ const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
 
 const menuItems = privateRoutes
-  .filter((route) => route.showInMenu && route.roles?.includes("ADMIN"))
+  .filter(
+    (route) =>
+      route.showInMenu &&
+      route.roles?.includes("ADMIN") &&
+      route.path.startsWith("/admin"),
+  )
   .map((route) => ({
     key: route.path,
     icon: {
@@ -27,6 +32,7 @@ const menuItems = privateRoutes
       "/admin/products": <ShoppingOutlined />,
       "/admin/customers": <UserOutlined />,
       "/admin/categories": <TagsOutlined />,
+      "/admin/orders-report": <AppstoreOutlined />,
     }[route.path] || <QuestionCircleOutlined />,
     label: route.label,
   }));
@@ -72,7 +78,11 @@ const AdminLayout = () => {
         collapsedWidth={80}
       >
         <div className="sider-content">
-          <div className="logo-section">
+          <div
+            className="logo-section"
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
+          >
             <img src={logoImage} alt="Logo" className="logo-image" />
             {!collapsed && (
               <Title level={4} className="logo-title">
@@ -120,14 +130,18 @@ const AdminLayout = () => {
             icon={<MenuOutlined />}
             onClick={showDrawer}
           />
-          <div className="mobile-logo-section">
+          <div
+            className="mobile-logo-section"
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
+          >
             <img src={logoImage} alt="Logo" className="logo-image" />
             <Title level={4} className="logo-title">
               camdo<b>TQ</b>
             </Title>
           </div>
           <div className="desktop-header-content">
-            <Title level={4}>Xin chào Evano 👋,</Title>
+            <Title level={4}>Xin chào Thao Quyen 👋,</Title>
             <Input
               placeholder="Search"
               prefix={<SearchOutlined />}

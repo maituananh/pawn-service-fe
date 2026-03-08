@@ -1,14 +1,14 @@
-import useAuth from '@/hooks/useAuth';
-import { MenuOutlined } from '@ant-design/icons';
-import { Button, Drawer, Layout, Menu, Typography, type MenuProps } from 'antd';
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import logoImage from '../assets/images/logo.png';
+import useAuth from "@/hooks/useAuth";
+import { MenuOutlined } from "@ant-design/icons";
+import { Button, Drawer, Layout, Menu, Typography, type MenuProps } from "antd";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import logoImage from "../assets/images/logo.png";
 
 const { Header } = Layout;
 const { Title } = Typography;
 
-const AppHeader = ({ menuItems }: { menuItems: MenuProps['items'] }) => {
+const AppHeader = ({ menuItems }: { menuItems: MenuProps["items"] }) => {
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -24,11 +24,14 @@ const AppHeader = ({ menuItems }: { menuItems: MenuProps['items'] }) => {
     closeDrawer();
   };
 
-
   return (
     <Header className="app-header">
       <div className="header-content">
-        <div className="logo-section">
+        <div
+          className="logo-section"
+          onClick={() => navigate("/")}
+          style={{ cursor: "pointer" }}
+        >
           <img src={logoImage} alt="Logo" className="logo-image" />
           <Title level={4} className="logo-title">
             camdo<b>thaoquyen</b>
@@ -46,7 +49,7 @@ const AppHeader = ({ menuItems }: { menuItems: MenuProps['items'] }) => {
           {isAuthenticated ? (
             <Button onClick={handleLogout}>Đăng xuất</Button>
           ) : (
-            <Button type="primary" onClick={() => navigate('/login')}>
+            <Button type="primary" onClick={() => navigate("/login")}>
               Đăng nhập
             </Button>
           )}
@@ -72,9 +75,21 @@ const AppHeader = ({ menuItems }: { menuItems: MenuProps['items'] }) => {
           />
           <div className="drawer-auth-section">
             {isAuthenticated ? (
-              <Button onClick={handleLogout} style={{ width: '100%', marginTop: '16px' }}>Đăng xuất</Button>
+              <Button
+                onClick={handleLogout}
+                style={{ width: "100%", marginTop: "16px" }}
+              >
+                Đăng xuất
+              </Button>
             ) : (
-              <Button type="primary" onClick={() => { navigate('/login'); closeDrawer(); }} style={{ width: '100%', marginTop: '16px' }}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  navigate("/login");
+                  closeDrawer();
+                }}
+                style={{ width: "100%", marginTop: "16px" }}
+              >
                 Đăng nhập
               </Button>
             )}
