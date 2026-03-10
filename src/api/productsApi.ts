@@ -33,12 +33,17 @@ const productsApi = {
     size: number;
     name?: string;
     categoryIds?: number[];
+    status?: string;
   }): Promise<Page<Product>> {
     const { data } = await axiosClient.get<Page<Product>>("/products/search", {
       params: query,
     });
 
     return data;
+  },
+
+  async liquidation(id: number): Promise<void> {
+    await axiosClient.patch(`/products/${id}/liquidation`);
   },
 };
 

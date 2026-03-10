@@ -1,8 +1,9 @@
+import { Button, Flex, message, Popconfirm, Spin, Typography, UploadFile } from 'antd';
+import { ShoppingOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import fileApi from '@/api/filesApi';
 import productsApi from '@/api/productsApi';
 import ProductForm from '@/components/admin/ProductForm';
 import { useProduct } from '@/hooks/useProduct';
-import { message, Spin, UploadFile } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -60,6 +61,20 @@ const AdminProductDetailPage: React.FC = () => {
     }
   };
 
+  const handleLiquidation = async () => {
+    try {
+      setLoading(true);
+      await productsApi.liquidation(productId);
+      message.success('Thanh lý sản phẩm thành công!');
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+      navigate('/admin/products');
+    } catch (error) {
+      // Handled globally
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (isLoading) return (
     <div style={{ textAlign: 'center', padding: '50px' }}>
       <Spin size="large" tip="Đang tải dữ liệu..." />
@@ -69,15 +84,44 @@ const AdminProductDetailPage: React.FC = () => {
   if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
 
   return (
-    <div className="product-detail-page" style={{ padding: '24px' }}>
+    <Flex vertical gap={24} style={{ padding: '24px' }}>
+      <Flex align="center" justify="space-between">
+        <Flex align="center" gap={16}>
+          <Button 
+            icon={<ArrowLeftOutlined />} 
+            onClick={() => navigate('/admin/products')}
+            type="text"
+          />
+          <Typography.Title level={4} style={{ margin: 0 }}>Chi tiết sản phẩm</Typography.Title>
+        </Flex>
+        
+        <Popconfirm
+          title="Thanh lý sản phẩm"
+          description="Bạn có chắc chắn muốn thanh lý sản phẩm này không? Hành động này không thể hoàn tác."
+          onConfirm={handleLiquidation}
+          okText="Thanh lý"
+          cancelText="Hủy"
+          okButtonProps={{ danger: true, loading: loading }}
+        >
+          <Button 
+            danger 
+            icon={<ShoppingOutlined />}
+            size="large"
+            style={{ borderRadius: 8, fontWeight: 600 }}
+          >
+            Thanh lý sản phẩm
+          </Button>
+        </Popconfirm>
+      </Flex>
+
       <ProductForm
         isEdit={true}
-        initialData={product} // Truyền toàn bộ object product vào
+        initialData={product}
         onFinish={handleUpdate}
         onCancel={() => navigate('/admin/products')}
         loading={loading}
       />
-    </div>
+    </Flex>
   );
 };
 

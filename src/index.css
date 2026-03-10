@@ -66,3 +66,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.product-card-hover:hover > div {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12) !important;
+  border-color: #1677ff !important;
+}
+
+.product-card-hover:hover img {
+  transform: scale(1.08);
+}

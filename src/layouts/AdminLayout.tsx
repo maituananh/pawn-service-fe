@@ -60,11 +60,6 @@ const AdminLayout = () => {
 
   const userMenuItems = [
     {
-      key: 'profile',
-      label: 'My Profile',
-      icon: <UserOutlined />,
-    },
-    {
       key: 'logout',
       label: 'Logout',
       icon: <LogoutOutlined />,

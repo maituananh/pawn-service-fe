@@ -80,12 +80,18 @@ const AdminProductsPage: React.FC = () => {
     { title: "Loại", dataIndex: "type", key: "type" },
     {
       title: "Trạng thái",
-      dataIndex: "isActived",
       key: "status",
-      render: (isActived: boolean | undefined) => (
-        <Tag bordered={false} color={isActived !== false ? "success" : "error"}>
-          {isActived !== false ? "Hoạt động" : "Đã xoá"}
-        </Tag>
+      render: (_: any, record: Product) => (
+        <Flex gap={4} wrap="wrap">
+          <Tag bordered={false} color={record.isActived !== false ? "success" : "error"}>
+            {record.isActived !== false ? "Hoạt động" : "Đã xoá"}
+          </Tag>
+          {record.isActived !== false && record.status && (
+            <Tag color="#108ee9" bordered={false} style={{ fontSize: 10, borderRadius: 4 }}>
+              {record.status}
+            </Tag>
+          )}
+        </Flex>
       ),
     },
     {

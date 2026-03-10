@@ -15,6 +15,7 @@ export interface Product {
   endDate: string;
   type: string;
   isActived?: boolean;
+  status?: string;
 }
 
 export interface ProductCreateRequest {
