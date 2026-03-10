@@ -20,8 +20,8 @@ import {
   Spin,
   Table,
   Tag,
-  Typography,
   theme,
+  Typography,
 } from "antd";
 import dayjs from "dayjs";
 import React from "react";
@@ -58,35 +58,43 @@ const AdminCategoriesPage: React.FC = () => {
       title: "Tên danh mục",
       dataIndex: "name",
       key: "name",
-      render: (text: string) => <Text strong>{text}</Text>
+      render: (text: string) => <Text strong>{text}</Text>,
     },
     {
       title: "Mô tả",
       dataIndex: "note",
       key: "note",
-      render: (text: string) => <Text type="secondary" style={{ fontSize: 13 }}>{text || "Không có mô tả"}</Text>
+      render: (text: string) => (
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          {text || "Không có mô tả"}
+        </Text>
+      ),
     },
     {
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) =>
-        date ? <Text type="secondary">{dayjs(date).format("DD/MM/YYYY HH:mm")}</Text> : "-",
+        date ? (
+          <Text type="secondary">{dayjs(date).format("DD/MM/YYYY HH:mm")}</Text>
+        ) : (
+          "-"
+        ),
     },
     {
       title: "Trạng thái",
       dataIndex: "isActive",
       key: "isActive",
       render: (status: boolean) => (
-        <Tag bordered={false} color={status ? "success" : "default"}>
-          {status ? "Hoạt động" : "Tạm khóa"}
+        <Tag bordered={false} color={status ? "success" : "red"}>
+          {status ? "Hoạt động" : "Đã xoá"}
         </Tag>
       ),
     },
     {
       title: "Hành động",
       key: "actions",
-      align: 'right' as const,
+      align: "right" as const,
       render: (_: any, record: Category) => (
         <Space onClick={(e) => e.stopPropagation()}>
           <Button
@@ -115,38 +123,52 @@ const AdminCategoriesPage: React.FC = () => {
     },
   ];
 
-  if (isLoading) return (
-    <Flex align="center" justify="center" style={{ minHeight: '400px' }}>
-      <Spin size="large" tip="Đang tải danh mục..." />
-    </Flex>
-  );
+  if (isLoading)
+    return (
+      <Flex align="center" justify="center" style={{ minHeight: "400px" }}>
+        <Spin size="large" tip="Đang tải danh mục..." />
+      </Flex>
+    );
 
-  if (isError) return (
-    <Flex align="center" justify="center" style={{ minHeight: '400px' }}>
-      <Text type="danger">Đã xảy ra lỗi khi tải danh sách danh mục!</Text>
-    </Flex>
-  );
+  if (isError)
+    return (
+      <Flex align="center" justify="center" style={{ minHeight: "400px" }}>
+        <Text type="danger">Đã xảy ra lỗi khi tải danh sách danh mục!</Text>
+      </Flex>
+    );
 
   return (
     <Flex vertical gap={24}>
-      <Card 
-        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+      <Card
+        style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
         title={
           <Flex align="center" justify="space-between" wrap="wrap" gap={16}>
             <Flex vertical gap={4}>
-              <Title level={4} style={{ margin: 0 }}>Quản lý danh mục</Title>
-              <Text type="secondary" style={{ fontSize: 12 }}>Phân loại các loại tài sản cầm đồ</Text>
+              <Title level={4} style={{ margin: 0 }}>
+                Quản lý danh mục
+              </Title>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Phân loại các loại tài sản cầm đồ
+              </Text>
             </Flex>
 
             <Flex gap={12} wrap="wrap">
-              <Input 
-                placeholder="Tìm danh mục..." 
-                prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />} 
+              <Input
+                placeholder="Tìm danh mục..."
+                prefix={
+                  <SearchOutlined
+                    style={{ color: token.colorTextDescription }}
+                  />
+                }
                 style={{ width: 240, borderRadius: 8 }}
                 allowClear
               />
 
-              <Select defaultValue="newest" style={{ width: 160 }} variant="filled">
+              <Select
+                defaultValue="newest"
+                style={{ width: 160 }}
+                variant="filled"
+              >
                 <Option value="newest">Mới nhất trước</Option>
                 <Option value="oldest">Cũ nhất trước</Option>
               </Select>
@@ -175,8 +197,8 @@ const AdminCategoriesPage: React.FC = () => {
           pagination={{
             position: ["bottomRight"],
             pageSize: 10,
-            showTotal: (total, range) => 
-              `Hiển thị ${range[0]}-${range[1]} của ${total} danh mục`
+            showTotal: (total, range) =>
+              `Hiển thị ${range[0]}-${range[1]} của ${total} danh mục`,
           }}
         />
       </Card>

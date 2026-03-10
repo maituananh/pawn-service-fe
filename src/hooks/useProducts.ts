@@ -10,6 +10,7 @@ export const useProducts = (query?: {
   size?: number;
   name?: string;
   categoryIds?: number[];
+  status?: string;
 }) => {
   const { data, isFetching, isError, error, refetch } = useQuery<Page<Product>>(
     {
@@ -20,6 +21,7 @@ export const useProducts = (query?: {
           size: query?.size ?? 15,
           name: query?.name,
           categoryIds: query?.categoryIds,
+          status: query?.status,
         }),
       retry: 1,
     }
