@@ -1,3 +1,4 @@
+// [UI ONLY] Redesigned AdminProductsPage with improved toolbar and table styling
 import productsApi from "@/api/productsApi";
 import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { useProducts } from "@/hooks/useProducts";
@@ -11,6 +12,7 @@ import {
 import {
   Button,
   Card,
+  Flex,
   Input,
   message,
   Popconfirm,
@@ -20,16 +22,18 @@ import {
   Table,
   Tag,
   Typography,
+  theme,
 } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const AdminProductsPage: React.FC = () => {
   const navigate = useNavigate();
   const { productsPage, isLoading, isError, error, refetch } = useProducts();
+  const { token } = theme.useToken();
 
   const handleRowClick = (record: Product) => {
     navigate(`/admin/products/${record.id}`);
@@ -45,105 +49,142 @@ const AdminProductsPage: React.FC = () => {
       message.success("Đã xóa sản phẩm thành công!");
       refetch();
     } catch (err) {
-      message.error("Xóa sản phẩm thất bại!");
+      // Error is already handled globally in axiosClient interceptor
     }
   };
 
   const columns = [
-    { title: "Tên sản phẩm", dataIndex: "name", key: "productName" },
-    { title: "Giá", dataIndex: "price", key: "price" },
-    { title: "SĐT Người sở hữu", dataIndex: "ownerPhone", key: "ownerPhone" },
-    { title: "Người sở hữu", dataIndex: "ownerName", key: "ownerName" },
+    { 
+      title: "Sản phẩm", 
+      dataIndex: "name", 
+      key: "productName",
+      render: (text: string) => <Text strong>{text}</Text>
+    },
+    { 
+      title: "Giá", 
+      dataIndex: "price", 
+      key: "price",
+      render: (price: number) => <Text style={{ color: token.colorPrimary, fontWeight: 600 }}>{price?.toLocaleString()} VND</Text>
+    },
+    { 
+      title: "Người sở hữu", 
+      dataIndex: "ownerName", 
+      key: "ownerName",
+      render: (text: string, record: Product) => (
+        <Flex vertical gap={0}>
+          <Text style={{ fontSize: 13 }}>{text}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>{(record as any).ownerPhone}</Text>
+        </Flex>
+      )
+    },
     { title: "Loại", dataIndex: "type", key: "type" },
     {
       title: "Trạng thái",
-      dataIndex: "status",
+      dataIndex: "isActived",
       key: "status",
-      render: (status: string) => (
-        <Tag color={status === "Active" ? "success" : "error"}>{status}</Tag>
+      render: (isActived: boolean | undefined) => (
+        <Tag bordered={false} color={isActived !== false ? "success" : "error"}>
+          {isActived !== false ? "Hoạt động" : "Đã xoá"}
+        </Tag>
       ),
     },
     {
       title: "Hành động",
       key: "actions",
+      align: "right" as const,
       render: (_: any, record: Product) => (
-        <Space>
+        <Space onClick={(e) => e.stopPropagation()}>
           <Button
-            type="link"
+            type="text"
+            shape="circle"
             icon={<EditOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(record.id);
-            }}
-          >
-            Sửa
-          </Button>
+            onClick={() => handleEdit(record.id)}
+          />
           <Popconfirm
-            title="Bạn có chắc muốn xóa sản phẩm này không?"
+            title="Xóa sản phẩm"
+            description="Bạn có chắc muốn xóa sản phẩm này không?"
             okText="Xóa"
             cancelText="Hủy"
-            onConfirm={(e) => {
-              e?.stopPropagation();
-              handleDelete(record.id);
-            }}
-            onCancel={(e) => e?.stopPropagation()}
+            onConfirm={() => handleDelete(record.id)}
           >
             <Button
-              type="link"
+              type="text"
+              shape="circle"
               danger
               icon={<DeleteOutlined />}
-              onClick={(e) => e.stopPropagation()}
-            >
-              Xóa
-            </Button>
+            />
           </Popconfirm>
         </Space>
       ),
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
+  if (isLoading) return (
+    <Flex align="center" justify="center" style={{ minHeight: '440px' }}>
+      <Spin size="large" tip="Đang tải danh sách sản phẩm..." />
+    </Flex>
+  );
+
+  if (isError) return (
+    <Flex align="center" justify="center" style={{ minHeight: '440px' }}>
+      <Text type="danger">Đã xảy ra lỗi khi tải danh sách sản phẩm!</Text>
+    </Flex>
+  );
 
   return (
-    <div className="admin-products-page">
+    <Flex vertical gap={24}>
       <DashboardStatsFeature rowClassName="stats-cards-products" />
-      <Card className="products-table-card">
-        <div className="table-toolbar mb-6">
-          <Title level={5} className="mt-0">
-            Tất cả sản phẩm
-          </Title>
-          <Space className="toolbar-actions">
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate("/admin/products/create")}
-            >
-              Mới
-            </Button>
-            <Input placeholder="Tìm khách hàng" prefix={<SearchOutlined />} />
-            <Select defaultValue="newest">
-              <Option value="newest">Short by: Newest</Option>
-              <Option value="oldest">Short by: Oldest</Option>
-            </Select>
-          </Space>
-        </div>
+      
+      <Card 
+        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+        title={
+          <Flex align="center" justify="space-between" wrap="wrap" gap={16}>
+            <Flex vertical gap={4}>
+              <Title level={4} style={{ margin: 0 }}>Kho sản phẩm cầm đồ</Title>
+              <Text type="secondary" style={{ fontSize: 12 }}>Quản lý và theo dõi thông tin tài sản</Text>
+            </Flex>
+            
+            <Flex gap={12} wrap="wrap">
+              <Input 
+                placeholder="Tìm sản phẩm..." 
+                prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />} 
+                style={{ width: 240, borderRadius: 8 }}
+                allowClear
+              />
+              <Select defaultValue="newest" style={{ width: 160 }} variant="filled">
+                <Option value="newest">Mới nhất trước</Option>
+                <Option value="oldest">Cũ nhất trước</Option>
+              </Select>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate("/admin/products/create")}
+                style={{ borderRadius: 8 }}
+              >
+                Thêm mới
+              </Button>
+            </Flex>
+          </Flex>
+        }
+      >
         <Table
           columns={columns}
           dataSource={productsPage?.data}
           onRow={(record) => ({
             onClick: () => handleRowClick(record),
           })}
+          size="middle"
+          rowClassName="row-hover-custom"
           pagination={{
-            position: ["bottomCenter"],
+            position: ["bottomRight"],
             total: productsPage?.totalElements,
             showTotal: (total, range) =>
-              `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
+              `Hiển thị ${range[0]}-${range[1]} của ${total} sản phẩm`,
             showSizeChanger: false,
           }}
         />
       </Card>
-    </div>
+    </Flex>
   );
 };
 

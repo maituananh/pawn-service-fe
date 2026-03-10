@@ -1,3 +1,4 @@
+// [UI ONLY] Redesigned AdminCustomersPage with improved toolbar and table styling
 import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { useUsers } from "@/hooks/useUsers";
 import { UserProfile } from "@/type/user.type";
@@ -9,6 +10,7 @@ import {
 import {
   Button,
   Card,
+  Flex,
   Input,
   Select,
   Space,
@@ -17,46 +19,48 @@ import {
   Tag,
   Typography,
   type TableProps,
+  theme,
 } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-interface CustomerDataType {
-  key: string;
-  name: string;
-  company: string;
-  phone: string;
-  email: string;
-  country: string;
-}
 
 const AdminCustomersPage: React.FC = () => {
   const navigate = useNavigate();
   const { users, isLoading, isError, error, refetch } = useUsers();
+  const { token } = theme.useToken();
 
   const columns: TableProps<UserProfile>["columns"] = [
-    { title: "Tên khách hàng", dataIndex: "name", key: "name" },
-    { title: "Company", dataIndex: "company", key: "company" },
-    { title: "Điện thoại", dataIndex: "phone", key: "phone" },
+    { 
+      title: "Khách hàng", 
+      dataIndex: "name", 
+      key: "name",
+      render: (text) => <Text strong style={{ color: token.colorPrimary }}>{text}</Text>
+    },
+    { title: "Công ty", dataIndex: "company", key: "company" },
+    { title: "Điện thoại", dataIndex: "phone", key: "phone", render: (text) => <Text type="secondary">{text}</Text> },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Địa chỉ", dataIndex: "country", key: "country" },
     {
-      title: "Action",
+      title: "Thao tác",
       key: "action",
+      align: "right" as const,
       render: (_: any, record: { id: string }) => (
-        <Space size="middle">
+        <Space size="small">
           <Button
             type="text"
+            shape="circle"
             icon={<EditOutlined />}
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/admin/customers / ${record.id}`);
+              navigate(`/admin/customers/${record.id}`);
             }}
           />
           <Button
             type="text"
+            shape="circle"
             danger
             icon={<DeleteOutlined />}
             onClick={(e) => {
@@ -69,39 +73,64 @@ const AdminCustomersPage: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
+  if (isLoading) return (
+    <Flex align="center" justify="center" style={{ minHeight: '400px' }}>
+      <Spin size="large" tip="Đang tải dữ liệu..." />
+    </Flex>
+  );
+
+  if (isError) return (
+    <Flex align="center" justify="center" style={{ minHeight: '400px' }}>
+      <Text type="danger">Đã xảy ra lỗi khi tải danh sách khách hàng!</Text>
+    </Flex>
+  );
 
   return (
-    <div className="customers-page">
+    <Flex vertical gap={24}>
       <DashboardStatsFeature rowClassName="stats-cards-customers" />
-      <Card className="customers-table-card">
-        <div className="table-toolbar">
-          <div>
-            <Title level={5}>Tất cả khách hàng</Title>
-            <Tag color="green">Active Members</Tag>
-          </div>
-          <Space>
-            <Input placeholder="Tìm khách hàng" prefix={<SearchOutlined />} />
-            <Select defaultValue="newest">
-              <Option value="newest">Short by: Newest</Option>
-              <Option value="oldest">Short by: Oldest</Option>
-            </Select>
-          </Space>
-        </div>
+      
+      <Card 
+        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+        title={
+          <Flex align="center" justify="space-between" wrap="wrap" gap={16}>
+            <Flex vertical gap={4}>
+              <Title level={4} style={{ margin: 0 }}>Tất cả khách hàng</Title>
+              <Space>
+                <Tag color="success" bordered={false}>Thành viên hoạt động</Tag>
+                <Text type="secondary" style={{ fontSize: 12 }}>{users?.length || 0} khách hàng trong hệ thống</Text>
+              </Space>
+            </Flex>
+            
+            <Flex gap={12} wrap="wrap">
+              <Input 
+                placeholder="Tìm khách hàng..." 
+                prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />} 
+                style={{ width: 240, borderRadius: 8 }}
+                allowClear
+              />
+              <Select defaultValue="newest" style={{ width: 170 }} variant="filled">
+                <Option value="newest">Sắp xếp: Mới nhất</Option>
+                <Option value="oldest">Sắp xếp: Cũ nhất</Option>
+              </Select>
+            </Flex>
+          </Flex>
+        }
+      >
         <Table
           columns={columns}
           dataSource={users}
+          size="middle"
+          rowClassName="row-hover-custom"
           pagination={{
-            position: ["bottomCenter"],
+            position: ["bottomRight"],
             total: users.length,
             showTotal: (total, range) =>
-              `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
+              `đang hiển thị ${range[0]} - ${range[1]} trong số ${total} khách hàng`,
             showSizeChanger: false,
           }}
         />
       </Card>
-    </div>
+    </Flex>
   );
 };
 

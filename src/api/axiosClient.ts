@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
+import { notification } from 'antd';
 import authApi from './authApi';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const REFRESH_URL = import.meta.env.VITE_API_REFRESH_URL || '';
@@ -47,6 +48,24 @@ axiosClient.interceptors.response.use(
     async (error: AxiosError & { config?: any }) => {
         const originalRequest = error.config;
 
+        // Extract error message from response
+        const errorData = error.response?.data as any;
+        const errorMessage = errorData?.message || errorData?.error || error.message || 'Lỗi hệ thống, vui lòng thử lại sau';
+
+        // Show global error notification at bottom left
+        // Skip notification only for the FIRST 401/403 attempt so we can try silenty refreshing token
+        const isAuthError = error.response?.status === 401 || error.response?.status === 403;
+        const isFirstAttempt = !originalRequest?._retry;
+
+        if (!isAuthError || !isFirstAttempt) {
+            notification.error({
+                message: 'Phát hiện lỗi!',
+                description: errorMessage,
+                placement: 'bottomLeft',
+                duration: 4,
+            });
+        }
+
         if (
             (error.response?.status === 401 || error.response?.status === 403) &&
             !originalRequest._retry
@@ -87,6 +106,14 @@ axiosClient.interceptors.response.use(
 
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
+                
+                // Show notification for authentication failure
+                notification.warning({
+                    message: 'Phiên làm việc hết hạn',
+                    description: 'Vui lòng đăng nhập lại.',
+                    placement: 'bottomLeft',
+                });
+
                 window.location.href = '/login';
                 return Promise.reject(err);
             } finally {

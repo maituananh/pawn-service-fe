@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// [UI ONLY] Redesigned AdminCustomerDetailPage with improved layout and styling
+import React, { useState } from 'react';
 import {
   Row,
   Col,
@@ -13,9 +14,21 @@ import {
   Dropdown,
   MenuProps,
   Flex,
+  Tag,
+  Space,
+  theme,
+  Divider,
   type TableProps,
 } from 'antd';
-import { EditOutlined, MoreOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { 
+  EditOutlined, 
+  MoreOutlined, 
+  DownOutlined, 
+  UpOutlined,
+  MailOutlined,
+  SaveOutlined,
+  UserOutlined
+} from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -46,22 +59,32 @@ const userProducts = [
 ];
 
 const productColumns: TableProps<ProductDataType>['columns'] = [
-  { title: 'Status', dataIndex: 'status', key: 'status', width: '5%', align: 'center', render: () => <div style={{ width: 15, height: 15, backgroundColor: 'green', borderRadius: '50%', margin: 'auto' }} /> },
-  { title: 'Tên sản phẩm', dataIndex: 'name', key: 'name' },
-  { title: 'Giá', dataIndex: 'price', key: 'price' },
-  { title: 'Task', dataIndex: 'task', key: 'task' },
-  { title: 'Start date', dataIndex: 'startDate', key: 'startDate' },
-  { title: 'Capacity', dataIndex: 'capacity', key: 'capacity', render: (percent: number) => <>{percent}%</> },
+  { 
+    title: 'Trạng thái', 
+    dataIndex: 'status', 
+    key: 'status', 
+    width: 120,
+    render: (status) => (
+      <Tag bordered={false} color={status === 'active' ? 'success' : 'default'}>
+        {status === 'active' ? 'Đang cầm' : 'Đã chuộc'}
+      </Tag>
+    ) 
+  },
+  { title: 'Tên sản phẩm', dataIndex: 'name', key: 'name', render: (text) => <Text strong>{text}</Text> },
+  { title: 'Giá định giá', dataIndex: 'price', key: 'price', render: (text) => <Text>{text}đ</Text> },
+  { title: 'Phân loại', dataIndex: 'task', key: 'task', render: (text) => <Tag bordered={false}>{text}</Tag> },
+  { title: 'Ngày bắt đầu', dataIndex: 'startDate', key: 'startDate', render: (text) => <Text type="secondary">{text}</Text> },
+  { title: 'Tỉ suất', dataIndex: 'capacity', key: 'capacity', align: 'right', render: (percent: number) => <Text strong style={{ color: '#1677ff' }}>{percent}%</Text> },
 ];
 
 const dropdownItems: MenuProps['items'] = [
-  { key: '1', label: 'Vô hiệu hóa' },
-  { key: '2', label: 'Admin' },
+  { key: 'disable', label: 'Vô hiệu hóa tài khoản', danger: true },
+  { key: 'admin', label: 'Đặt làm quản trị viên' },
 ];
 
 const AdminCustomerDetailPage: React.FC = () => {
   const [form] = Form.useForm();
-  form.setFieldsValue(userData);
+  const { token } = theme.useToken();
   const [isDisableForm, setIsDisableForm] = useState(true);
   const [tableRowsVisible, setTableRowsVisible] = useState(true);
 
@@ -70,73 +93,141 @@ const AdminCustomerDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="user-detail-page">
-      <Row className='bg-white p-4 radius-16'>
-        <Row gutter={[24, 24]}>
-          <Col xs={24} md={18} lg={18}>
-            <div className="card-header">
-              <Title level={5}>Chi tiết</Title>
-              <Button type="text" icon={<EditOutlined />} onClick={() => setIsDisableForm(!isDisableForm)} />
-            </div>
-            <Form form={form} layout="vertical" disabled={isDisableForm}>
+    <Flex vertical gap={24}>
+      {/* [UI ONLY] Header Section */}
+      <Flex align="center" justify="space-between">
+        <Flex vertical gap={4}>
+          <Title level={4} style={{ margin: 0 }}>Chi tiết khách hàng</Title>
+          <Text type="secondary" style={{ fontSize: 12 }}>Xem và chỉnh sửa thông tin hồ sơ khách hàng</Text>
+        </Flex>
+        <Space>
+          <Button icon={<MailOutlined />}>Liên hệ</Button>
+          <Dropdown menu={{ items: dropdownItems }}>
+            <Button icon={<MoreOutlined />} />
+          </Dropdown>
+        </Space>
+      </Flex>
+
+      <Row gutter={[24, 24]}>
+        {/* [UI ONLY] Left Section: Edit Form */}
+        <Col xs={24} lg={16}>
+          <Card 
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 12 }}
+            title={
+              <Flex justify="space-between" align="center">
+                <Text strong>Thông tin cá nhân</Text>
+                <Button 
+                  type={isDisableForm ? "default" : "primary"} 
+                  ghost={isDisableForm}
+                  icon={isDisableForm ? <EditOutlined /> : <SaveOutlined />} 
+                  onClick={() => setIsDisableForm(!isDisableForm)}
+                >
+                  {isDisableForm ? "Chỉnh sửa" : "Lưu thay đổi"}
+                </Button>
+              </Flex>
+            }
+          >
+            <Form form={form} layout="vertical" disabled={isDisableForm} initialValues={userData}>
               <Row gutter={24}>
-                <Col xs={24} md={12}><Form.Item label="Tên" name="name"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="Email" name="email"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="Thành phố" name="city"><Select><Option value="Paris">Paris</Option></Select></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="Phường" name="district"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="Địa chỉ" name="address"><Input /></Form.Item></Col>
-                <Col xs={24} md={12}><Form.Item label="SĐT" name="phone"><Input /></Form.Item></Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Họ và tên" name="name" rules={[{ required: true }]}>
+                    <Input placeholder="Nhập họ và tên" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Địa chỉ Email" name="email" rules={[{ type: 'email' }]}>
+                    <Input placeholder="example@gmail.com" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Thành phố/Tỉnh" name="city">
+                    <Select placeholder="Chọn thành phố">
+                      <Option value="Paris">Paris</Option>
+                      <Option value="HN">Hà Nội</Option>
+                      <Option value="HCM">TP. Hồ Chí Minh</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Quận/Phường" name="district">
+                    <Input placeholder="Nhập quận/phường" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Địa chỉ chi tiết" name="address">
+                    <Input placeholder="Số nhà, tên đường..." />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Form.Item label="Số điện thoại" name="phone">
+                    <Input placeholder="09xxxxxxxx" />
+                  </Form.Item>
+                </Col>
               </Row>
-              <Form.Item>
-                <Button type="primary" className='bg-success'>Save</Button>
-              </Form.Item>
             </Form>
-          </Col>
-          <Col xs={24} md={6} lg={6} className='flex-column align-center'>
-            <Avatar size={80} src={userData.avatarUrl} />
-            <Title level={4} className='mt-4 text-center'>{userData.name}</Title>
-            <Text type="secondary">Khách hàng</Text>
-            <Flex className='mt-2'>
-              <div className="profile-actions">
-                <Button icon={<img
-                  // src={mailIcon}
-                  alt="Google"
-                  style={{
-                    width: '1em',
-                    height: '1em',
-                    verticalAlign: 'middle',
-                  }}
-                />} />
-              </div>
-              <div className="profile-actions ml-2">
-                <Dropdown menu={{ items: dropdownItems }}>
-                  <Button icon={<MoreOutlined className='text-blue' />} />
-                </Dropdown>
-              </div>
+          </Card>
+        </Col>
+
+        {/* [UI ONLY] Right Section: Quick Summary */}
+        <Col xs={24} lg={8}>
+          <Card 
+            style={{ 
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)', 
+              borderRadius: 12,
+              textAlign: 'center' 
+            }}
+          >
+            <Flex vertical align="center" gap={16} style={{ padding: '16px 0' }}>
+              <Avatar 
+                size={100} 
+                src={userData.avatarUrl} 
+                icon={<UserOutlined />}
+                style={{ border: `4px solid ${token.colorPrimaryBg}` }}
+              />
+              <Flex vertical gap={4}>
+                <Title level={4} style={{ margin: 0 }}>{userData.name}</Title>
+                <Tag color="blue" bordered={false} style={{ margin: '0 auto' }}>Thành viên thân thiết</Tag>
+              </Flex>
+              
+              <Divider style={{ margin: '12px 0' }} />
+              
+              <Flex justify="space-around" style={{ width: '100%' }}>
+                <Flex vertical>
+                  <Text type="secondary" style={{ fontSize: 12 }}>Tổng sản phẩm</Text>
+                  <Text strong style={{ fontSize: 18 }}>24</Text>
+                </Flex>
+                <Flex vertical>
+                  <Text type="secondary" style={{ fontSize: 12 }}>Tổng giá trị</Text>
+                  <Text strong style={{ fontSize: 18, color: token.colorSuccess }}>120M</Text>
+                </Flex>
+              </Flex>
             </Flex>
-          </Col>
-        </Row>
+          </Card>
+        </Col>
       </Row>
-      <Row className='bg-white mt-8 p-4 radius-16'>
-        <Card className="products-table-card w-100">
-          <div className="card-header">
-            <Title level={5}>Sản phẩm đã cầm</Title>
+
+      {/* [UI ONLY] Products Table */}
+      <Card 
+        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 12 }}
+        title={
+          <Flex justify="space-between" align="center">
+            <Text strong>Danh sách sản phẩm đã cầm</Text>
             <Button
               type="text"
-              icon={tableRowsVisible ? <UpOutlined className='text-blue' /> : <DownOutlined className='text-blue' />}
+              icon={tableRowsVisible ? <UpOutlined /> : <DownOutlined />}
               onClick={toggleProductTableRows}
             />
-          </div>
-          <Table
-            columns={productColumns}
-            dataSource={tableRowsVisible ? userProducts : []}
-            locale={{ emptyText: tableRowsVisible ? undefined : ' ' }}
-            pagination={false}
-            className="product-table-content"
-          />
-        </Card>
-      </Row>
-    </div>
+          </Flex>
+        }
+      >
+        <Table
+          columns={productColumns}
+          dataSource={tableRowsVisible ? userProducts : []}
+          pagination={false}
+          size="middle"
+        />
+      </Card>
+    </Flex>
   );
 };
 

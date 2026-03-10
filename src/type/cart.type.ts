@@ -14,6 +14,7 @@ export interface CartItem {
   type: string;
   productName?: string;
   status?: string;
+  isActived?: boolean;
 }
 
 export interface AddToCartRequest {

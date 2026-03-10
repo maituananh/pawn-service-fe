@@ -49,10 +49,9 @@ const AdminProductDetailPage: React.FC = () => {
 
       await productsApi.update(productId, payload);
       message.success('Cập nhật sản phẩm thành công!');
-      refetch(); // Tải lại dữ liệu mới nhất
+      refetch(); 
     } catch (error) {
-      console.error("Update Error:", error);
-      message.error('Cập nhật thất bại!');
+      // Handled globally
     } finally {
       setLoading(false);
     }
