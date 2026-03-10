@@ -10,3 +10,12 @@ export const useProduct = (id: number) => {
     retry: 1,
   });
 };
+
+export const useRelatedProducts = (id: number, page: number = 1, size: number = 5) => {
+  return useQuery({
+    queryKey: ['related-products', id, page, size],
+    queryFn: () => productsApi.getRelated(id, page, size),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+};

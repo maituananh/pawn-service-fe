@@ -45,6 +45,16 @@ const productsApi = {
   async liquidation(id: number): Promise<void> {
     await axiosClient.patch(`/products/${id}/liquidation`);
   },
+  async getRelated(
+    id: number,
+    page: number = 1,
+    size: number = 5
+  ): Promise<Page<Product>> {
+    const { data } = await axiosClient.get<Page<Product>>(`/products/${id}/related`, {
+      params: { page, size },
+    });
+    return data;
+  },
 };
 
 export default productsApi;

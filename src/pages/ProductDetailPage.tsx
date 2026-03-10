@@ -1,51 +1,31 @@
 import { useCart } from "@/hooks/useCart";
-import { useProduct } from "@/hooks/useProduct"; // Sử dụng hook bạn đã viết
-import { ShoppingCartOutlined } from "@ant-design/icons";
+import { useProduct, useRelatedProducts } from "@/hooks/useProduct";
+import { 
+  ShoppingCartOutlined, 
+  ArrowLeftOutlined, 
+  SafetyCertificateOutlined, 
+  ThunderboltOutlined,
+  CheckCircleOutlined
+} from "@ant-design/icons";
 import {
   Button,
-  Card,
   Col,
-  Divider,
   InputNumber,
-  List,
   message,
   Row,
-  Space,
   Spin,
   Typography,
+  Tag,
+  Breadcrumb,
+  Descriptions,
+  Flex,
+  theme,
+  Badge
 } from "antd";
 import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 
-const { Title, Text } = Typography;
-const { Meta } = Card;
-
-const relatedProductsData = [
-  {
-    id: 10,
-    name: "Winner X 2021",
-    price: "20.000.000 vnd",
-    image: "https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Bike",
-  },
-  {
-    id: 11,
-    name: "Máy ảnh",
-    price: "10.000.000 vnd",
-    image: "https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Camera",
-  },
-  {
-    id: 12,
-    name: "Winner X 2021",
-    price: "20.000.000 vnd",
-    image: "https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Bike",
-  },
-  {
-    id: 13,
-    name: "Máy ảnh",
-    price: "10.000.000 vnd",
-    image: "https://via.placeholder.com/200x200/CCCCCC/FFFFFF?text=Camera",
-  },
-];
+const { Title, Text, Paragraph } = Typography;
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams();
@@ -53,13 +33,14 @@ const ProductDetailPage: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [messageApi, contextHolder] = message.useMessage();
+  const { token } = theme.useToken();
 
   const { data: product, isLoading, isError } = useProduct(Number(id));
+  const { data: relatedPage, isLoading: isLoadingRelated } = useRelatedProducts(Number(id), 1, 5);
   const { addToCart, isAdding } = useCart();
 
   const handleAddToCart = () => {
     if (!product) return;
-
     addToCart(
       { productId: product.id, quantity },
       {
@@ -73,73 +54,94 @@ const ProductDetailPage: React.FC = () => {
     );
   };
 
-  if (isLoading) return <div style={{ textAlign: 'center', padding: '50px' }}><Spin size="large" /></div>;
-  if (isError || !product) return <div>Không tìm thấy sản phẩm</div>;
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '100px' }}><Spin size="large" /></div>;
+  if (isError || !product) return (
+    <div style={{ textAlign: 'center', padding: '100px' }}>
+      <Title level={4}>Không tìm thấy sản phẩm</Title>
+      <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>Quay lại danh sách</Button>
+    </div>
+  );
+
+  const mainImageUrl = selectedImage || product?.images?.[0]?.url || product?.image;
 
   return (
-    <div className="product-detail-page">
+    <div className="product-detail-container" style={{ maxWidth: 1400, margin: '0 auto', padding: '24px' }}>
       {contextHolder}
-      <Button
-        type="link"
-        onClick={() => navigate('/products')} // Quay lại trang trước đó trong lịch sử trình duyệt
-        style={{ marginBottom: 16, padding: 0 }}
-      >
-        Quay lại danh sách
-      </Button>
-      <Row gutter={[32, 32]} className="main-product-section">
-        <Col xs={24} md={12}>
-          <Row gutter={16}>
-            <Col span={4}>
-              <Space direction="vertical" size={12}>
-                {product?.images?.map((img: any, index: number) => {
-                  const isActive =
-                    (selectedImage || product?.images?.[0]?.url) === img.url;
+      
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb 
+        style={{ marginBottom: 24 }}
+        items={[
+          { title: <a onClick={() => navigate('/')}>Trang chủ</a> },
+          { title: <a onClick={() => navigate('/products')}>Sản phẩm</a> },
+          { title: product.name },
+        ]}
+      />
 
+      <Row gutter={[48, 48]}>
+        {/* Left Column: Image Gallery */}
+        <Col xs={24} lg={12}>
+          <Row gutter={[16, 16]}>
+            <Col span={4}>
+              <Flex vertical gap={12}>
+                {(product?.images || []).map((img: any, index: number) => {
+                  const isActive = (selectedImage === img.url) || (!selectedImage && index === 0);
                   return (
                     <div
                       key={img.id || index}
                       onClick={() => setSelectedImage(img.url)}
                       style={{
-                        border: isActive
-                          ? "2px solid #ff4d4f"
-                          : "1px solid #ddd",
-                        borderRadius: 8,
+                        border: isActive ? `2px solid ${token.colorPrimary}` : "1px solid #f0f0f0",
+                        borderRadius: 12,
                         cursor: "pointer",
                         overflow: "hidden",
-                        padding: 4,
-                        transition: "all 0.2s ease",
+                        padding: 2,
+                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        boxShadow: isActive ? `0 0 10px ${token.colorPrimary}40` : 'none',
+                        transform: isActive ? 'scale(1.05)' : 'scale(1)',
                       }}
                     >
                       <img
                         src={img.url}
                         alt={`thumb-${index}`}
-                        style={{
-                          width: "100%",
-                          height: 70,
-                          objectFit: "cover",
-                        }}
+                        style={{ width: "100%", height: 75, objectFit: "cover", borderRadius: 10 }}
                       />
                     </div>
                   );
                 })}
-              </Space>
+              </Flex>
             </Col>
 
             <Col span={20}>
               <div
                 style={{
-                  border: "1px solid #f0f0f0",
-                  borderRadius: 12,
-                  padding: 16,
+                  background: "#fff",
+                  borderRadius: 20,
+                  padding: 20,
                   textAlign: "center",
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.06)',
+                  border: '1px solid #f0f0f0',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  minHeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
+                {product.status === 'LIQUIDATION' && (
+                  <Tag color="red" style={{ position: 'absolute', top: 20, right: 20, padding: '4px 12px', borderRadius: 20, fontSize: 14, fontWeight: 600 }}>
+                    Thanh lý
+                  </Tag>
+                )}
                 <img
-                  src={selectedImage || product?.images?.[0]?.url}
-                  alt="Main product"
+                  src={mainImageUrl}
+                  alt={product.name}
                   style={{
-                    width: "85%",
+                    maxWidth: "100%",
+                    maxHeight: 600,
                     borderRadius: 12,
+                    transition: 'transform 0.5s',
                   }}
                 />
               </div>
@@ -147,73 +149,198 @@ const ProductDetailPage: React.FC = () => {
           </Row>
         </Col>
 
-        <Col xs={24} md={12} className="product-info">
-          <Title level={2}>{product?.name}</Title>
-          <div className="price-section">
-            <Text className="current-price">
-              {product?.price.toLocaleString()} vnd
-            </Text>
-            {/* Nếu API không trả về oldPrice, tạm thời hiển thị giá hiện tại như giao diện cũ */}
-            <Text delete className="original-price" style={{ marginLeft: 10 }}>
-              {product?.price.toLocaleString()} vnd
-            </Text>
-          </div>
-          <div className="quantity-section" style={{ margin: '16px 0' }}>
-            <Text strong>Số lượng muốn đặt: </Text>
-            <InputNumber
-              min={1}
-              max={product?.quantity}
-              defaultValue={1}
-              onChange={(value) => setQuantity(value || 1)}
-            />
-            <Text strong>Số lượng hiện có: {product?.quantity}</Text>
-          </div>
-          <div className="description-section">
-            <Text strong>Mô tả:</Text>
-            <ul>
-              <li>Loại: {product?.type}</li>
-              <li>Danh mục: {product?.category?.name}</li>
-              <li>Mã sản phẩm: {product?.code}</li>
-            </ul>
-          </div>
-          <Space className="action-buttons" size="middle" style={{ marginTop: 20 }}>
-            <Button
-              size="large"
-              icon={<ShoppingCartOutlined />}
-              className="btn-add-to-cart"
-              onClick={handleAddToCart}
-              loading={isAdding}
+        {/* Right Column: Product Info */}
+        <Col xs={24} lg={12}>
+          <div className="product-header">
+            <Tag color="blue" style={{ marginBottom: 12, borderRadius: 20 }}>{product.category?.name || product.category || 'Chưa phân loại'}</Tag>
+            <Title level={1} style={{ fontSize: 32, fontWeight: 800, color: '#1a1a1a', marginBottom: 16 }}>
+              {product.name}
+            </Title>
+            
+            <Flex align="center" gap={16} style={{ marginBottom: 24 }}>
+              <Text style={{ fontSize: 36, fontWeight: 900, color: token.colorPrimary }}>
+                {product.price.toLocaleString()} <small>vnđ</small>
+              </Text>
+              {product.oldPrice && (
+                <Text delete style={{ fontSize: 20, color: '#999' }}>
+                  {product.oldPrice.toLocaleString()} vnđ
+                </Text>
+              )}
+            </Flex>
+
+            <Paragraph style={{ fontSize: 16, color: '#666', marginBottom: 24, lineHeight: 1.6 }}>
+              {product.description || "Sản phẩm chính hãng với mức giá cạnh tranh nhất trên thị trường. Bảo hành uy tín từ hệ thống Thảo Quyên."}
+            </Paragraph>
+
+            <Descriptions
+              title="Thông tin chi tiết"
+              bordered
+              column={1}
+              size="small"
+              style={{ marginBottom: 32 }}
+              styles={{ label: { width: 140, fontWeight: 600, background: '#fafafa' } }}
             >
-              Thêm vào giỏ hàng
-            </Button>
-            <Button type="primary" size="large" danger className="btn-buy-now">
-              Mua ngay
-            </Button>
-          </Space>
+              <Descriptions.Item label="Mã sản phẩm">
+                <Text strong code>{product.code}</Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="Loại sản phẩm">
+                <Tag color="cyan">{product.type}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="Tình trạng">
+                <Badge status={product.quantity > 0 ? "success" : "error"} text={product.quantity > 0 ? `Còn hàng (${product.quantity})` : "Hết hàng"} />
+              </Descriptions.Item>
+            </Descriptions>
+
+            <Flex vertical gap={16} style={{ marginBottom: 32 }}>
+              <Flex align="center" gap={12}>
+                <Text strong style={{ minWidth: 100 }}>Số lượng:</Text>
+                <InputNumber
+                  min={1}
+                  max={product.quantity}
+                  value={quantity}
+                  onChange={(val) => setQuantity(val || 1)}
+                  style={{ width: 80, borderRadius: 8 }}
+                />
+              </Flex>
+            </Flex>
+
+            <Flex gap={16}>
+              <Button
+                type="primary"
+                size="large"
+                icon={<ShoppingCartOutlined />}
+                style={{ 
+                  height: 56, 
+                  flex: 1, 
+                  fontSize: 18, 
+                  fontWeight: 700, 
+                  borderRadius: 14,
+                  boxShadow: `0 8px 20px ${token.colorPrimary}40`
+                }}
+                onClick={handleAddToCart}
+                loading={isAdding}
+                disabled={product.quantity <= 0}
+              >
+                Thêm vào giỏ hàng
+              </Button>
+              <Button 
+                danger 
+                size="large" 
+                type="primary"
+                style={{ 
+                  height: 56, 
+                  flex: 1, 
+                  fontSize: 18, 
+                  fontWeight: 700, 
+                  borderRadius: 14,
+                  background: '#ff4d4f',
+                  boxShadow: '0 8px 20px rgba(255, 77, 79, 0.4)'
+                }}
+                disabled={product.quantity <= 0}
+              >
+                Mua ngay
+              </Button>
+            </Flex>
+
+            {/* Trust Signals */}
+            <div style={{ marginTop: 40, borderTop: '1px solid #f0f0f0', paddingTop: 24 }}>
+              <Row gutter={[16, 16]}>
+                <Col span={8}>
+                  <Flex vertical align="center" gap={8}>
+                    <SafetyCertificateOutlined style={{ fontSize: 24, color: '#52c41a' }} />
+                    <Text style={{ fontSize: 12, textAlign: 'center' }}>Cam kết chính hãng</Text>
+                  </Flex>
+                </Col>
+                <Col span={8}>
+                  <Flex vertical align="center" gap={8}>
+                    <ThunderboltOutlined style={{ fontSize: 24, color: '#faad14' }} />
+                    <Text style={{ fontSize: 12, textAlign: 'center' }}>Giao hàng nhanh</Text>
+                  </Flex>
+                </Col>
+                <Col span={8}>
+                  <Flex vertical align="center" gap={8}>
+                    <CheckCircleOutlined style={{ fontSize: 24, color: '#1890ff' }} />
+                    <Text style={{ fontSize: 12, textAlign: 'center' }}>Bảo hành uy tín</Text>
+                  </Flex>
+                </Col>
+              </Row>
+            </div>
+          </div>
         </Col>
       </Row>
-      <Divider />
-      <div className="related-products-section">
-        <Title level={3}>Những sản phẩm liên quan</Title>
-        <List
-          grid={{
-            gutter: 16,
-            xs: 2,
-            sm: 3,
-            md: 4,
-            lg: 6,
-            xl: 6,
-            xxl: 6,
-          }}
-          dataSource={relatedProductsData}
-          renderItem={(item) => (
-            <List.Item>
-              <Card hoverable cover={<img alt={item.name} src={item.image} />}>
-                <Meta title={item.name} description={item.price} />
-              </Card>
-            </List.Item>
-          )}
-        />
+
+      {/* Related Products Section */}
+      <div style={{ marginTop: 80 }}>
+        <Flex justify="space-between" align="center" style={{ marginBottom: 32 }}>
+          <Title level={2} style={{ margin: 0, fontWeight: 800 }}>Sản phẩm liên quan</Title>
+          <Button type="link" onClick={() => navigate('/products')}>Xem tất cả</Button>
+        </Flex>
+
+        {isLoadingRelated ? (
+          <Flex justify="center" style={{ padding: '40px 0' }}>
+            <Spin />
+          </Flex>
+        ) : (
+          <Row gutter={[24, 24]}>
+            {relatedPage?.data?.map((item: any) => (
+              <Col xs={12} sm={8} md={6} lg={4.8} key={item.id} style={{ display: 'flex' }}>
+                <Link
+                  to={`/products/${item.id}`}
+                  style={{ textDecoration: 'none', width: '100%' }}
+                  onClick={() => {
+                    setSelectedImage(null);
+                    window.scrollTo(0, 0);
+                  }}
+                  className="product-card-hover"
+                >
+                  <div 
+                    style={{ 
+                      background: '#fff', 
+                      borderRadius: 16, 
+                      overflow: 'hidden', 
+                      transition: 'all 0.3s ease',
+                      boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      border: '1px solid #f0f0f0'
+                    }}
+                  >
+                    <div style={{ 
+                      padding: '12px', 
+                      background: '#fcfcfc',
+                      height: 160,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <img
+                        src={(item.image && item.image !== "string") ? item.image : (item.images?.[0]?.url || "https://via.placeholder.com/400?text=No+Image")}
+                        alt={item.name}
+                        style={{ 
+                          maxWidth: '100%', 
+                          maxHeight: '100%', 
+                          objectFit: 'contain'
+                        }}
+                      />
+                    </div>
+                    <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <Text type="secondary" style={{ fontSize: 11, marginBottom: 4, textTransform: 'uppercase' }}>
+                        {item.type}
+                      </Text>
+                      <Text strong style={{ fontSize: 14, marginBottom: 12, display: 'block', minHeight: 40 }}>
+                        {item.name}
+                      </Text>
+                      <div style={{ marginTop: 'auto', color: token.colorPrimary, fontWeight: 700, fontSize: 16 }}>
+                        {item.price.toLocaleString()} đ
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </Col>
+            ))}
+          </Row>
+        )}
       </div>
     </div>
   );

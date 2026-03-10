@@ -16,6 +16,7 @@ import { Avatar, Button, Card, Drawer, Dropdown, Flex, Input, Layout, Menu, Typo
 import { useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/images/logo.png";
+import AIAgent from "@/components/AIAgent";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -72,6 +73,7 @@ const AdminLayout = () => {
   const closeDrawer = () => setDrawerVisible(false);
 
   return (
+    <>
     <Layout hasSider style={{ minHeight: "100vh" }}>
       {/* [UI ONLY] Fixed 220px Sider with custom styling */}
       <Sider
@@ -212,41 +214,43 @@ const AdminLayout = () => {
           <Outlet />
         </Content>
       </Layout>
-
-      <Drawer
-        title={
-          <Flex align="center" gap={8}>
-            <img src={logoImage} alt="Logo" style={{ height: 24 }} />
-            <Text strong>camdoTQ</Text>
-          </Flex>
-        }
-        placement="left"
-        onClose={closeDrawer}
-        open={drawerVisible}
-        styles={{ body: { padding: 0 } }}
-      >
-        <Menu
-          mode="inline"
-          selectedKeys={activeMenuKey}
-          items={menuItems}
-          onClick={(e) => {
-            handleMenuClick(e);
-            closeDrawer();
-          }}
-          style={{ borderInlineEnd: "none" }}
-        />
-        <div style={{ padding: 16 }}>
-          <Button
-            danger
-            block
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-          >
-            Đăng xuất
-          </Button>
-        </div>
-      </Drawer>
     </Layout>
+    <AIAgent />
+
+    <Drawer
+      title={
+        <Flex align="center" gap={8}>
+          <img src={logoImage} alt="Logo" style={{ height: 24 }} />
+          <Text strong>camdoTQ</Text>
+        </Flex>
+      }
+      placement="left"
+      onClose={closeDrawer}
+      open={drawerVisible}
+      styles={{ body: { padding: 0 } }}
+    >
+      <Menu
+        mode="inline"
+        selectedKeys={activeMenuKey}
+        items={menuItems}
+        onClick={(e) => {
+          handleMenuClick(e);
+          closeDrawer();
+        }}
+        style={{ borderInlineEnd: "none" }}
+      />
+      <div style={{ padding: 16 }}>
+        <Button
+          danger
+          block
+          icon={<LogoutOutlined />}
+          onClick={handleLogout}
+        >
+          Đăng xuất
+        </Button>
+      </div>
+    </Drawer>
+    </>
   );
 };
 
