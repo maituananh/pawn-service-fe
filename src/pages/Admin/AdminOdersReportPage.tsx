@@ -1,3 +1,4 @@
+// [UI ONLY] Redesigned AdminOrderReportPage with improved layout and styling
 import React from 'react';
 import {
   Card,
@@ -8,11 +9,13 @@ import {
   Select,
   Space,
   Tag,
+  Flex,
+  theme,
   type TableProps,
 } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, ExportOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 interface OrderDataType {
@@ -30,14 +33,6 @@ const orderData: OrderDataType[] = [
   { key: '2', customerName: 'Floyd Miles', orderDate: '2025-12-12 20:30:30', phone: '(205) 555-0100', orderId: '123456678', address: 'Kiribati', status: 'Đã giao' },
   { key: '3', customerName: 'Ronald Richards', orderDate: '2025-12-12 20:30:30', phone: '(302) 555-0107', orderId: '123456678', address: 'Israel', status: 'Đã hủy' },
   { key: '4', customerName: 'Marvin McKinney', orderDate: '2025-12-12 20:30:30', phone: '(252) 555-0126', orderId: '123456678', address: 'Iran', status: 'Đang giao' },
-  { key: '5', customerName: 'Jerome Bell', orderDate: '2025-12-12 20:30:30', phone: '(629) 555-0129', orderId: '123456678', address: 'Réunion', status: 'Đã giao' },
-  { key: '6', customerName: 'Kathryn Murphy', orderDate: '2025-12-12 20:30:30', phone: '(406) 555-0120', orderId: '123456678', address: 'Curaçao', status: 'Đã hủy' },
-  { key: '7', customerName: 'Jacob Jones', orderDate: '2025-12-12 20:30:30', phone: '(208) 555-0112', orderId: '123456678', address: 'Brazil', status: 'Đang giao' },
-  { key: '8', customerName: 'Kristin Watson', orderDate: '2025-12-12 20:30:30', phone: '(704) 555-0127', orderId: '123456678', address: 'Åland Islands', status: 'Đã giao' },
-  { key: '9', customerName: 'Kristin Watson', orderDate: '2025-12-12 20:30:30', phone: '(704) 555-0127', orderId: '123456678', address: 'Åland Islands', status: 'Đã hủy' },
-  { key: '10', customerName: 'Kristin Watson', orderDate: '2025-12-12 20:30:30', phone: '(704) 555-0127', orderId: '123456678', address: 'Åland Islands', status: 'Đang giao' },
-  { key: '11', customerName: 'Kristin Watson', orderDate: '2025-12-12 20:30:30', phone: '(704) 555-0127', orderId: '123456678', address: 'Åland Islands', status: 'Đã giao' },
-  { key: '12', customerName: 'Kristin Watson', orderDate: '2025-12-12 20:30:30', phone: '(704) 555-0127', orderId: '123456678', address: 'Åland Islands', status: 'Đã hủy' },
 ];
 
 const getStatusColor = (status: OrderDataType['status']): string => {
@@ -50,47 +45,93 @@ const getStatusColor = (status: OrderDataType['status']): string => {
 };
 
 const columns: TableProps<OrderDataType>['columns'] = [
-  { title: 'Tên khách hàng', dataIndex: 'customerName', key: 'customerName' },
-  { title: 'Ngày đặt', dataIndex: 'orderDate', key: 'orderDate' },
+  { 
+    title: 'Mã đơn hàng', 
+    dataIndex: 'orderId', 
+    key: 'orderId',
+    render: (text) => <Text code>{text}</Text>
+  },
+  { 
+    title: 'Khách hàng', 
+    dataIndex: 'customerName', 
+    key: 'customerName',
+    render: (text) => <Text strong>{text}</Text>
+  },
   { title: 'Số điện thoại', dataIndex: 'phone', key: 'phone' },
-  { title: 'Mã đơn hàng', dataIndex: 'orderId', key: 'orderId' },
-  { title: 'Địa chỉ', dataIndex: 'address', key: 'address' },
+  { 
+    title: 'Ngày đặt', 
+    dataIndex: 'orderDate', 
+    key: 'orderDate',
+    render: (text) => <Text type="secondary" style={{ fontSize: 13 }}>{text}</Text>
+  },
+  { title: 'Địa chỉ', dataIndex: 'address', key: 'address', ellipsis: true },
   {
     title: 'Trạng thái',
     dataIndex: 'status',
     key: 'status',
     render: (status: OrderDataType['status']) => (
-      <Tag color={getStatusColor(status)}>{status}</Tag>
+      <Tag bordered={false} color={getStatusColor(status)}>{status}</Tag>
     ),
   },
+  {
+    title: 'Thao tác',
+    key: 'actions',
+    width: 100,
+    render: () => (
+      <Button type="text" icon={<InfoCircleOutlined />} size="small">Chi tiết</Button>
+    )
+  }
 ];
 
 const AdminOrderReportPage: React.FC = () => {
+  const { token } = theme.useToken();
+
   return (
-    <div className="orders-report-page">
-      <Card className="orders-table-card">
-        <div className="table-toolbar mb-6">
-          <Title level={5}>Tất cả đơn hàng</Title>
+    <Flex vertical gap={24}>
+      {/* [UI ONLY] Header Section */}
+      <Flex align="center" justify="space-between">
+        <Flex vertical gap={4}>
+          <Title level={4} style={{ margin: 0 }}>Báo cáo đơn hàng</Title>
+          <Text type="secondary" style={{ fontSize: 12 }}>Theo dõi và quản lý lịch sử giao dịch toàn hệ thống</Text>
+        </Flex>
+        <Button icon={<ExportOutlined />} style={{ borderRadius: 8 }}>Xuất báo cáo</Button>
+      </Flex>
+
+      <Card 
+        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 12 }}
+        styles={{ body: { padding: '0 0 24px 0' } }}
+      >
+        <Flex gap={16} align="center" justify="space-between" style={{ padding: '24px' }}>
+          <Title level={5} style={{ margin: 0 }}>Danh sách giao dịch</Title>
           <Space>
-            <Input placeholder="Tìm khách hàng" prefix={<SearchOutlined />} />
-            <Select defaultValue="newest">
-              <Option value="newest">Short by: Newest</Option>
-              <Option value="oldest">Short by: Oldest</Option>
+            <Input 
+              placeholder="Tìm theo khách hàng, SĐT..." 
+              prefix={<SearchOutlined style={{ color: token.colorTextTertiary }} />} 
+              style={{ width: 280, borderRadius: 8 }}
+            />
+            <Select defaultValue="newest" style={{ width: 180 }}>
+              <Option value="newest">Sắp xếp: Mới nhất</Option>
+              <Option value="oldest">Sắp xếp: Cũ nhất</Option>
             </Select>
           </Space>
-        </div>
+        </Flex>
+
         <Table
           columns={columns}
           dataSource={orderData}
           pagination={{
             position: ['bottomCenter'],
-            total: orderData.length,
-            showTotal: (total, range) => `Showing data ${range[0]} to ${range[1]} of ${total} entries`,
-            showSizeChanger: false,
+            pageSize: 10,
+            showTotal: (total, range) => (
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Đang hiển thị {range[0]} - {range[1]} trong tổng số {total} đơn hàng
+              </Text>
+            ),
           }}
+          size="middle"
         />
       </Card>
-    </div>
+    </Flex>
   );
 };
 

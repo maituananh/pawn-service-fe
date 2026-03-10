@@ -5,6 +5,7 @@ import {
   Button,
   Checkbox,
   Empty,
+  Flex,
   List,
   Space,
   Spin,
@@ -28,10 +29,13 @@ const CartPage = () => {
 
   const formatCurrency = (value: number) => `${(value || 0).toLocaleString()} vnd`;
 
+  const activeItems = cart.filter(item => item.isActived !== false);
+  const inactiveItems = cart.filter(item => item.isActived === false);
+
   const onSelectAll = (e: any) => {
     if (e.target.checked) {
-      const allIds = cart.map((item: CartItem) => item.productId);
-      setSelectedIds(allIds);
+      const activeIds = activeItems.map((item: CartItem) => item.productId);
+      setSelectedIds(activeIds);
     } else {
       setSelectedIds([]);
     }
@@ -44,7 +48,7 @@ const CartPage = () => {
   };
 
   const calculateSelectedTotal = () => {
-    return cart
+    return activeItems
       .filter((item: CartItem) => selectedIds.includes(item.productId))
       .reduce((sum: number, item: CartItem) => sum + (item.price * item.quantity), 0);
   };
@@ -55,7 +59,7 @@ const CartPage = () => {
         message.success("Đã xóa sản phẩm");
         setSelectedIds(prev => prev.filter(id => id !== productId));
       }
-    });
+    } as any);
   };
 
   const handlePayment = () => {
@@ -83,83 +87,141 @@ const CartPage = () => {
     );
   };
 
-  if (isLoading) return <div style={{ textAlign: 'center', padding: '50px' }}><Spin size="large" /></div>;
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '100px' }}><Spin size="large" tip="Đang tải giỏ hàng..." /></div>;
   if (!cart || cart.length === 0) return <Empty description="Giỏ hàng trống" style={{ marginTop: 100 }} />;
 
-  return (
-    <div className="cart-container" style={{ padding: '20px', maxWidth: 1000, margin: '0 auto' }}>
-      <Title level={3}>Giỏ hàng ({cart.length})</Title>
-
-      <List
-        dataSource={cart}
-        renderItem={(item: CartItem) => (
-          <div
-            key={item.productId}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '16px',
-              borderBottom: '1px solid #f0f0f0',
-              gap: '16px',
-              background: '#fff'
-            }}
-          >
-            <Checkbox
-              checked={selectedIds.includes(item.productId)}
-              onChange={() => onSelectItem(item.productId)}
-            />
-
-            <img
-              src={item.image || "https://via.placeholder.com/80"}
-              alt={item.productName}
-              style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
-            />
-
-            <div style={{ flex: 1 }}>
-              <Text strong style={{ fontSize: '16px', display: 'block' }}>{item.productName}</Text>
-              <Text type="danger">{formatCurrency(item.price)}</Text>
-              <div><Tag color="orange" style={{ marginTop: 4 }}>{item.status}</Tag></div>
-            </div>
-
-            <div style={{ textAlign: 'right', minWidth: 120 }}>
-              <div style={{ marginBottom: 8 }}>Số lượng: {item.quantity}</div>
-              <Text strong>{formatCurrency(item.price * item.quantity)}</Text>
-              <div style={{ marginTop: 8 }}>
-                <Button type="link" danger onClick={() => handleRemove(item.productId)} size="small">
-                  Xóa
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+  const renderCartItem = (item: CartItem, isInactive = false) => (
+    <div
+      key={item.productId}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '20px',
+        borderBottom: '1px solid #f5f5f5',
+        gap: '20px',
+        background: isInactive ? '#fafafa' : '#fff',
+        opacity: isInactive ? 0.7 : 1,
+        borderRadius: 12,
+        marginBottom: 12,
+        transition: 'all 0.3s ease',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+      }}
+    >
+      <Checkbox
+        checked={selectedIds.includes(item.productId)}
+        onChange={() => onSelectItem(item.productId)}
+        disabled={isInactive}
       />
 
+      <img
+        src={item.image || "https://via.placeholder.com/80"}
+        alt={item.productName}
+        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 10, border: '1px solid #eee' }}
+      />
+
+      <div style={{ flex: 1 }}>
+        <Text strong style={{ fontSize: '16px', display: 'block', color: isInactive ? '#8c8c8c' : '#262626' }}>
+          {item.productName}
+        </Text>
+        <Text type={isInactive ? "secondary" : "danger"} style={{ fontSize: 15, fontWeight: 600 }}>
+          {formatCurrency(item.price)}
+        </Text>
+        <div>
+          <Tag bordered={false} color={isInactive ? "default" : "blue"} style={{ marginTop: 8 }}>
+            {isInactive ? "Sản phẩm đã xoá/ngừng" : item.status}
+          </Tag>
+        </div>
+      </div>
+
+      <div style={{ textAlign: 'right', minWidth: 140 }}>
+        <div style={{ marginBottom: 4, color: '#8c8c8c' }}>Số lượng: {item.quantity}</div>
+        <Text strong style={{ fontSize: 16 }}>{formatCurrency(item.price * item.quantity)}</Text>
+        <div style={{ marginTop: 12 }}>
+          <Button 
+            type="text" 
+            danger 
+            onClick={() => handleRemove(item.productId)} 
+            size="small"
+            style={{ fontWeight: 500 }}
+          >
+            Xóa khỏi giỏ
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="cart-page-wrapper" style={{ padding: '40px 24px', maxWidth: 1200, margin: '0 auto', minHeight: '80vh' }}>
+      <Flex align="center" justify="space-between" style={{ marginBottom: 32 }}>
+        <Title level={2} style={{ margin: 0 }}>Giỏ hàng của bạn</Title>
+        <Text type="secondary">{cart.length} sản phẩm trong giỏ</Text>
+      </Flex>
+
+      {/* Section 1: Active Items */}
+      <div style={{ marginBottom: 48 }}>
+        <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
+          <div style={{ width: 4, height: 20, background: '#1677ff', borderRadius: 2 }} />
+          <Title level={4} style={{ margin: 0 }}>Sản phẩm sẵn có ({activeItems.length})</Title>
+        </Flex>
+        {activeItems.length > 0 ? (
+          <div className="active-items-list">
+            {activeItems.map(item => renderCartItem(item))}
+          </div>
+        ) : (
+          <Text type="secondary" italic>Không có sản phẩm khả dụng</Text>
+        )}
+      </div>
+
+      {/* Section 2: Inactive Items */}
+      {inactiveItems.length > 0 && (
+        <div style={{ marginBottom: 48 }}>
+          <Flex align="center" gap={8} style={{ marginBottom: 16 }}>
+            <div style={{ width: 4, height: 20, background: '#8c8c8c', borderRadius: 2 }} />
+            <Title level={4} style={{ margin: 0, color: '#8c8c8c' }}>Sản phẩm không khả dụng ({inactiveItems.length})</Title>
+          </Flex>
+          <div className="inactive-items-list" style={{ filter: 'grayscale(0.5)' }}>
+            {inactiveItems.map(item => renderCartItem(item, true))}
+          </div>
+          <Text type="secondary" style={{ fontSize: 13, background: '#fff2f0', color: '#ff4d4f', padding: '8px 16px', borderRadius: 6, display: 'inline-block', marginTop: 8 }}>
+            ⚠️ Các sản phẩm này đã bị xoá hoặc ngừng kinh doanh. Vui lòng xoá chúng khỏi giỏ hàng.
+          </Text>
+        </div>
+      )}
+
+      {/* Footer Summary */}
       <div style={{
-        marginTop: 24,
-        padding: '24px',
-        background: '#fafafa',
-        borderRadius: 8,
+        marginTop: 40,
+        padding: '32px',
+        background: '#fff',
+        borderRadius: 16,
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
+        position: 'sticky',
+        bottom: 24,
+        zIndex: 10,
+        border: '1px solid #f0f0f0'
       }}>
         <Space size="large">
           <Checkbox
             onChange={onSelectAll}
-            checked={selectedIds.length === cart.length && cart.length > 0}
+            checked={selectedIds.length === activeItems.length && activeItems.length > 0}
+            disabled={activeItems.length === 0}
           >
-            Chọn tất cả
+            <Text strong>Chọn tất cả sản phẩm sẵn có</Text>
           </Checkbox>
-          <Button type="link" onClick={() => setSelectedIds([])} disabled={selectedIds.length === 0}>
+          <Button type="text" onClick={() => setSelectedIds([])} disabled={selectedIds.length === 0}>
             Bỏ chọn
           </Button>
         </Space>
 
-        <Space size="large">
+        <Space size={32}>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ color: '#8c8c8c' }}>Tổng cộng: {formatCurrency(cartTotal)}</div>
-            <Text strong style={{ fontSize: 20 }}>
-              Thanh toán: <span style={{ color: '#ff4d4f' }}>{formatCurrency(calculateSelectedTotal())}</span>
+            <div style={{ color: '#8c8c8c', marginBottom: 4 }}>Tạm tính: {formatCurrency(cartTotal)}</div>
+            <Text style={{ fontSize: 16 }}>
+              Tổng thanh toán: <Text strong style={{ fontSize: 24, color: '#ff4d4f' }}>{formatCurrency(calculateSelectedTotal())}</Text>
             </Text>
           </div>
           <Button
@@ -167,7 +229,14 @@ const CartPage = () => {
             danger
             size="large"
             disabled={selectedIds.length === 0}
-            style={{ height: 48, padding: '0 32px' }}
+            style={{ 
+              height: 56, 
+              padding: '0 48px', 
+              fontSize: 18, 
+              fontWeight: 700, 
+              borderRadius: 12,
+              boxShadow: selectedIds.length > 0 ? '0 8px 20px rgba(255, 77, 79, 0.3)' : 'none'
+            }}
             onClick={handlePayment}
             loading={isProcessing}
           >

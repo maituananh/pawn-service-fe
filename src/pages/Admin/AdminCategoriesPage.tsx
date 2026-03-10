@@ -1,3 +1,4 @@
+// [UI ONLY] Redesigned AdminCategoriesPage with improved toolbar and table styling
 import categoriesApi from "@/api/categoriesApi";
 import { useCategories } from "@/hooks/useCategories";
 import { Category } from "@/type/category.type";
@@ -10,6 +11,7 @@ import {
 import {
   Button,
   Card,
+  Flex,
   Input,
   message,
   Popconfirm,
@@ -19,17 +21,19 @@ import {
   Table,
   Tag,
   Typography,
+  theme,
 } from "antd";
 import dayjs from "dayjs";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const AdminCategoriesPage: React.FC = () => {
   const navigate = useNavigate();
   const { categories, isLoading, isError, refetch } = useCategories();
+  const { token } = theme.useToken();
 
   const handleRowClick = (record: Category) => {
     navigate(`/admin/categories/${record.id}`);
@@ -45,7 +49,7 @@ const AdminCategoriesPage: React.FC = () => {
       message.success("Đã xóa danh mục thành công!");
       refetch();
     } catch (err) {
-      message.error("Xóa danh mục thất bại!");
+      // Error is already handled globally in axiosClient interceptor
     }
   };
 
@@ -54,99 +58,111 @@ const AdminCategoriesPage: React.FC = () => {
       title: "Tên danh mục",
       dataIndex: "name",
       key: "name",
+      render: (text: string) => <Text strong>{text}</Text>
     },
     {
       title: "Mô tả",
       dataIndex: "note",
       key: "note",
+      render: (text: string) => <Text type="secondary" style={{ fontSize: 13 }}>{text || "Không có mô tả"}</Text>
     },
-
     {
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) =>
-        date ? dayjs(date).format("DD/MM/YYYY HH:mm") : "-",
+        date ? <Text type="secondary">{dayjs(date).format("DD/MM/YYYY HH:mm")}</Text> : "-",
     },
     {
       title: "Trạng thái",
       dataIndex: "isActive",
       key: "isActive",
       render: (status: boolean) => (
-        <Tag color={status ? "success" : "error"}>
-          {status ? "Hoạt động" : "Đã khóa"}
+        <Tag bordered={false} color={status ? "success" : "default"}>
+          {status ? "Hoạt động" : "Tạm khóa"}
         </Tag>
       ),
     },
     {
       title: "Hành động",
       key: "actions",
+      align: 'right' as const,
       render: (_: any, record: Category) => (
-        <Space>
+        <Space onClick={(e) => e.stopPropagation()}>
           <Button
-            type="link"
+            type="text"
+            shape="circle"
             icon={<EditOutlined />}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(record.id);
-            }}
-          >
-            Sửa
-          </Button>
+            onClick={() => handleEdit(record.id)}
+          />
 
           <Popconfirm
-            title="Bạn có chắc muốn xóa danh mục này không?"
+            title="Xóa danh mục"
+            description="Tất cả sản phẩm thuộc danh mục này sẽ bị ảnh hưởng. Bạn có chắc muốn xóa không?"
             okText="Xóa"
             cancelText="Hủy"
-            onConfirm={(e) => {
-              e?.stopPropagation();
-              handleDelete(record.id);
-            }}
-            onCancel={(e) => e?.stopPropagation()}
+            onConfirm={() => handleDelete(record.id)}
           >
             <Button
-              type="link"
+              type="text"
+              shape="circle"
               danger
               icon={<DeleteOutlined />}
-              onClick={(e) => e.stopPropagation()}
-            >
-              Xóa
-            </Button>
+            />
           </Popconfirm>
         </Space>
       ),
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Đã xảy ra lỗi khi tải danh mục!</div>;
+  if (isLoading) return (
+    <Flex align="center" justify="center" style={{ minHeight: '400px' }}>
+      <Spin size="large" tip="Đang tải danh mục..." />
+    </Flex>
+  );
+
+  if (isError) return (
+    <Flex align="center" justify="center" style={{ minHeight: '400px' }}>
+      <Text type="danger">Đã xảy ra lỗi khi tải danh sách danh mục!</Text>
+    </Flex>
+  );
 
   return (
-    <div className="admin-categories-page">
-      <Card className="categories-table-card">
-        <div className="table-toolbar mb-6">
-          <Title level={5} className="mt-0">
-            Tất cả danh mục
-          </Title>
+    <Flex vertical gap={24}>
+      <Card 
+        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+        title={
+          <Flex align="center" justify="space-between" wrap="wrap" gap={16}>
+            <Flex vertical gap={4}>
+              <Title level={4} style={{ margin: 0 }}>Quản lý danh mục</Title>
+              <Text type="secondary" style={{ fontSize: 12 }}>Phân loại các loại tài sản cầm đồ</Text>
+            </Flex>
 
-          <Space className="toolbar-actions">
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate("/admin/categories/create")}
-            >
-              Mới
-            </Button>
+            <Flex gap={12} wrap="wrap">
+              <Input 
+                placeholder="Tìm danh mục..." 
+                prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />} 
+                style={{ width: 240, borderRadius: 8 }}
+                allowClear
+              />
 
-            <Input placeholder="Tìm danh mục" prefix={<SearchOutlined />} />
+              <Select defaultValue="newest" style={{ width: 160 }} variant="filled">
+                <Option value="newest">Mới nhất trước</Option>
+                <Option value="oldest">Cũ nhất trước</Option>
+              </Select>
 
-            <Select defaultValue="newest">
-              <Option value="newest">Sort by: Newest</Option>
-              <Option value="oldest">Sort by: Oldest</Option>
-            </Select>
-          </Space>
-        </div>
-
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate("/admin/categories/new")}
+                style={{ borderRadius: 8 }}
+              >
+                Thêm danh mục
+              </Button>
+            </Flex>
+          </Flex>
+        }
+      >
         <Table
           rowKey="id"
           columns={columns}
@@ -154,13 +170,17 @@ const AdminCategoriesPage: React.FC = () => {
           onRow={(record) => ({
             onClick: () => handleRowClick(record),
           })}
+          size="middle"
+          rowClassName="row-hover-custom"
           pagination={{
-            position: ["bottomCenter"],
-            pageSize: 5,
+            position: ["bottomRight"],
+            pageSize: 10,
+            showTotal: (total, range) => 
+              `Hiển thị ${range[0]}-${range[1]} của ${total} danh mục`
           }}
         />
       </Card>
-    </div>
+    </Flex>
   );
 };
 

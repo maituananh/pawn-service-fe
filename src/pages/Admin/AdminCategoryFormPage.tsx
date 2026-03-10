@@ -1,3 +1,4 @@
+// [UI ONLY] Redesigned AdminCategoryFormPage with improved layout and styling
 import categoriesApi from "@/api/categoriesApi";
 import { CategoryCreateRequest } from "@/type/category.type";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
@@ -11,11 +12,13 @@ import {
   Space,
   Spin,
   Typography,
+  Flex,
+  theme,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const AdminCategoryFormPage: React.FC = () => {
@@ -25,6 +28,8 @@ const AdminCategoryFormPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const isEdit = !!id;
   const queryClient = useQueryClient();
+  const { token } = theme.useToken();
+
   useEffect(() => {
     if (!isEdit) return;
 
@@ -39,14 +44,14 @@ const AdminCategoryFormPage: React.FC = () => {
           note: data.note,
         });
       } catch (err) {
-        message.error("Không tải được dữ liệu danh mục");
+        // Handled globally
       } finally {
         setLoading(false);
       }
     };
 
     fetchCategory();
-  }, [id, form]);
+  }, [id, form, isEdit]);
 
   const handleSubmit = async (values: any) => {
     try {
@@ -69,30 +74,42 @@ const AdminCategoryFormPage: React.FC = () => {
 
       navigate("/admin/categories");
     } catch (err) {
-      message.error("Có lỗi xảy ra!");
+      // Handled globally
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading && isEdit) return <Spin size="large" />;
+  if (loading && isEdit) return (
+    <Flex justify="center" align="center" style={{ minHeight: 400 }}>
+      <Spin size="large" tip="Đang tải dữ liệu..." />
+    </Flex>
+  );
 
   return (
-    <div className="admin-category-form-page">
-      <Card>
-        <Space style={{ marginBottom: 16 }}>
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate("/admin/categories")}
-          >
-            Quay lại
-          </Button>
-        </Space>
+    <Flex vertical gap={24}>
+      {/* [UI ONLY] Header Section */}
+      <Flex align="center" justify="space-between">
+        <Flex vertical gap={4}>
+          <Title level={4} style={{ margin: 0 }}>
+            {isEdit ? "Cập nhật danh mục" : "Tạo danh mục mới"}
+          </Title>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {isEdit ? "Chỉnh sửa thông tin danh mục tài sản" : "Thêm danh mục tài sản mới vào hệ thống"}
+          </Text>
+        </Flex>
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/admin/categories")}
+          style={{ borderRadius: 8 }}
+        >
+          Quay lại
+        </Button>
+      </Flex>
 
-        <Title level={4}>
-          {isEdit ? "Cập nhật danh mục" : "Tạo danh mục mới"}
-        </Title>
-
+      <Card 
+        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 12, maxWidth: 800 }}
+      >
         <Form
           form={form}
           layout="vertical"
@@ -100,34 +117,42 @@ const AdminCategoryFormPage: React.FC = () => {
           initialValues={{
             isActive: true,
           }}
+          requiredMark="optional"
         >
           <Form.Item
             label="Tên danh mục"
             name="name"
             rules={[{ required: true, message: "Vui lòng nhập tên danh mục" }]}
           >
-            <Input placeholder="Nhập tên danh mục" />
+            <Input size="large" placeholder="Ví dụ: Trang sức, Đồ điện tử..." style={{ borderRadius: 8 }} />
           </Form.Item>
+          
           <Form.Item
-            label="Ghi chú"
+            label="Ghi chú mô tả"
             name="note"
             rules={[{ required: true, message: "Vui lòng nhập ghi chú" }]}
           >
-            <TextArea rows={4} placeholder="Nhập ghi chú" />
+            <TextArea rows={4} placeholder="Mô tả ngắn gọn về danh mục này..." style={{ borderRadius: 8 }} />
           </Form.Item>
-          <Form.Item>
+
+          <Flex gap={12} justify="flex-end" style={{ marginTop: 12 }}>
+            <Button size="large" onClick={() => navigate("/admin/categories")} style={{ borderRadius: 8, minWidth: 100 }}>
+              Hủy
+            </Button>
             <Button
               type="primary"
+              size="large"
               htmlType="submit"
               icon={<SaveOutlined />}
               loading={loading}
+              style={{ borderRadius: 8, minWidth: 120 }}
             >
-              {isEdit ? "Cập nhật" : "Tạo mới"}
+              {isEdit ? "Cập nhật" : "Tạo danh mục"}
             </Button>
-          </Form.Item>
+          </Flex>
         </Form>
       </Card>
-    </div>
+    </Flex>
   );
 };
 

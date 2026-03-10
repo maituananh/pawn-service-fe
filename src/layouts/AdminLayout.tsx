@@ -1,8 +1,10 @@
+// [UI ONLY] Redesigned AdminLayout with fixed 220px sidebar and modern fintech aesthetic
 import useAuth from "@/hooks/useAuth";
 import { privateRoutes } from "@/router/router.config";
 import {
   AppstoreOutlined,
   DownOutlined,
+  LogoutOutlined,
   MenuOutlined,
   QuestionCircleOutlined,
   SearchOutlined,
@@ -10,7 +12,7 @@ import {
   TagsOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Drawer, Input, Layout, Menu, Typography } from "antd";
+import { Avatar, Button, Card, Drawer, Dropdown, Flex, Input, Layout, Menu, Typography, theme } from "antd";
 import { useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/images/logo.png";
@@ -36,7 +38,9 @@ const AdminLayout = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, currentUser } = useAuth();
+  const { token } = theme.useToken();
+
   const activeMenuKey = useMemo(() => {
     const matchingPath = menuItems
       .map((item) => item.key as string)
@@ -54,126 +58,197 @@ const AdminLayout = () => {
     logout();
   };
 
+  const userMenuItems = [
+    {
+      key: 'profile',
+      label: 'My Profile',
+      icon: <UserOutlined />,
+    },
+    {
+      key: 'logout',
+      label: 'Logout',
+      icon: <LogoutOutlined />,
+      danger: true,
+      onClick: handleLogout,
+    },
+  ];
+
   const showDrawer = () => setDrawerVisible(true);
   const closeDrawer = () => setDrawerVisible(false);
 
   return (
-    <Layout
-      className={`admin-layout ${collapsed ? "admin-layout-collapsed" : ""}`}
-    >
+    <Layout hasSider style={{ minHeight: "100vh" }}>
+      {/* [UI ONLY] Fixed 220px Sider with custom styling */}
       <Sider
         theme="light"
-        className="admin-sider"
-        width={250}
+        width={260}
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
         breakpoint="lg"
         collapsedWidth={80}
+        style={{
+          overflow: "auto",
+          height: "100vh",
+          position: "fixed",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          zIndex: 1000,
+        }}
       >
-        <div className="sider-content">
-          <div className="logo-section">
-            <img src={logoImage} alt="Logo" className="logo-image" />
-            {!collapsed && (
-              <Title level={4} className="logo-title">
-                camdo<b>TQ</b>
-              </Title>
-            )}
+        <Flex vertical gap={24} style={{ height: "100%", paddingBottom: 24 }}>
+          <div style={{ padding: "24px 24px 12px" }}>
+            <Flex align="center" gap={12} style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+              <div style={{ 
+                background: "#fff", 
+                padding: "6px", 
+                borderRadius: "10px", 
+                boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                <img src={logoImage} alt="Logo" style={{ height: 24, width: 'auto' }} />
+              </div>
+              {!collapsed && (
+                <Text style={{ fontSize: 18, fontWeight: 800, margin: 0, letterSpacing: "-0.01em", color: "#1a1a1a", whiteSpace: "nowrap" }}>
+                  camdo<span style={{ color: token.colorPrimary }}>ThảoQuyên</span>
+                </Text>
+              )}
+            </Flex>
           </div>
+
           <Menu
             mode="inline"
             selectedKeys={activeMenuKey}
             items={menuItems}
-            className="admin-menu"
             onClick={handleMenuClick}
+            style={{ borderInlineEnd: "none", flexGrow: 1 }}
           />
-          <div className="flex-centered">
-            {isAuthenticated ? (
-              <Button onClick={handleLogout}>Đăng xuất</Button>
-            ) : (
-              <Button type="primary" onClick={() => navigate("/login")}>
-                Đăng nhập
-              </Button>
-            )}
+
+
+          <div style={{ padding: "0 16px" }}>
+            <Dropdown menu={{ items: userMenuItems }} placement="topRight">
+              <Flex
+                align="center"
+                gap={12}
+                style={{
+                  padding: "12px",
+                  borderRadius: 12,
+                  cursor: "pointer",
+                  transition: "background 0.3s",
+                  background: token.colorBgTextHover
+                }}
+              >
+                <Avatar size={40} src={`https://ui-avatars.com/api/?name=${currentUser?.name || 'User'}&background=random`} />
+                {!collapsed && (
+                  <Flex vertical style={{ overflow: 'hidden' }}>
+                    <Text strong style={{ fontSize: 14 }}>{currentUser?.name || 'Admin'}</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }} ellipsis>{currentUser?.role || 'Manager'}</Text>
+                  </Flex>
+                )}
+              </Flex>
+            </Dropdown>
           </div>
-          <div
-            className={`user-profile-section ${collapsed ? "user-profile-collapsed" : ""}`}
-          >
-            <Avatar size={40} src="https://i.pravatar.cc/150?u=evano" />
-            {!collapsed && (
-              <>
-                <div className="user-info">
-                  <Text strong>Evano</Text>
-                  <Text type="secondary">Project Manager</Text>
-                </div>
-                <DownOutlined />
-              </>
-            )}
-          </div>
-        </div>
+        </Flex>
       </Sider>
-      <Layout className="admin-main-layout">
-        <Header className="admin-header">
-          <Button
-            className="mobile-menu-icon"
-            type="text"
-            icon={<MenuOutlined />}
-            onClick={showDrawer}
-          />
-          <div className="mobile-logo-section">
-            <img src={logoImage} alt="Logo" className="logo-image" />
-            <Title level={4} className="logo-title">
-              camdo<b>TQ</b>
-            </Title>
-          </div>
-          <div className="desktop-header-content">
-            <Title level={4}>Xin chào Evano 👋,</Title>
-            <Input
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              className="search-input"
+
+      <Layout
+        style={{
+          marginLeft: collapsed ? 80 : 260,
+          transition: "margin-left 0.2s",
+          background: token.colorBgLayout,
+        }}
+      >
+        <Header
+          style={{
+            background: "rgba(255, 255, 255, 0.7)",
+            backdropFilter: "saturate(180%) blur(20px)",
+            padding: "0 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            position: "sticky",
+            top: 0,
+            zIndex: 999,
+            borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.03)",
+            height: 64,
+          }}
+        >
+          <Flex align="center" gap={16} style={{ flexGrow: 1 }}>
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={showDrawer}
+              className="lg-hidden"
+              style={{ display: "none" }} // Show only on small screens via CSS or conditional rendering
             />
-          </div>
+            <Title level={4} style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em' }}>
+              Xin chào {currentUser?.name || 'Admin'} 👋
+            </Title>
+          </Flex>
+
+          <Flex align="center" gap={16}>
+            <Input
+              placeholder="Tìm kiếm..."
+              prefix={<SearchOutlined style={{ color: token.colorTextTertiary, marginRight: 4 }} />}
+              style={{
+                width: 280,
+                borderRadius: 12,
+                background: "rgba(0, 0, 0, 0.04)",
+                border: "none",
+                height: 40,
+                fontSize: 14
+              }}
+            />
+          </Flex>
         </Header>
-        <Content className="admin-content">
-          <div className="site-layout-background">
-            <Outlet />
-          </div>
+
+        <Content
+          style={{
+            margin: "24px",
+            minHeight: 280,
+            borderRadius: token.borderRadiusLG,
+          }}
+        >
+          <Outlet />
         </Content>
       </Layout>
+
       <Drawer
-        title="Menu"
+        title={
+          <Flex align="center" gap={8}>
+            <img src={logoImage} alt="Logo" style={{ height: 24 }} />
+            <Text strong>camdoTQ</Text>
+          </Flex>
+        }
         placement="left"
         onClose={closeDrawer}
         open={drawerVisible}
-        className="mobile-drawer"
+        styles={{ body: { padding: 0 } }}
       >
         <Menu
           mode="inline"
           selectedKeys={activeMenuKey}
           items={menuItems}
-          onClick={handleMenuClick}
+          onClick={(e) => {
+            handleMenuClick(e);
+            closeDrawer();
+          }}
+          style={{ borderInlineEnd: "none" }}
         />
-        <div className="drawer-auth-section">
-          {isAuthenticated ? (
-            <Button
-              onClick={handleLogout}
-              style={{ width: "100%", marginTop: "16px" }}
-            >
-              Đăng xuất
-            </Button>
-          ) : (
-            <Button
-              type="primary"
-              onClick={() => {
-                navigate("/login");
-                closeDrawer();
-              }}
-              style={{ width: "100%", marginTop: "16px" }}
-            >
-              Đăng nhập
-            </Button>
-          )}
+        <div style={{ padding: 16 }}>
+          <Button
+            danger
+            block
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+          >
+            Đăng xuất
+          </Button>
         </div>
       </Drawer>
     </Layout>

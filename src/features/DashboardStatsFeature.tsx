@@ -1,3 +1,4 @@
+// [UI ONLY] Updated DashboardStatsFeature to use the redesigned StatisticCard
 import statisticApi from "@/api/statisticApi";
 import StatisticCard from "@/components/StatisticCard";
 import { Statistic } from "@/type/statistic.type";
@@ -7,7 +8,7 @@ import {
   UsergroupAddOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Row } from "antd";
+import { Row, Col } from "antd";
 
 const STATISTICS_QUERY_KEY = ["statistics"];
 
@@ -24,21 +25,27 @@ export default function DashboardStatsFeature({
 
   return (
     <Row gutter={[24, 24]} className={rowClassName ?? "stats-cards"}>
-      <StatisticCard
-        title="Tổng khách"
-        value={data?.numberOfUser ?? 0}
-        prefix={<UsergroupAddOutlined />}
-      />
-      <StatisticCard
-        title="Tổng sản phẩm"
-        value={data?.numberOfProduct ?? 0}
-        prefix={<ShoppingOutlined />}
-      />
-      <StatisticCard
-        title="Tài khoản hoạt động"
-        value={data?.numberOfUserActive ?? 0}
-        prefix={<DesktopOutlined />}
-      />
+      <Col xs={24} sm={12} lg={8}>
+        <StatisticCard
+          title="Tổng khách hàng"
+          value={data?.numberOfUser ?? 0}
+          prefix={<UsergroupAddOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} lg={8}>
+        <StatisticCard
+          title="Tổng sản phẩm"
+          value={data?.numberOfProduct ?? 0}
+          prefix={<ShoppingOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} lg={8}>
+        <StatisticCard
+          title="Tài khoản hoạt động"
+          value={data?.numberOfUserActive ?? 0}
+          prefix={<DesktopOutlined />}
+        />
+      </Col>
     </Row>
   );
 }

@@ -13,7 +13,9 @@ const MainLayout = () => {
   const menuItems = [...publicRoutes, ...privateRoutes]
     .filter(
       (route) =>
-        route.showInMenu && (!route.roles || route.roles.includes(role))
+        route.showInMenu && 
+        (!route.roles || route.roles.includes(role)) &&
+        (!route.path.startsWith('/admin') || route.path === '/admin/dashboard')
     )
     .map((route) => ({
       key: route.path,
