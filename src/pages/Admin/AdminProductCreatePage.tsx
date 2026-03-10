@@ -6,9 +6,11 @@ import { message, UploadFile, Flex } from "antd";
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AdminProductCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
 
   const handleFinish = async (values: any, fileList: UploadFile[]) => {
@@ -45,6 +47,7 @@ const AdminProductCreatePage: React.FC = () => {
       await productsApi.create(payload);
       
       message.success("Tạo hợp đồng cầm cố mới thành công!");
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
       navigate("/admin/products", { replace: true });
     } catch (error: any) {
       // Handled globally
