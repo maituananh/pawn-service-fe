@@ -65,13 +65,13 @@ const AdminCategoryFormPage: React.FC = () => {
 
       if (isEdit) {
         await categoriesApi.update(Number(id), payload);
-        queryClient.invalidateQueries({ queryKey: ["categories"] });
         message.success("Cập nhật danh mục thành công!");
       } else {
         await categoriesApi.create(payload);
         message.success("Tạo danh mục thành công!");
       }
 
+      await queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/categories");
     } catch (err) {
       // Handled globally

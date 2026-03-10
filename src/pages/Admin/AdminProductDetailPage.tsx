@@ -6,9 +6,11 @@ import { message, Spin, UploadFile } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AdminProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { id } = useParams<{ id: string }>();
   const productId = Number(id);
   const [loading, setLoading] = useState(false);
@@ -49,6 +51,7 @@ const AdminProductDetailPage: React.FC = () => {
 
       await productsApi.update(productId, payload);
       message.success('Cập nhật sản phẩm thành công!');
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
       refetch(); 
     } catch (error) {
       // Handled globally
