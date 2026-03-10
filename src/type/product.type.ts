@@ -29,4 +29,5 @@ export interface ProductCreateRequest {
   description: string;
   type: string;
   imageIds: number[];
+  status?: string;
 }

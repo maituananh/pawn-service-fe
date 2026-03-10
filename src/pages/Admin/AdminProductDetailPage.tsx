@@ -1,11 +1,11 @@
-import fileApi from '@/api/filesApi';
-import productsApi from '@/api/productsApi';
-import ProductForm from '@/components/admin/ProductForm';
-import { useProduct } from '@/hooks/useProduct';
-import { message, Spin, UploadFile } from 'antd';
-import dayjs from 'dayjs';
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import fileApi from "@/api/filesApi";
+import productsApi from "@/api/productsApi";
+import ProductForm from "@/components/admin/ProductForm";
+import { useProduct } from "@/hooks/useProduct";
+import { message, Spin, UploadFile } from "antd";
+import dayjs from "dayjs";
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,9 +16,28 @@ const AdminProductDetailPage: React.FC = () => {
   // 1. Fetch dữ liệu sản phẩm từ API
   const { data: product, isLoading, isError, refetch } = useProduct(productId);
 
+  const handleLiquidate = async () => {
+    try {
+      setLoading(true);
+
+      await productsApi.update(productId, {
+        ...product,
+        status: "Liquidated",
+      });
+
+      message.success("Thanh lý sản phẩm thành công!");
+      refetch();
+    } catch (error) {
+      message.error("Thanh lý sản phẩm thất bại!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 2. Hàm xử lý Update (giữ nguyên logic upload ảnh nếu có thay đổi)
   const handleUpdate = async (values: any, fileList: UploadFile[]) => {
-    console.log("handleUpdate")
+    console.log("handleUpdate");
+
     try {
       setLoading(true);
 
@@ -33,7 +52,7 @@ const AdminProductDetailPage: React.FC = () => {
         newFiles.map(async (f) => {
           const res = await fileApi.upload(f.originFileObj as File);
           return res.id;
-        })
+        }),
       );
 
       const payload = {
@@ -48,31 +67,33 @@ const AdminProductDetailPage: React.FC = () => {
       };
 
       await productsApi.update(productId, payload);
-      message.success('Cập nhật sản phẩm thành công!');
+      message.success("Cập nhật sản phẩm thành công!");
       refetch(); // Tải lại dữ liệu mới nhất
     } catch (error) {
       console.error("Update Error:", error);
-      message.error('Cập nhật thất bại!');
+      message.error("Cập nhật thất bại!");
     } finally {
       setLoading(false);
     }
   };
 
-  if (isLoading) return (
-    <div style={{ textAlign: 'center', padding: '50px' }}>
-      <Spin size="large" tip="Đang tải dữ liệu..." />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>
+        <Spin size="large" tip="Đang tải dữ liệu..." />
+      </div>
+    );
 
   if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
 
   return (
-    <div className="product-detail-page" style={{ padding: '24px' }}>
+    <div className="product-detail-page" style={{ padding: "24px" }}>
       <ProductForm
         isEdit={true}
         initialData={product} // Truyền toàn bộ object product vào
         onFinish={handleUpdate}
-        onCancel={() => navigate('/admin/products')}
+        onCancel={() => navigate("/admin/products")}
+        onLiquidate={handleLiquidate}
         loading={loading}
       />
     </div>
