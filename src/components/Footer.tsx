@@ -51,7 +51,7 @@ const AppFooter = () => {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: 12
               }}
-              bodyStyle={{ padding: 20 }}
+              styles={{ body: { padding: 20 } }}
             >
               <Title level={5} style={{ color: '#fff', marginTop: 0, marginBottom: 12 }}>Ví dụ minh họa:</Title>
               <Paragraph style={{ color: 'rgba(255, 255, 255, 0.65)', margin: 0, fontSize: 14, lineHeight: 1.6 }}>

@@ -4,6 +4,7 @@ import { Layout } from "antd";
 import { Link, Outlet } from "react-router-dom";
 import AppFooter from "../components/Footer";
 import AppHeader from "../components/Header";
+import AIAgent from "../components/AIAgent";
 
 const { Content } = Layout;
 
@@ -23,17 +24,18 @@ const MainLayout = () => {
     }));
 
   return (
-    <Layout className="main-layout">
+    <div className="main-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AppHeader menuItems={menuItems} />
 
-      <Content className="main-content px-4">
+      <Content className="main-content px-4" style={{ flex: 1 }}>
         <div className="site-layout-background">
           <Outlet />
         </div>
       </Content>
 
       <AppFooter />
-    </Layout>
+      <AIAgent />
+    </div>
   );
 };
 

@@ -133,7 +133,7 @@ const ProductsPage = () => {
                   justifyContent: 'center'
                 }}>
                   <img
-                    src={product.image || "https://via.placeholder.com/200"}
+                    src={(product.image && product.image !== "string") ? product.image : "https://via.placeholder.com/400?text=No+Image"}
                     alt={product.name}
                     style={{ 
                       maxWidth: '100%', 

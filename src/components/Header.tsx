@@ -1,7 +1,8 @@
 // [UI ONLY] Redesigned AppHeader for a premium fintech feel
 import useAuth from '@/hooks/useAuth';
-import { MenuOutlined, LogoutOutlined, LoginOutlined } from '@ant-design/icons';
-import { Button, Drawer, Layout, Menu, Typography, Flex, theme, type MenuProps } from 'antd';
+import { useCart } from '@/hooks/useCart';
+import { MenuOutlined, LogoutOutlined, LoginOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { Button, Drawer, Layout, Menu, Typography, Flex, theme, Badge, type MenuProps } from 'antd';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import logoImage from '../assets/images/logo.png';
@@ -11,6 +12,7 @@ const { Text } = Typography;
 
 const AppHeader = ({ menuItems }: { menuItems: MenuProps['items'] }) => {
   const { isAuthenticated, logout } = useAuth();
+  const { cart } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -100,6 +102,25 @@ const AppHeader = ({ menuItems }: { menuItems: MenuProps['items'] }) => {
 
         {/* [UI ONLY] Refined Auth Section */}
         <Flex align="center" gap={16}>
+          <Badge count={cart?.length || 0} offset={[-4, 4]}>
+            <Button 
+              type="text" 
+              icon={<ShoppingCartOutlined style={{ fontSize: 20, color: 'rgba(0,0,0,0.65)' }} />} 
+              onClick={() => navigate('/mycart')}
+              style={{ 
+                borderRadius: '50%', 
+                width: 40, 
+                height: 40, 
+                background: 'rgba(0,0,0,0.04)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease'
+              }}
+              className="cart-button-hover"
+            />
+          </Badge>
+
           <div className="desktop-menu">
             {isAuthenticated ? (
               <Button 
