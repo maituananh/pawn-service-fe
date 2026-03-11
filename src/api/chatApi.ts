@@ -8,6 +8,15 @@ export interface ChatRequest {
 export interface ChatResponse {
   result: string;
   type?: string;
+  username?: string;
+  password?: string;
+  name?: string;
+  age?: number;
+  email?: string;
+  cardId?: string;
+  phone?: string;
+  address?: string;
+  gender?: string;
 }
 
 export interface OcrUserRequest {

@@ -3,11 +3,11 @@ import filesApi from "@/api/filesApi";
 import useAuth from "@/hooks/useAuth";
 import {
   CloseOutlined,
+  ExpandAltOutlined,
   PictureOutlined,
   SendOutlined,
-  UserOutlined,
-  ExpandAltOutlined,
   ShrinkOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -34,6 +34,7 @@ interface Message {
   timestamp: Date;
   imageUrl?: string;
   type?: string;
+  data?: any;
 }
 
 const NewAccountForm: React.FC = () => {
@@ -43,6 +44,7 @@ const NewAccountForm: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitResult, setSubmitResult] = useState<string | null>(null);
+  const [resultData, setResultData] = useState<any>(null);
 
   const handleSubmit = async () => {
     if (!username || !phone || !email || !file) {
@@ -61,6 +63,7 @@ const NewAccountForm: React.FC = () => {
       });
       message.success("Đã gửi thông tin đăng ký định danh!");
       setSubmitResult(res.result || "Đã gửi thành công");
+      setResultData(res);
     } catch (error) {
       console.error(error);
       message.error("Có lỗi xảy ra khi gửi thông tin.");
@@ -71,44 +74,86 @@ const NewAccountForm: React.FC = () => {
 
   if (submitResult) {
     return (
-      <div style={{ marginTop: 12, borderTop: "1px solid #f0f0f0", paddingTop: 12 }}>
-        <Text type="success" strong>{submitResult}</Text>
+      <div
+        style={{
+          marginTop: 12,
+          borderTop: "1px solid #f0f0f0",
+          paddingTop: 12,
+        }}
+      >
+        <Text
+          type="success"
+          strong
+          style={{ display: "block", marginBottom: 8 }}
+        >
+          {submitResult}
+        </Text>
+        {resultData?.username && (
+          <Flex
+            vertical
+            gap={4}
+            style={{ background: "#f5f5f5", padding: 12, borderRadius: 8 }}
+          >
+            <Text>
+              <Text strong>Username:</Text> {resultData.username}
+            </Text>
+            {resultData.password && (
+              <Text>
+                <Text strong>Password:</Text> {resultData.password}
+              </Text>
+            )}
+          </Flex>
+        )}
       </div>
     );
   }
 
   return (
-    <div style={{ marginTop: 12, borderTop: "1px solid #f0f0f0", paddingTop: 12 }}>
+    <div
+      style={{ marginTop: 12, borderTop: "1px solid #f0f0f0", paddingTop: 12 }}
+    >
       <Flex vertical gap={8}>
-        <Input 
-          placeholder="Username" 
-          size="small" 
+        <Input
+          placeholder="Username"
+          size="small"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           disabled={loading}
         />
-        <Input 
-          placeholder="Number phone" 
-          size="small" 
+        <Input
+          placeholder="Number phone"
+          size="small"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           disabled={loading}
         />
-        <Input 
-          placeholder="Email" 
-          size="small" 
+        <Input
+          placeholder="Email"
+          size="small"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading}
         />
-        <Upload 
-          showUploadList={true} 
+        <Upload
+          showUploadList={true}
           maxCount={1}
-          beforeUpload={(f) => { setFile(f); return false; }}
+          beforeUpload={(f) => {
+            setFile(f);
+            return false;
+          }}
           onRemove={() => setFile(null)}
-          fileList={file ? [{ uid: '-1', name: file.name, status: 'done' }] as any : []}
+          fileList={
+            file
+              ? ([{ uid: "-1", name: file.name, status: "done" }] as any)
+              : []
+          }
         >
-          <Button icon={<PictureOutlined />} size="small" block disabled={loading}>
+          <Button
+            icon={<PictureOutlined />}
+            size="small"
+            block
+            disabled={loading}
+          >
             Identity Cards (CCCD)
           </Button>
         </Upload>
@@ -193,6 +238,7 @@ const AIAgent: React.FC = () => {
         sender: "ai",
         timestamp: new Date(),
         type: chatRes.type,
+        data: chatRes,
       };
       setMessages((prev) => [...prev, aiMsg]);
     } catch (error) {
@@ -309,9 +355,102 @@ const AIAgent: React.FC = () => {
                     boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
                   }}
                 >
-                  <Text style={{ color: "inherit", whiteSpace: "pre-wrap" }}>
-                    {item.text}
-                  </Text>
+                  {/* ERROR type: show error message */}
+                  {item.type === "ERROR" && (
+                    <Flex
+                      gap={6}
+                      align="start"
+                      style={{
+                        background: "#fff2f0",
+                        border: "1px solid #ffccc7",
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text type="danger" style={{ whiteSpace: "pre-wrap" }}>
+                        ⚠️ {item.text}
+                      </Text>
+                    </Flex>
+                  )}
+
+                  {/* PROFILE type: show profile card without result text */}
+                  {item.type === "PROFILE" && item.data && (
+                    <Flex
+                      vertical
+                      gap={4}
+                      style={{
+                        background: "#fafafa",
+                        padding: 12,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text strong style={{ marginBottom: 4 }}>Thông tin cá nhân</Text>
+                      {item.data.name && (
+                        <Text>
+                          <Text strong>Họ tên:</Text> {item.data.name}
+                        </Text>
+                      )}
+                      {item.data.age !== undefined && item.data.age !== null && (
+                        <Text>
+                          <Text strong>Tuổi:</Text> {item.data.age}
+                        </Text>
+                      )}
+                      {item.data.gender && (
+                        <Text>
+                          <Text strong>Giới tính:</Text> {item.data.gender}
+                        </Text>
+                      )}
+                      {item.data.phone && (
+                        <Text>
+                          <Text strong>SĐT:</Text> {item.data.phone}
+                        </Text>
+                      )}
+                      {item.data.email && (
+                        <Text>
+                          <Text strong>Email:</Text> {item.data.email}
+                        </Text>
+                      )}
+                      {item.data.address && (
+                        <Text>
+                          <Text strong>Địa chỉ:</Text> {item.data.address}
+                        </Text>
+                      )}
+                    </Flex>
+                  )}
+
+                  {/* OCR_IDENTITY type: show username/password without result text */}
+                  {item.type === "OCR_IDENTITY" && item.data && (
+                    <Flex
+                      vertical
+                      gap={4}
+                      style={{
+                        background: "#fafafa",
+                        padding: 12,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text strong style={{ marginBottom: 4 }}>Thông tin tài khoản</Text>
+                      {item.data.username && (
+                        <Text>
+                          <Text strong>Username:</Text> {item.data.username}
+                        </Text>
+                      )}
+                      {item.data.password && (
+                        <Text>
+                          <Text strong>Password:</Text> {item.data.password}
+                        </Text>
+                      )}
+                    </Flex>
+                  )}
+
+                  {/* Default: show result text for non-typed messages */}
+                  {!item.type && (
+                    <Text style={{ color: "inherit", whiteSpace: "pre-wrap" }}>
+                      {item.text}
+                    </Text>
+                  )}
+
+
                   {item.type === "NEW_ACCOUNT" && <NewAccountForm />}
                   {item.imageUrl && (
                     <img
