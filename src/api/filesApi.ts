@@ -1,4 +1,6 @@
-import axiosClient from './axiosClient';
+import axiosClient from "./axiosClient";
+
+const BASE_URL = "http://localhost:8080";
 
 export interface UploadResponse {
   url: string;
@@ -8,11 +10,15 @@ export interface UploadResponse {
 const filesApi = {
   async upload(file: File): Promise<UploadResponse> {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
-    const { data } = await axiosClient.post<UploadResponse>('/files/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const { data } = await axiosClient.post<UploadResponse>(
+      "/files/upload",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
 
     return data;
   },
