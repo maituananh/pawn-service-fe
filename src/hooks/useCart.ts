@@ -7,6 +7,7 @@ export const useCart = () => {
   const cartQuery = useQuery({
     queryKey: ['carts'],
     queryFn: cartApi.getMyCart,
+    enabled: !!localStorage.getItem('access_token'),
   });
 
   const cartData = cartQuery.data?.items ?? [];
