@@ -1,36 +1,148 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Button, Card, Input, List, Avatar, Space, Upload, message, Typography, Badge, Flex } from 'antd';
-import { RobotOutlined, SendOutlined, PictureOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
-import useAuth from '@/hooks/useAuth';
-import filesApi from '@/api/filesApi';
-import chatApi from '@/api/chatApi';
-import robotIcon from '../assets/images/ai-robot-icon.png';
+import chatApi from "@/api/chatApi";
+import filesApi from "@/api/filesApi";
+import useAuth from "@/hooks/useAuth";
+import {
+  CloseOutlined,
+  PictureOutlined,
+  SendOutlined,
+  UserOutlined,
+  ExpandAltOutlined,
+  ShrinkOutlined,
+} from "@ant-design/icons";
+import {
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Flex,
+  Input,
+  List,
+  message,
+  Space,
+  Typography,
+  Upload,
+} from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import robotIcon from "../assets/images/ai-robot-icon.png";
 
 const { Text } = Typography;
 
 interface Message {
   id: number;
   text: string;
-  sender: 'ai' | 'user';
+  sender: "ai" | "user";
   timestamp: Date;
   imageUrl?: string;
+  type?: string;
 }
+
+const NewAccountForm: React.FC = () => {
+  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [submitResult, setSubmitResult] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!username || !phone || !email || !file) {
+      message.error("Vui lòng điền đầy đủ thông tin và chọn ảnh!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const uploadRes = await filesApi.upload(file);
+      const res = await chatApi.sendOcrUser({
+        username,
+        phone,
+        email,
+        fileUrl: uploadRes.url,
+      });
+      message.success("Đã gửi thông tin đăng ký định danh!");
+      setSubmitResult(res.result || "Đã gửi thành công");
+    } catch (error) {
+      console.error(error);
+      message.error("Có lỗi xảy ra khi gửi thông tin.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (submitResult) {
+    return (
+      <div style={{ marginTop: 12, borderTop: "1px solid #f0f0f0", paddingTop: 12 }}>
+        <Text type="success" strong>{submitResult}</Text>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: 12, borderTop: "1px solid #f0f0f0", paddingTop: 12 }}>
+      <Flex vertical gap={8}>
+        <Input 
+          placeholder="Username" 
+          size="small" 
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          disabled={loading}
+        />
+        <Input 
+          placeholder="Number phone" 
+          size="small" 
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          disabled={loading}
+        />
+        <Input 
+          placeholder="Email" 
+          size="small" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
+        />
+        <Upload 
+          showUploadList={true} 
+          maxCount={1}
+          beforeUpload={(f) => { setFile(f); return false; }}
+          onRemove={() => setFile(null)}
+          fileList={file ? [{ uid: '-1', name: file.name, status: 'done' }] as any : []}
+        >
+          <Button icon={<PictureOutlined />} size="small" block disabled={loading}>
+            Identity Cards (CCCD)
+          </Button>
+        </Upload>
+        <Button
+          type="primary"
+          size="small"
+          onClick={handleSubmit}
+          loading={loading}
+        >
+          Gửi
+        </Button>
+      </Flex>
+    </div>
+  );
+};
 
 const AIAgent: React.FC = () => {
   const { isAuthenticated, currentUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       text: "Xin chào! Tôi là trợ lý AI. Tôi có thể giúp gì cho bạn?",
-      sender: 'ai',
-      timestamp: new Date()
-    }
+      sender: "ai",
+      timestamp: new Date(),
+    },
   ]);
   const [loading, setLoading] = useState(false);
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
-  const [pendingImagePreview, setPendingImagePreview] = useState<string | null>(null);
+  const [pendingImagePreview, setPendingImagePreview] = useState<string | null>(
+    null,
+  );
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,20 +161,20 @@ const AIAgent: React.FC = () => {
     const userMsg: Message = {
       id: Date.now(),
       text: currentInput || (currentImageFile ? "Gửi ảnh cho AI" : ""),
-      sender: 'user',
+      sender: "user",
       timestamp: new Date(),
-      imageUrl: currentPreviewUrl || undefined
+      imageUrl: currentPreviewUrl || undefined,
     };
 
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
+    setMessages((prev) => [...prev, userMsg]);
+    setInput("");
     setPendingImageFile(null);
     setPendingImagePreview(null);
     setLoading(true);
 
     try {
       let fileUrl = undefined;
-      
+
       // Upload image first if it exists
       if (currentImageFile) {
         const uploadRes = await filesApi.upload(currentImageFile);
@@ -72,27 +184,27 @@ const AIAgent: React.FC = () => {
       // Send to chat API
       const chatRes = await chatApi.sendMessage({
         content: currentInput,
-        fileUrl: fileUrl
+        fileUrl: fileUrl,
       });
 
       const aiMsg: Message = {
         id: Date.now() + 1,
         text: chatRes.result,
-        sender: 'ai',
-        timestamp: new Date()
+        sender: "ai",
+        timestamp: new Date(),
+        type: chatRes.type,
       };
-      setMessages(prev => [...prev, aiMsg]);
-      
+      setMessages((prev) => [...prev, aiMsg]);
     } catch (error) {
       console.error("Chat Error:", error);
       message.error("Đã có lỗi xảy ra khi kết nối với máy chủ AI.");
       const errorMsg: Message = {
         id: Date.now() + 1,
         text: "Hệ thống AI hiện đang xử lý nhiều yêu cầu hoặc không phản hồi. Vui lòng thử lại sau ít phút.",
-        sender: 'ai',
-        timestamp: new Date()
+        sender: "ai",
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMsg]);
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setLoading(false);
     }
@@ -105,64 +217,112 @@ const AIAgent: React.FC = () => {
   };
 
   const chatContent = (
-    <Card 
+    <Card
       title={
         <Flex justify="space-between" align="center">
           <Space>
             <Avatar src={robotIcon} size="small" />
             <Text strong>AI Assistant</Text>
           </Space>
-          <Button 
-            type="text" 
-            icon={<CloseOutlined />} 
-            onClick={() => setIsOpen(false)} 
-            size="small"
-          />
+          <Space size={0}>
+            <Button
+              type="text"
+              icon={isExpanded ? <ShrinkOutlined /> : <ExpandAltOutlined />}
+              onClick={() => setIsExpanded(!isExpanded)}
+              size="small"
+            />
+            <Button
+              type="text"
+              icon={<CloseOutlined />}
+              onClick={() => setIsOpen(false)}
+              size="small"
+            />
+          </Space>
         </Flex>
       }
-      styles={{ 
-        body: { 
-          padding: 0, 
-          display: 'flex', 
-          flexDirection: 'column', 
-          height: 440 // Adjusting based on 500px total height minus header
-        } 
+      styles={{
+        body: {
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          minHeight: 0,
+        },
       }}
-      style={{ 
-        width: 380, 
-        height: 500, 
-        boxShadow: '0 12px 30px rgba(0,0,0,0.15)',
+      style={{
+        width: "100%",
+        height: "100%",
+        boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
         borderRadius: 16,
-        overflow: 'hidden'
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <div 
+      <div
         ref={chatBodyRef}
-        style={{ flex: 1, overflowY: 'auto', padding: 16, background: '#f8f9fa', minHeight: 0, scrollBehavior: 'smooth' }}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: 16,
+          background: "#f8f9fa",
+          minHeight: 0,
+          scrollBehavior: "smooth",
+        }}
       >
         <List
           dataSource={messages}
           renderItem={(item) => (
-            <List.Item style={{ border: 'none', padding: '8px 0', justifyContent: item.sender === 'user' ? 'flex-end' : 'flex-start' }}>
-              <Flex gap={8} style={{ maxWidth: '85%', flexDirection: item.sender === 'user' ? 'row-reverse' : 'row' }} align="start">
-                <Avatar 
-                  src={item.sender === 'user' ? undefined : robotIcon}
-                  icon={item.sender === 'user' ? <UserOutlined /> : undefined} 
-                  style={{ backgroundColor: item.sender === 'user' ? '#1677ff' : '#fff', flexShrink: 0, border: item.sender === 'ai' ? '1px solid #f0f0f0' : 'none' }}
+            <List.Item
+              style={{
+                border: "none",
+                padding: "8px 0",
+                marginBottom: "12px",
+                justifyContent:
+                  item.sender === "user" ? "flex-end" : "flex-start",
+              }}
+            >
+              <Flex
+                gap={8}
+                style={{
+                  maxWidth: "85%",
+                  flexDirection: item.sender === "user" ? "row-reverse" : "row",
+                }}
+                align="start"
+              >
+                <Avatar
+                  src={item.sender === "user" ? undefined : robotIcon}
+                  icon={item.sender === "user" ? <UserOutlined /> : undefined}
+                  style={{
+                    backgroundColor:
+                      item.sender === "user" ? "#1677ff" : "#fff",
+                    flexShrink: 0,
+                    border: item.sender === "ai" ? "1px solid #f0f0f0" : "none",
+                  }}
                 />
-                <div style={{ 
-                  background: item.sender === 'user' ? '#1677ff' : '#fff', 
-                  color: item.sender === 'user' ? '#fff' : '#000',
-                  padding: '8px 12px',
-                  borderRadius: 12,
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
-                }}>
-                  <Text style={{ color: 'inherit' }}>{item.text}</Text>
+                <div
+                  style={{
+                    background: item.sender === "user" ? "#1677ff" : "#fff",
+                    color: item.sender === "user" ? "#fff" : "#000",
+                    padding: "8px 12px",
+                    borderRadius: 12,
+                    boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <Text style={{ color: "inherit", whiteSpace: "pre-wrap" }}>
+                    {item.text}
+                  </Text>
+                  {item.type === "NEW_ACCOUNT" && <NewAccountForm />}
                   {item.imageUrl && (
-                    <img 
-                      src={item.imageUrl} 
-                      alt="Uploaded" 
-                      style={{ maxWidth: '100%', marginTop: 8, borderRadius: 8, display: 'block' }} 
+                    <img
+                      src={item.imageUrl}
+                      alt="Uploaded"
+                      style={{
+                        maxWidth: "100%",
+                        marginTop: 8,
+                        borderRadius: 8,
+                        display: "block",
+                      }}
                     />
                   )}
                 </div>
@@ -171,50 +331,71 @@ const AIAgent: React.FC = () => {
           )}
         />
         {loading && (
-          <div style={{ textAlign: 'left', marginBottom: 16 }}>
+          <div style={{ textAlign: "left", marginBottom: 16 }}>
             <Badge status="processing" text="Robot đang suy nghĩ..." />
           </div>
         )}
       </div>
-      
-      <div style={{ padding: 16, background: '#fff', borderTop: '1px solid #f0f0f0' }}>
+
+      <div
+        style={{
+          padding: 16,
+          background: "#fff",
+          borderTop: "1px solid #f0f0f0",
+        }}
+      >
         {pendingImagePreview && (
-          <div style={{ position: 'relative', marginBottom: 12, display: 'inline-block' }}>
-            <img 
-              src={pendingImagePreview} 
-              alt="Pending" 
-              style={{ width: 80, height: 80, borderRadius: 8, objectFit: 'cover', border: '1px solid #d9d9d9' }} 
+          <div
+            style={{
+              position: "relative",
+              marginBottom: 12,
+              display: "inline-block",
+            }}
+          >
+            <img
+              src={pendingImagePreview}
+              alt="Pending"
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 8,
+                objectFit: "cover",
+                border: "1px solid #d9d9d9",
+              }}
             />
-            <Button 
-              type="primary" 
-              shape="circle" 
-              icon={<CloseOutlined style={{ fontSize: 10 }} />} 
-              size="small" 
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<CloseOutlined style={{ fontSize: 10 }} />}
+              size="small"
               onClick={() => {
                 setPendingImageFile(null);
                 setPendingImagePreview(null);
               }}
-              style={{ position: 'absolute', top: -8, right: -8, width: 20, height: 20 }}
+              style={{
+                position: "absolute",
+                top: -8,
+                right: -8,
+                width: 20,
+                height: 20,
+              }}
             />
           </div>
         )}
         <Flex gap={8} align="center">
-          <Upload 
-            showUploadList={false} 
-            beforeUpload={handleBeforeUpload}
-          >
+          <Upload showUploadList={false} beforeUpload={handleBeforeUpload}>
             <Button icon={<PictureOutlined />} shape="circle" />
           </Upload>
-          <Input 
-            placeholder="Nhập nội dung..." 
+          <Input
+            placeholder="Nhập nội dung..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onPressEnter={handleSend}
             style={{ borderRadius: 20 }}
           />
-          <Button 
-            type="primary" 
-            icon={<SendOutlined />} 
+          <Button
+            type="primary"
+            icon={<SendOutlined />}
             onClick={handleSend}
             shape="circle"
           />
@@ -224,38 +405,66 @@ const AIAgent: React.FC = () => {
   );
 
   return (
-    <div style={{ position: 'fixed', bottom: 30, right: 30, zIndex: 9999 }}>
+    <div style={{ position: "fixed", bottom: 30, right: 30, zIndex: 9999 }}>
+      {/* Background Overlay */}
+      {isOpen && isExpanded && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.45)",
+            zIndex: 9998,
+            animation: "fadeIn 0.3s ease-out",
+          }}
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
+
       {/* Manual Fixed Chat Window */}
       {isOpen && (
-        <div style={{ 
-          position: 'fixed', 
-          bottom: 110, 
-          right: 30, 
-          zIndex: 10000,
-          animation: 'slideUp 0.3s ease-out'
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            bottom: isExpanded ? "10vh" : 110,
+            right: isExpanded ? "10vw" : 30,
+            width: isExpanded ? "80vw" : 380,
+            height: isExpanded ? "80vh" : 500,
+            zIndex: 10000,
+            animation: "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+            transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
           {chatContent}
         </div>
       )}
 
       {/* Floating Button */}
-      <Button 
-        type="primary" 
+      <Button
+        type="primary"
         size="large"
-        shape="circle" 
+        shape="circle"
         onClick={() => setIsOpen(!isOpen)}
-        icon={<img src={robotIcon} style={{ width: 45, height: 45, transition: 'transform 0.3s' }} className={isOpen ? "rotate-icon" : ""} />}
+        icon={
+          <img
+            src={robotIcon}
+            style={{ width: 45, height: 45, transition: "transform 0.3s" }}
+            className={isOpen ? "rotate-icon" : ""}
+          />
+        }
         className="ai-agent-pulse"
-        style={{ 
-          width: 64, 
-          height: 64, 
-          boxShadow: '0 4px 15px rgba(22, 119, 255, 0.4)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#fff',
-          border: '2px solid #1677ff',
-          overflow: 'hidden'
+        style={{
+          width: 64,
+          height: 64,
+          boxShadow: "0 4px 15px rgba(22, 119, 255, 0.4)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#fff",
+          border: "2px solid #1677ff",
+          overflow: "hidden",
         }}
       />
 
@@ -264,6 +473,10 @@ const AIAgent: React.FC = () => {
           @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
           }
           .ai-agent-pulse {
             animation: pulse 2s infinite;
