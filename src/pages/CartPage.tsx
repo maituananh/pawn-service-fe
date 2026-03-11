@@ -66,7 +66,7 @@ const CartPage = () => {
     if (selectedIds.length === 0) return;
 
     processPayment(
-      { productIds: selectedIds },
+      { productIds: selectedIds, currency: "vnd" },
       {
         onSuccess: (res: any) => {
           const checkoutUrl = res?.sessionUrl || res?.data?.sessionUrl;
