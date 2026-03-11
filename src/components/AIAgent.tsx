@@ -39,8 +39,6 @@ const AIAgent: React.FC = () => {
     }
   }, [messages, loading]);
 
-  if (!isAuthenticated) return null;
-
   const handleSend = async () => {
     if (!input.trim() && !pendingImageFile) return;
 
