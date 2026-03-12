@@ -1,22 +1,22 @@
 // [UI ONLY] Redesigned ProductForm with premium fintech aesthetic
 import { useCategories } from "@/hooks/useCategories";
 import { useUsers } from "@/hooks/useUsers";
-import { InboxOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, InboxOutlined, SaveOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
   Col,
   DatePicker,
+  Flex,
   Form,
   Input,
   InputNumber,
   Row,
   Select,
+  theme,
   Typography,
   Upload,
   UploadFile,
-  Flex,
-  theme,
 } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
@@ -31,18 +31,24 @@ interface ProductFormProps {
   isEdit?: boolean;
 }
 
-const SaveButton = ({ form, loading, fileList }: { form: any; loading: boolean; fileList: any[] }) => {
+const SaveButton = ({
+  form,
+  loading,
+  fileList,
+}: {
+  form: any;
+  loading: boolean;
+  fileList: any[];
+}) => {
   const [submittable, setSubmittable] = useState(false);
   const values = Form.useWatch([], form);
   const { token } = theme.useToken();
 
   useEffect(() => {
-    form
-      .validateFields({ validateOnly: true })
-      .then(
-        () => setSubmittable(true),
-        () => setSubmittable(false)
-      );
+    form.validateFields({ validateOnly: true }).then(
+      () => setSubmittable(true),
+      () => setSubmittable(false),
+    );
   }, [values, form, fileList]);
 
   return (
@@ -53,11 +59,11 @@ const SaveButton = ({ form, loading, fileList }: { form: any; loading: boolean; 
       loading={loading}
       disabled={!submittable}
       icon={<SaveOutlined />}
-      style={{ 
-        minWidth: 120, 
+      style={{
+        minWidth: 120,
         borderRadius: 8,
         background: submittable ? token.colorSuccess : undefined,
-        borderColor: submittable ? token.colorSuccess : undefined
+        borderColor: submittable ? token.colorSuccess : undefined,
       }}
     >
       Lưu tài sản
@@ -118,7 +124,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const handleUploadChange = ({ fileList: newFileList }: any) => {
     setFileList(newFileList);
     form.setFieldsValue({ images: newFileList });
-    form.validateFields(['images']);
+    form.validateFields(["images"]);
   };
 
   return (
@@ -130,30 +136,44 @@ const ProductForm: React.FC<ProductFormProps> = ({
       requiredMark="optional"
     >
       <Flex vertical gap={24}>
-        <Card 
-          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 12 }}
+        <Card
+          style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)", borderRadius: 12 }}
           title={
             <Flex vertical gap={4}>
-              <Title level={4} style={{ margin: 0 }}>{isEdit ? "Cập nhật sản phẩm" : "Tạo hợp đồng mới"}</Title>
-              <Text type="secondary" style={{ fontSize: 12 }}>Thông tin chi tiết về tài sản và điều khoản cầm cố</Text>
+              <Title level={4} style={{ margin: 0 }}>
+                {isEdit ? "Cập nhật sản phẩm" : "Tạo hợp đồng mới"}
+              </Title>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Thông tin chi tiết về tài sản và điều khoản cầm cố
+              </Text>
             </Flex>
           }
         >
           <Row gutter={[24, 0]}>
             <Col xs={24} md={12}>
-              <Form.Item label="Tên sản phẩm" name="name" rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
+              <Form.Item
+                label="Tên sản phẩm"
+                name="name"
+                rules={[{ required: true, message: "Vui lòng nhập tên" }]}
+              >
                 <Input placeholder="Ví dụ: iPhone 15 Pro Max" />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item label="Loại sản phẩm" name="type" rules={[{ required: true, message: "Chọn loại" }]}>
+              <Form.Item
+                label="Loại sản phẩm"
+                name="type"
+                rules={[{ required: true, message: "Chọn loại" }]}
+              >
                 <Select
                   placeholder="Chọn phân loại chính"
                   onChange={() => form.setFieldValue("categoryId", undefined)}
                 >
                   <Select.Option value="PHONE">Điện thoại</Select.Option>
-                  <Select.Option value="LAPTOP">Máy tính / Laptop</Select.Option>
+                  <Select.Option value="LAPTOP">
+                    Máy tính / Laptop
+                  </Select.Option>
                   <Select.Option value="MOTORBIKE">Xe máy</Select.Option>
                   <Select.Option value="GOLD">Vàng bạc / Đá quý</Select.Option>
                 </Select>
@@ -161,63 +181,134 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item label="Danh mục cụ thể" name="categoryId" rules={[{ required: true, message: "Vui lòng chọn danh mục" }]}>
+              <Form.Item
+                label="Danh mục cụ thể"
+                name="categoryId"
+                rules={[{ required: true, message: "Vui lòng chọn danh mục" }]}
+              >
                 <Select
                   placeholder="Chọn danh mục con"
-                  options={categories?.map((u: any) => ({ label: u.name, value: u.id }))}
+                  options={categories?.map((u: any) => ({
+                    label: u.name,
+                    value: u.id,
+                  }))}
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item label="Mã hợp đồng / Số seri" name="code" rules={[{ required: true, message: "Vui lòng nhập mã" }]}>
+              <Form.Item
+                label="Mã hợp đồng / Số seri"
+                name="code"
+                rules={[{ required: true, message: "Vui lòng nhập mã" }]}
+              >
                 <Input placeholder="P-XXXXXX" />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item label="Giá trị định giá" name="price" rules={[{ required: true, message: "Nhập giá trị" }]}>
-                <InputNumber 
-                  min={0} 
-                  style={{ width: "100%" }} 
+              <Form.Item
+                label="Giá trị định giá"
+                name="price"
+                rules={[{ required: true, message: "Nhập giá trị" }]}
+              >
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
                   addonAfter="VNĐ"
-                  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} 
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item label="Lợi nhuận mỗi ngày" name="dailyProfit" rules={[{ required: true }]}>
-                <InputNumber 
-                  min={0} 
-                  style={{ width: "100%" }} 
+              <Form.Item
+                label="Lợi nhuận mỗi ngày"
+                name="dailyProfit"
+                rules={[{ required: true }]}
+              >
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
                   addonAfter="VNĐ"
-                  formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  formatter={(value) =>
+                    `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={6}>
-              <Form.Item label="Ngày bắt đầu" name="startDate" rules={[{ required: true }]}>
-                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" placeholder="Chọn ngày" />
+              <Form.Item
+                label="Ngày bắt đầu"
+                name="startDate"
+                rules={[{ required: true }]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  format="DD/MM/YYYY"
+                  placeholder="Chọn ngày"
+                  disabledDate={(current) => {
+                    const today = dayjs().startOf("day");
+                    if (isEdit) {
+                      return current && current < today;
+                    }
+                    return current && current < today;
+                  }}
+                />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={6}>
-              <Form.Item label="Ngày kết thúc (Dự kiến)" name="endDate" rules={[{ required: true }]}>
-                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" placeholder="Chọn ngày" />
+              <Form.Item
+                label="Ngày kết thúc (Dự kiến)"
+                name="endDate"
+                dependencies={["startDate"]}
+                rules={[
+                  { required: true, message: "Vui lòng chọn ngày kết thúc" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const start = getFieldValue("startDate");
+                      if (!value || !start) return Promise.resolve();
+                      if (value.isBefore(start, "day")) {
+                        return Promise.reject(
+                          new Error(
+                            "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu",
+                          ),
+                        );
+                      }
+
+                      return Promise.resolve();
+                    },
+                  }),
+                ]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  format="DD/MM/YYYY"
+                  placeholder="Chọn ngày"
+                />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item label="Số lượng" name="quantity" rules={[{ required: true }]}>
+              <Form.Item
+                label="Số lượng"
+                name="quantity"
+                rules={[{ required: true }]}
+              >
                 <InputNumber min={1} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
 
             <Col xs={24}>
               <Form.Item label="Mô tả hiện trạng tài sản" name="description">
-                <Input.TextArea rows={3} placeholder="Mô tả chi tiết ngoại quan, lỗi (nếu có)..." />
+                <Input.TextArea
+                  rows={3}
+                  placeholder="Mô tả chi tiết ngoại quan, lỗi (nếu có)..."
+                />
               </Form.Item>
             </Col>
 
@@ -228,9 +319,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 rules={[
                   {
                     validator: (_, value) => {
-                      const currentFiles = form.getFieldValue('images') || [];
+                      const currentFiles = form.getFieldValue("images") || [];
                       if (currentFiles.length === 4) return Promise.resolve();
-                      return Promise.reject(new Error("Vui lòng chụp đúng 4 góc của sản phẩm!"));
+                      return Promise.reject(
+                        new Error("Vui lòng chụp đúng 4 góc của sản phẩm!"),
+                      );
                     },
                   },
                 ]}
@@ -243,52 +336,75 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   onChange={handleUploadChange}
                   style={{ borderRadius: 12, background: token.colorFillAlter }}
                 >
-                  <p className="ant-upload-drag-icon"><InboxOutlined style={{ color: token.colorPrimary }} /></p>
-                  <p className="ant-upload-text">Kéo thả hoặc nhấn để chọn 4 ảnh thực tế</p>
-                  <p className="ant-upload-hint">Yêu cầu ảnh chụp rõ nét, không bị lóa</p>
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined style={{ color: token.colorPrimary }} />
+                  </p>
+                  <p className="ant-upload-text">
+                    Kéo thả hoặc nhấn để chọn 4 ảnh thực tế
+                  </p>
+                  <p className="ant-upload-hint">
+                    Yêu cầu ảnh chụp rõ nét, không bị lóa
+                  </p>
                 </Upload.Dragger>
               </Form.Item>
             </Col>
           </Row>
         </Card>
 
-        <Card 
-          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 12 }}
+        <Card
+          style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)", borderRadius: 12 }}
           title={
             <Flex vertical gap={4}>
-              <Title level={4} style={{ margin: 0 }}>Thông tin khách hàng</Title>
-              <Text type="secondary" style={{ fontSize: 12 }}>Xác thực chủ sở hữu tài sản</Text>
+              <Title level={4} style={{ margin: 0 }}>
+                Thông tin khách hàng
+              </Title>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Xác thực chủ sở hữu tài sản
+              </Text>
             </Flex>
           }
         >
           <Row gutter={[24, 0]}>
             <Col xs={24} md={12}>
-              <Form.Item label="Họ tên khách hàng" name="customerId" rules={[{ required: true }]}>
+              <Form.Item
+                label="Họ tên khách hàng"
+                name="customerId"
+                rules={[{ required: true }]}
+              >
                 <Select
                   showSearch
                   placeholder="Tìm kiếm khách hàng"
                   onChange={fillCustomerFields}
                   optionFilterProp="label"
-                  options={users?.map((u: any) => ({ label: u.name, value: u.id }))}
+                  options={users?.map((u: any) => ({
+                    label: u.name,
+                    value: u.id,
+                  }))}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="Số điện thoại" name="phone"><Input readOnly /></Form.Item>
+              <Form.Item label="Số điện thoại" name="phone">
+                <Input readOnly />
+              </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="Số CCCD" name="idCard"><Input readOnly /></Form.Item>
+              <Form.Item label="Số CCCD" name="idCard">
+                <Input readOnly />
+              </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="Địa chỉ" name="address"><Input readOnly /></Form.Item>
+              <Form.Item label="Địa chỉ" name="address">
+                <Input readOnly />
+              </Form.Item>
             </Col>
           </Row>
         </Card>
 
         <Flex justify="flex-end" gap={12} style={{ marginBottom: 24 }}>
-          <Button 
-            size="large" 
-            onClick={onCancel} 
+          <Button
+            size="large"
+            onClick={onCancel}
             icon={<CloseOutlined />}
             style={{ borderRadius: 8, minWidth: 100 }}
           >
