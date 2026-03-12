@@ -53,7 +53,7 @@ const AdminProductDetailPage: React.FC = () => {
       await productsApi.update(productId, payload);
       message.success('Cập nhật sản phẩm thành công!');
       await queryClient.invalidateQueries({ queryKey: ["products"] });
-      refetch(); 
+      navigate('/admin/products'); 
     } catch (error) {
       // Handled globally
     } finally {
