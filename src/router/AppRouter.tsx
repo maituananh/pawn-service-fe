@@ -7,7 +7,7 @@ import AdminCategoryFormPage from "@/pages/Admin/AdminCategoryFormPage";
 import AdminCustomerDetailPage from "@/pages/Admin/AdminCustomerDetailPage";
 import AdminCustomersPage from "@/pages/Admin/AdminCustomersPage";
 import AdminDashboardPage from "@/pages/Admin/AdminDashboardPage";
-import AdminOrderReportPage from "@/pages/Admin/AdminOdersReportPage";
+import AdminOrdersPage from "@/pages/Admin/AdminOrdersPage";
 import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
 import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
 import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
@@ -113,8 +113,12 @@ export const router = createBrowserRouter([
         element: <PrivateRoute element={<AdminProductCreatePage />} />,
       },
       {
-        path: "orders-report",
-        element: <PrivateRoute element={<AdminOrderReportPage />} />,
+        path: "orders",
+        element: <PrivateRoute element={<AdminOrdersPage />} />,
+      },
+      {
+        path: "orders/:id",
+        element: <PrivateRoute element={<OrderDetailPage />} />,
       },
     ],
   },

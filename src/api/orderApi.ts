@@ -2,7 +2,9 @@ import {
   CheckoutRequest,
   CheckoutResponse,
   OrderDetailResponse,
+  OrderParams,
   OrderStatusResponse,
+  PaginatedOrderResponse,
 } from '@/type/order.type';
 import axiosClient from './axiosClient';
 
@@ -19,9 +21,9 @@ const orderApi = {
     return (res as any).data || res;
   },
 
-  getOrders: async (): Promise<OrderDetailResponse[]> => {
+  getOrders: async (params?: OrderParams): Promise<PaginatedOrderResponse | OrderDetailResponse[]> => {
     const url = '/orders';
-    const res = await axiosClient.get<OrderDetailResponse[]>(url);
+    const res = await axiosClient.get(url, { params });
     return (res as any).data || res;
   },
 

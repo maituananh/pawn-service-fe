@@ -1,16 +1,13 @@
 import { useOrder } from '@/hooks/useOrder';
-import { OrderStatus } from '@/type/order.type';
+import { OrderDetailResponse, OrderStatus } from '@/type/order.type';
 import {
   CalendarOutlined,
   EyeOutlined,
-  InboxOutlined,
 } from '@ant-design/icons';
 import {
-  Badge,
   Button,
   Card,
   Empty,
-  List,
   Space,
   Table,
   Tag,
@@ -64,9 +61,10 @@ const OrdersPage = () => {
   const columns = [
     {
       title: 'Mã đơn hàng',
-      dataIndex: 'orderCode',
       key: 'orderCode',
-      render: (text: string) => <Text strong>#{text}</Text>,
+      render: (_: any, record: OrderDetailResponse) => (
+        <Text strong>#{record.orderId || record.orderCode || record.id}</Text>
+      ),
     },
     {
       title: 'Ngày đặt',
@@ -83,7 +81,7 @@ const OrdersPage = () => {
       title: 'Số lượng sản phẩm',
       dataIndex: 'items',
       key: 'itemsCount',
-      render: (items: any[]) => items.length,
+      render: (items: any[]) => items?.length || 0,
     },
     {
       title: 'Tổng cộng',
@@ -91,28 +89,30 @@ const OrdersPage = () => {
       key: 'totalAmount',
       render: (amount: number) => (
         <Text strong style={{ color: '#ff4d4f' }}>
-          {amount.toLocaleString()} vnd
+          {amount?.toLocaleString()} vnd
         </Text>
       ),
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'status',
       key: 'status',
-      render: (status: OrderStatus) => (
-        <Tag color={getStatusColor(status)} style={{ borderRadius: 4 }}>
-          {getStatusLabel(status)}
-        </Tag>
-      ),
+      render: (_: any, record: OrderDetailResponse) => {
+        const currentStatus = record.orderStatus || record.status;
+        return (
+          <Tag color={getStatusColor(currentStatus)} style={{ borderRadius: 4 }}>
+            {getStatusLabel(currentStatus)}
+          </Tag>
+        );
+      },
     },
     {
       title: 'Thao tác',
       key: 'action',
-      render: (_: any, record: any) => (
+      render: (_: any, record: OrderDetailResponse) => (
         <Button
           type="link"
           icon={<EyeOutlined />}
-          onClick={() => navigate(`/orders/${record.id}`)}
+          onClick={() => navigate(`/orders/${record.id || record.orderId}`)}
         >
           Chi tiết
         </Button>
@@ -132,9 +132,9 @@ const OrdersPage = () => {
       >
         <Table
           columns={columns}
-          dataSource={orders}
+          dataSource={Array.isArray(orders) ? orders : (orders as any)?.data || []}
           loading={isLoading}
-          rowKey="id"
+          rowKey={(record) => record.id || record.orderId || Math.random()}
           locale={{
             emptyText: (
               <Empty
