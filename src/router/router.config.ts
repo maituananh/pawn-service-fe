@@ -186,7 +186,7 @@ export const privateRoutes: RouteConfig[] = [
     path: "/orders",
     label: "Đơn hàng",
     component: OrdersPage,
-    showInMenu: false,
+    showInMenu: true,
     requiresLayout: true,
     roles: ["CUSTOMER", "ADMIN"],
   },

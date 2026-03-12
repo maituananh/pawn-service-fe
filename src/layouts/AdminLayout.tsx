@@ -33,7 +33,7 @@ const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
 
 const menuItems = privateRoutes
-  .filter((route) => route.showInMenu && route.roles?.includes("ADMIN"))
+  .filter((route) => route.showInMenu && route.roles?.includes("ADMIN") && route.path.startsWith('/admin'))
   .map((route) => ({
     key: route.path,
     icon: {
