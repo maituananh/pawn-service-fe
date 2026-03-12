@@ -3,7 +3,7 @@ import AdminCategoryFormPage from "@/pages/Admin/AdminCategoryFormPage";
 import AdminCustomerDetailPage from "@/pages/Admin/AdminCustomerDetailPage";
 import AdminCustomersPage from "@/pages/Admin/AdminCustomersPage";
 import AdminDashboardPage from "@/pages/Admin/AdminDashboardPage";
-import AdminOrderReportPage from "@/pages/Admin/AdminOdersReportPage";
+import AdminOrdersPage from "@/pages/Admin/AdminOrdersPage";
 import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
 import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
 import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
@@ -151,10 +151,18 @@ export const privateRoutes: RouteConfig[] = [
     roles: ["ADMIN"],
   },
   {
-    path: "/admin/orders-report",
-    label: "Quản lý đơn",
-    component: AdminOrderReportPage,
+    path: "/admin/orders",
+    label: "Quản lý đơn hàng",
+    component: AdminOrdersPage,
     showInMenu: true,
+    requiresLayout: true,
+    roles: ["ADMIN"],
+  },
+  {
+    path: "/admin/orders/:id",
+    label: "Chi tiết đơn hàng",
+    component: OrderDetailPage,
+    showInMenu: false,
     requiresLayout: true,
     roles: ["ADMIN"],
   },
