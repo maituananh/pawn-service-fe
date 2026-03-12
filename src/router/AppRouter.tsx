@@ -12,7 +12,10 @@ import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
 import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
 import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
 import CartPage from "@/pages/CartPage";
+import CheckoutPage from "@/pages/CheckoutPage";
 import MyProfilePage from "@/pages/MyProfilePage";
+import OrderDetailPage from "@/pages/OrderDetailPage";
+import OrdersPage from "@/pages/OrdersPage";
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import ProductDetailPage from "@/pages/ProductDetailPage";
 import ProductsPage from "@/pages/ProductsPage";
@@ -36,6 +39,18 @@ export const router = createBrowserRouter([
       {
         path: "payment-success",
         element: <PrivateRoute element={<PaymentSuccess />} />,
+      },
+      {
+        path: "checkout",
+        element: <PrivateRoute element={<CheckoutPage />} />,
+      },
+      {
+        path: "orders",
+        element: <PrivateRoute element={<OrdersPage />} />,
+      },
+      {
+        path: "orders/:id",
+        element: <PrivateRoute element={<OrderDetailPage />} />,
       },
     ],
   },

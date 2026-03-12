@@ -8,7 +8,11 @@ import AdminProductCreatePage from "@/pages/Admin/AdminProductCreatePage";
 import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
 import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
 import CartPage from "@/pages/CartPage";
+import CheckoutPage from "@/pages/CheckoutPage";
 import MyProfilePage from "@/pages/MyProfilePage";
+import OrderDetailPage from "@/pages/OrderDetailPage";
+import OrdersPage from "@/pages/OrdersPage";
+import PaymentSuccess from "@/pages/PaymentSuccess";
 import RegisterPage from "@/pages/RegisterPage";
 import { UserRole } from "@/type/user.type";
 import HomePage from "../pages/HomePage";
@@ -158,6 +162,38 @@ export const privateRoutes: RouteConfig[] = [
     path: "/mycart",
     label: "Giỏ hàng",
     component: CartPage,
+    showInMenu: false,
+    requiresLayout: true,
+    roles: ["CUSTOMER", "ADMIN"],
+  },
+  {
+    path: "/checkout",
+    label: "Thanh toán",
+    component: CheckoutPage,
+    showInMenu: false,
+    requiresLayout: true,
+    roles: ["CUSTOMER", "ADMIN"],
+  },
+  {
+    path: "/orders",
+    label: "Đơn hàng",
+    component: OrdersPage,
+    showInMenu: false,
+    requiresLayout: true,
+    roles: ["CUSTOMER", "ADMIN"],
+  },
+  {
+    path: "/orders/:id",
+    label: "Chi tiết đơn hàng",
+    component: OrderDetailPage,
+    showInMenu: false,
+    requiresLayout: true,
+    roles: ["CUSTOMER", "ADMIN"],
+  },
+  {
+    path: "/payment-success",
+    label: "Thanh toán thành công",
+    component: PaymentSuccess,
     showInMenu: false,
     requiresLayout: true,
     roles: ["CUSTOMER", "ADMIN"],
