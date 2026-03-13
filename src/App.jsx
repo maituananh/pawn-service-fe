@@ -1,6 +1,7 @@
 import { ConfigProvider } from "antd";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router/AppRouter";
+import ErrorToast from "./components/ErrorToast";
 
 // [UI ONLY] Global theme configuration for Ant Design v5
 const themeConfig = {
@@ -34,6 +35,7 @@ function App() {
   return (
     <ConfigProvider theme={themeConfig}>
       <RouterProvider router={router} />
+      <ErrorToast />
     </ConfigProvider>
   );
 }
