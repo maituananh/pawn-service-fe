@@ -38,7 +38,7 @@ export const useCart = () => {
     isError: cartQuery.isError,
     removeItem: removeItemMutation.mutate as (ids: number[], options?: any) => void,
     isRemoving: removeItemMutation.isPending,
-    addToCart: addToCartMutation.mutate,
+    addToCart: addToCartMutation.mutateAsync,
     isAdding: addToCartMutation.isPending,
     cartTotal,
   };

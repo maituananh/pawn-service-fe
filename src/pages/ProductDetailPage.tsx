@@ -41,6 +41,11 @@ const ProductDetailPage: React.FC = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
+    const avail = product.availableQty ?? product.quantity;
+    if (avail <= 0) {
+      messageApi.warning('Sản phẩm này đã hết hàng.');
+      return;
+    }
     addToCart(
       { productId: product.id, quantity },
       {
@@ -54,6 +59,23 @@ const ProductDetailPage: React.FC = () => {
     );
   };
 
+  const handleBuyNow = async () => {
+    if (!product) return;
+    const avail = product.availableQty ?? product.quantity;
+    if (avail <= 0) {
+      messageApi.warning('Sản phẩm này đã hết hàng.');
+      return;
+    }
+    
+    try {
+      await addToCart({ productId: product.id, quantity });
+      navigate('/checkout');
+    } catch (error) {
+      // Error is handled by axiosClient/errorEmitter already, but we can add specific handling here if needed
+      messageApi.error("Có lỗi xảy ra khi thêm vào giỏ hàng.");
+    }
+  };
+
   if (isLoading) return <div style={{ textAlign: 'center', padding: '100px' }}><Spin size="large" /></div>;
   if (isError || !product) return (
     <div style={{ textAlign: 'center', padding: '100px' }}>
@@ -62,11 +84,32 @@ const ProductDetailPage: React.FC = () => {
     </div>
   );
 
+  const isOutOfStock = (product.availableQty ?? product.quantity) <= 0;
   const mainImageUrl = selectedImage || product?.images?.[0]?.url || product?.image;
 
   return (
     <div className="product-detail-container" style={{ maxWidth: 1400, margin: '0 auto', padding: '24px' }}>
       {contextHolder}
+      
+      {/* Out of stock banner */}
+      {isOutOfStock && (
+        <div style={{
+          background: '#1c1c1c',
+          color: '#fff',
+          borderRadius: 12,
+          padding: '14px 24px',
+          marginBottom: 24,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          fontWeight: 600,
+          fontSize: 15,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+        }}>
+          <span style={{ fontSize: 22 }}>🚫</span>
+          <span>Sản phẩm này <strong>đã hết hàng</strong> và không thể mua hay thêm vào giỏ.</span>
+        </div>
+      )}
       
       {/* Breadcrumb Navigation */}
       <Breadcrumb 
@@ -134,6 +177,28 @@ const ProductDetailPage: React.FC = () => {
                     Thanh lý
                   </Tag>
                 )}
+                {isOutOfStock && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.35)',
+                    borderRadius: 20,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <span style={{
+                      background: '#1c1c1c',
+                      color: '#fff',
+                      fontSize: 22,
+                      fontWeight: 900,
+                      padding: '10px 28px',
+                      borderRadius: 14,
+                      letterSpacing: '0.04em',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                    }}>Hết hàng</span>
+                  </div>
+                )}
                 <img
                   src={mainImageUrl}
                   alt={product.name}
@@ -187,7 +252,12 @@ const ProductDetailPage: React.FC = () => {
                 <Tag color="cyan">{product.type}</Tag>
               </Descriptions.Item>
               <Descriptions.Item label="Tình trạng">
-                <Badge status={product.quantity > 0 ? "success" : "error"} text={product.quantity > 0 ? `Còn hàng (${product.quantity})` : "Hết hàng"} />
+                <Badge
+                  status={(product.availableQty ?? product.quantity) > 0 ? 'success' : 'error'}
+                  text={(product.availableQty ?? product.quantity) > 0
+                    ? `Còn hàng (${product.availableQty ?? product.quantity})`
+                    : 'Hết hàng'}
+                />
               </Descriptions.Item>
             </Descriptions>
 
@@ -196,10 +266,11 @@ const ProductDetailPage: React.FC = () => {
                 <Text strong style={{ minWidth: 100 }}>Số lượng:</Text>
                 <InputNumber
                   min={1}
-                  max={product.quantity}
+                  max={product.availableQty ?? product.quantity}
                   value={quantity}
                   onChange={(val) => setQuantity(val || 1)}
                   style={{ width: 80, borderRadius: 8 }}
+                  disabled={isOutOfStock}
                 />
               </Flex>
             </Flex>
@@ -215,13 +286,13 @@ const ProductDetailPage: React.FC = () => {
                   fontSize: 18, 
                   fontWeight: 700, 
                   borderRadius: 14,
-                  boxShadow: `0 8px 20px ${token.colorPrimary}40`
+                  boxShadow: isOutOfStock ? 'none' : `0 8px 20px ${token.colorPrimary}40`
                 }}
                 onClick={handleAddToCart}
                 loading={isAdding}
-                disabled={product.quantity <= 0}
+                disabled={isOutOfStock}
               >
-                Thêm vào giỏ hàng
+                {isOutOfStock ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
               </Button>
               <Button 
                 danger 
@@ -233,10 +304,12 @@ const ProductDetailPage: React.FC = () => {
                   fontSize: 18, 
                   fontWeight: 700, 
                   borderRadius: 14,
-                  background: '#ff4d4f',
-                  boxShadow: '0 8px 20px rgba(255, 77, 79, 0.4)'
+                  background: isOutOfStock ? undefined : '#ff4d4f',
+                  boxShadow: isOutOfStock ? 'none' : '0 8px 20px rgba(255, 77, 79, 0.4)'
                 }}
-                disabled={product.quantity <= 0}
+                disabled={isOutOfStock}
+                onClick={handleBuyNow}
+                loading={isAdding}
               >
                 Mua ngay
               </Button>
