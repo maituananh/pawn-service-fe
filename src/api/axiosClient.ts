@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
-import { notification } from 'antd';
 import authApi from './authApi';
+import { errorEmitter } from '@/lib/errorEmitter';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const REFRESH_URL = import.meta.env.VITE_API_REFRESH_URL || '';
 
@@ -52,18 +52,25 @@ axiosClient.interceptors.response.use(
         const errorData = error.response?.data as any;
         const errorMessage = errorData?.message || errorData?.error || error.message || 'Lỗi hệ thống, vui lòng thử lại sau';
 
-        // Show global error notification at bottom left
-        // Skip notification only for the FIRST 401/403 attempt so we can try silenty refreshing token
+        // Build full detail string for the "View Detail" popup
+        const fullDetail = JSON.stringify({
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            url: error.config?.url,
+            method: error.config?.method?.toUpperCase(),
+            requestData: (() => {
+                try { return JSON.parse(error.config?.data || 'null'); } catch { return error.config?.data; }
+            })(),
+            response: errorData,
+            timestamp: new Date().toISOString(),
+        }, null, 2);
+
+        // Skip notification only for the FIRST 401/403 attempt so we can try silently refreshing token
         const isAuthError = error.response?.status === 401 || error.response?.status === 403;
         const isFirstAttempt = !originalRequest?._retry;
 
         if (!isAuthError || !isFirstAttempt) {
-            notification.error({
-                message: 'Phát hiện lỗi!',
-                description: errorMessage,
-                placement: 'bottomLeft',
-                duration: 4,
-            });
+            errorEmitter.emit({ message: errorMessage, fullDetail });
         }
 
         if (
@@ -107,11 +114,10 @@ axiosClient.interceptors.response.use(
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
                 
-                // Show notification for authentication failure
-                notification.warning({
-                    message: 'Phiên làm việc hết hạn',
-                    description: 'Vui lòng đăng nhập lại.',
-                    placement: 'bottomLeft',
+                // Show toast for authentication failure
+                errorEmitter.emit({
+                    message: 'Phiên làm việc hết hạn. Vui lòng đăng nhập lại.',
+                    fullDetail: JSON.stringify({ error: 'Refresh token expired or invalid', timestamp: new Date().toISOString() }, null, 2),
                 });
 
                 window.location.href = '/login';
