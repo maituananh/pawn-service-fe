@@ -1,10 +1,19 @@
 import orderApi from '@/api/orderApi';
 import { CheckoutRequest, OrderParams } from '@/type/order.type';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useOrder = () => {
+  const queryClient = useQueryClient();
+
   const checkoutMutation = useMutation({
     mutationFn: (data: CheckoutRequest) => orderApi.checkout(data),
+  });
+
+  const cancelOrderMutation = useMutation({
+    mutationFn: (orderId: number) => orderApi.cancelOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
   });
 
   const useGetOrders = (params?: OrderParams) => {
@@ -28,12 +37,11 @@ export const useOrder = () => {
       queryFn: () => orderApi.getOrderStatus(orderId),
       enabled: !!orderId,
       refetchInterval: (query) => {
-        // Stop polling if status is final (PAID, CANCELLED, etc. - logic depends on backend)
         const status = (query.state.data as any)?.status;
         if (status && ['PAID', 'CANCELLED', 'FAILED', 'COMPLETED'].includes(status)) {
           return false;
         }
-        return 3000; // Poll every 3 seconds
+        return 3000;
       },
     });
   };
@@ -41,6 +49,8 @@ export const useOrder = () => {
   return {
     checkout: checkoutMutation.mutate,
     isCheckingOut: checkoutMutation.isPending,
+    cancelOrder: cancelOrderMutation.mutate,
+    isCancelling: cancelOrderMutation.isPending,
     useGetOrders,
     useGetOrderDetail,
     useGetOrderStatus,
