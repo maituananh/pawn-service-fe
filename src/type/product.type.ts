@@ -10,7 +10,7 @@ export interface Product {
   name: string;
   price: number;
   description?: any;
-  quantity: number;
+  stockQty: number;
   availableQty?: number;
   startDate: string;
   endDate: string;
@@ -28,7 +28,7 @@ export interface ProductCreateRequest {
   code: string;
   customerId: number;
   dailyProfit: number;
-  quantity: number;
+  stockQty: number;
   description: string;
   type: string;
   imageIds: number[];

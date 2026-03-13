@@ -147,7 +147,7 @@ const ProductsPage = () => {
         >
           {productsPage?.data?.map((product: Product) => {
             const isOutOfStock =
-              (product.availableQty ?? product.quantity) === 0;
+              (product.availableQty ?? product.stockQty) <= 0 || product.status === "SOLD_OUT";
 
             return (
               <Link

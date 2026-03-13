@@ -39,7 +39,7 @@ const AdminProductCreatePage: React.FC = () => {
         customerId: values.customerId, 
         type: values.type,
         dailyProfit: Number(values.dailyProfit),
-        quantity: Number(values.quantity),
+        stockQty: Number(values.stockQty),
         description: values.description || "",
         imageIds,
       };
