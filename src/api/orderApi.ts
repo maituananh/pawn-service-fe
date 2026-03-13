@@ -32,6 +32,11 @@ const orderApi = {
     const res = await axiosClient.get<OrderDetailResponse>(url);
     return (res as any).data || res;
   },
+
+  cancelOrder: async (orderId: number): Promise<void> => {
+    const url = `/orders/${orderId}/cancel`;
+    await axiosClient.post(url);
+  },
 };
 
 export default orderApi;
