@@ -98,30 +98,38 @@ const AdminProductsPage: React.FC = () => {
       title: "Hành động",
       key: "actions",
       align: "right" as const,
-      render: (_: any, record: Product) => (
-        <Space onClick={(e) => e.stopPropagation()}>
-          <Button
-            type="text"
-            shape="circle"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record.id)}
-          />
-          <Popconfirm
-            title="Xóa sản phẩm"
-            description="Bạn có chắc muốn xóa sản phẩm này không?"
-            okText="Xóa"
-            cancelText="Hủy"
-            onConfirm={() => handleDelete(record.id)}
-          >
+      render: (_: any, record: Product) => {
+        const isDeleted = record.isActived === false;
+        return (
+          <Space onClick={(e) => e.stopPropagation()}>
             <Button
               type="text"
               shape="circle"
-              danger
-              icon={<DeleteOutlined />}
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record.id)}
+              disabled={isDeleted}
+              title={isDeleted ? "Sản phẩm đã bị xoá" : "Chỉnh sửa"}
             />
-          </Popconfirm>
-        </Space>
-      ),
+            <Popconfirm
+              title="Xóa sản phẩm"
+              description="Bạn có chắc muốn xóa sản phẩm này không?"
+              okText="Xóa"
+              cancelText="Hủy"
+              onConfirm={() => handleDelete(record.id)}
+              disabled={isDeleted}
+            >
+              <Button
+                type="text"
+                shape="circle"
+                danger
+                icon={<DeleteOutlined />}
+                disabled={isDeleted}
+                title={isDeleted ? "Sản phẩm đã bị xoá" : "Xoá"}
+              />
+            </Popconfirm>
+          </Space>
+        );
+      },
     },
   ];
 

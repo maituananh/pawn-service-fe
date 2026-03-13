@@ -29,6 +29,7 @@ interface ProductFormProps {
   onFinish: (values: any, fileList: UploadFile[]) => Promise<void>;
   onCancel: () => void;
   isEdit?: boolean;
+  readOnly?: boolean;
 }
 
 const SaveButton = ({ form, loading, fileList }: { form: any; loading: boolean; fileList: any[] }) => {
@@ -51,13 +52,13 @@ const SaveButton = ({ form, loading, fileList }: { form: any; loading: boolean; 
       size="large"
       htmlType="submit"
       loading={loading}
-      disabled={!submittable}
+      disabled={!submittable || (form as any)._readOnly}
       icon={<SaveOutlined />}
       style={{ 
         minWidth: 120, 
         borderRadius: 8,
-        background: submittable ? token.colorSuccess : undefined,
-        borderColor: submittable ? token.colorSuccess : undefined
+        background: (submittable && !(form as any)._readOnly) ? token.colorSuccess : undefined,
+        borderColor: (submittable && !(form as any)._readOnly) ? token.colorSuccess : undefined
       }}
     >
       Lưu tài sản
@@ -71,6 +72,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onFinish,
   onCancel,
   isEdit = false,
+  readOnly = false,
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -92,6 +94,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   useEffect(() => {
     if (initialData) {
+      (form as any)._readOnly = readOnly;
       const formattedData = {
         ...initialData,
         startDate: initialData.startDate ? dayjs(initialData.startDate) : null,
@@ -142,7 +145,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <Row gutter={[24, 0]}>
             <Col xs={24} md={12}>
               <Form.Item label="Tên sản phẩm" name="name" rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
-                <Input placeholder="Ví dụ: iPhone 15 Pro Max" />
+                <Input placeholder="Ví dụ: iPhone 15 Pro Max" disabled={readOnly} />
               </Form.Item>
             </Col>
 
@@ -151,6 +154,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 <Select
                   placeholder="Chọn phân loại chính"
                   onChange={() => form.setFieldValue("categoryId", undefined)}
+                  disabled={readOnly}
                 >
                   <Select.Option value="PHONE">Điện thoại</Select.Option>
                   <Select.Option value="LAPTOP">Máy tính / Laptop</Select.Option>
@@ -165,13 +169,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 <Select
                   placeholder="Chọn danh mục con"
                   options={categories?.map((u: any) => ({ label: u.name, value: u.id }))}
+                  disabled={readOnly}
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
               <Form.Item label="Mã hợp đồng / Số seri" name="code" rules={[{ required: true, message: "Vui lòng nhập mã" }]}>
-                <Input placeholder="P-XXXXXX" />
+                <Input placeholder="P-XXXXXX" disabled={readOnly} />
               </Form.Item>
             </Col>
 
@@ -182,6 +187,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   style={{ width: "100%" }} 
                   addonAfter="VNĐ"
                   formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} 
+                  disabled={readOnly}
                 />
               </Form.Item>
             </Col>
@@ -193,31 +199,32 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   style={{ width: "100%" }} 
                   addonAfter="VNĐ"
                   formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  disabled={readOnly}
                 />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={6}>
               <Form.Item label="Ngày bắt đầu" name="startDate" rules={[{ required: true }]}>
-                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" placeholder="Chọn ngày" />
+                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" placeholder="Chọn ngày" disabled={readOnly} />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={6}>
               <Form.Item label="Ngày kết thúc (Dự kiến)" name="endDate" rules={[{ required: true }]}>
-                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" placeholder="Chọn ngày" />
+                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" placeholder="Chọn ngày" disabled={readOnly} />
               </Form.Item>
             </Col>
 
             <Col xs={24} md={12}>
               <Form.Item label="Số lượng" name="quantity" rules={[{ required: true }]}>
-                <InputNumber min={1} style={{ width: "100%" }} />
+                <InputNumber min={1} style={{ width: "100%" }} disabled={readOnly} />
               </Form.Item>
             </Col>
 
             <Col xs={24}>
               <Form.Item label="Mô tả hiện trạng tài sản" name="description">
-                <Input.TextArea rows={3} placeholder="Mô tả chi tiết ngoại quan, lỗi (nếu có)..." />
+                <Input.TextArea rows={3} placeholder="Mô tả chi tiết ngoại quan, lỗi (nếu có)..." disabled={readOnly} />
               </Form.Item>
             </Col>
 
@@ -242,6 +249,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   beforeUpload={() => false}
                   onChange={handleUploadChange}
                   style={{ borderRadius: 12, background: token.colorFillAlter }}
+                  disabled={readOnly}
                 >
                   <p className="ant-upload-drag-icon"><InboxOutlined style={{ color: token.colorPrimary }} /></p>
                   <p className="ant-upload-text">Kéo thả hoặc nhấn để chọn 4 ảnh thực tế</p>
@@ -270,6 +278,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   onChange={fillCustomerFields}
                   optionFilterProp="label"
                   options={users?.map((u: any) => ({ label: u.name, value: u.id }))}
+                  disabled={readOnly}
                 />
               </Form.Item>
             </Col>

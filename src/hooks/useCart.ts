@@ -36,10 +36,10 @@ export const useCart = () => {
     cart: cartData,
     isLoading: cartQuery.isLoading,
     isError: cartQuery.isError,
-    removeItem: removeItemMutation.mutate,
+    removeItem: removeItemMutation.mutate as (ids: number[], options?: any) => void,
     isRemoving: removeItemMutation.isPending,
     addToCart: addToCartMutation.mutate,
     isAdding: addToCartMutation.isPending,
-    cartTotal
+    cartTotal,
   };
 };

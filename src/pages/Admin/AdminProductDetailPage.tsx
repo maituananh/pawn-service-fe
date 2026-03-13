@@ -95,27 +95,30 @@ const AdminProductDetailPage: React.FC = () => {
           <Typography.Title level={4} style={{ margin: 0 }}>Chi tiết sản phẩm</Typography.Title>
         </Flex>
         
-        <Popconfirm
-          title="Thanh lý sản phẩm"
-          description="Bạn có chắc chắn muốn thanh lý sản phẩm này không? Hành động này không thể hoàn tác."
-          onConfirm={handleLiquidation}
-          okText="Thanh lý"
-          cancelText="Hủy"
-          okButtonProps={{ danger: true, loading: loading }}
-        >
-          <Button 
-            danger 
-            icon={<ShoppingOutlined />}
-            size="large"
-            style={{ borderRadius: 8, fontWeight: 600 }}
+        {product?.isActived !== false && (
+          <Popconfirm
+            title="Thanh lý sản phẩm"
+            description="Bạn có chắc chắn muốn thanh lý sản phẩm này không? Hành động này không thể hoàn tác."
+            onConfirm={handleLiquidation}
+            okText="Thanh lý"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true, loading: loading }}
           >
-            Thanh lý sản phẩm
-          </Button>
-        </Popconfirm>
+            <Button 
+              danger 
+              icon={<ShoppingOutlined />}
+              size="large"
+              style={{ borderRadius: 8, fontWeight: 600 }}
+            >
+              Thanh lý sản phẩm
+            </Button>
+          </Popconfirm>
+        )}
       </Flex>
 
       <ProductForm
         isEdit={true}
+        readOnly={product?.isActived === false}
         initialData={product}
         onFinish={handleUpdate}
         onCancel={() => navigate('/admin/products')}
