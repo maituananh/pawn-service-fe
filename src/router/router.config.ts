@@ -72,7 +72,7 @@ export const privateRoutes: RouteConfig[] = [
     path: "/my-profile",
     label: "Hồ sơ",
     component: MyProfilePage,
-    showInMenu: false,
+    showInMenu: true,
     requiresLayout: true,
     roles: ["ADMIN", "CUSTOMER"],
   },

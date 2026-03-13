@@ -1,4 +1,3 @@
-
 export type LoginPayload = {
   username: string;
   password: string;
@@ -18,7 +17,9 @@ export type UserProfile = {
   avatarUrl: string;
   phone: string;
   address: string;
+  gender?: string;
   cardId: string;
+  age?: number;
 };
 
-export type UserRole = UserProfile['role']; 
+export type UserRole = UserProfile["role"];
