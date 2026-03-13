@@ -11,8 +11,8 @@ const cartApi = {
     return data;
   },
 
-  async removeItem(productId: number): Promise<void> {
-    await axiosClient.delete(`/carts/${productId}`);
+  async removeItem(productIds: number[]): Promise<void> {
+    await axiosClient.delete("/carts", { data: productIds });
   },
 };
 

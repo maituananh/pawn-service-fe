@@ -6,11 +6,14 @@ import {
   LogoutOutlined,
   MenuOutlined,
   ShoppingCartOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import {
+  Avatar,
   Badge,
   Button,
   Drawer,
+  Dropdown,
   Flex,
   Layout,
   Menu,
@@ -26,7 +29,7 @@ const { Header } = Layout;
 const { Text } = Typography;
 
 const AppHeader = ({ menuItems }: { menuItems: MenuProps["items"] }) => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, currentUser } = useAuth();
   const { cart } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
@@ -167,22 +170,49 @@ const AppHeader = ({ menuItems }: { menuItems: MenuProps["items"] }) => {
 
           <div className="desktop-menu">
             {isAuthenticated ? (
-              <Button
-                type="text"
-                onClick={handleLogout}
-                icon={<LogoutOutlined style={{ fontSize: 16 }} />}
-                style={{
-                  borderRadius: "10px",
-                  height: 40,
-                  display: "flex",
-                  alignItems: "center",
-                  fontWeight: 600,
-                  color: "rgba(0,0,0,0.65)",
-                  background: "rgba(0,0,0,0.03)",
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "profile",
+                      label: "Hồ sơ của tôi",
+                      icon: <UserOutlined />,
+                      onClick: () => navigate("/my-profile"),
+                    },
+                    {
+                      key: "logout",
+                      label: "Đăng xuất",
+                      icon: <LogoutOutlined />,
+                      danger: true,
+                      onClick: handleLogout,
+                    },
+                  ],
                 }}
+                placement="bottomRight"
+                arrow
               >
-                Đăng xuất
-              </Button>
+                <Flex
+                  align="center"
+                  gap={8}
+                  style={{
+                    cursor: "pointer",
+                    padding: "4px 12px",
+                    borderRadius: "12px",
+                    background: "rgba(0,0,0,0.03)",
+                    transition: "all 0.3s ease",
+                  }}
+                  className="user-profile-hover"
+                >
+                  <Avatar
+                    size="small"
+                    src={`https://ui-avatars.com/api/?name=${currentUser?.name || "User"}&background=random`}
+                    icon={<UserOutlined />}
+                  />
+                  <Text strong style={{ fontSize: 13 }}>
+                    {currentUser?.name?.split(" ").pop() || "Tài khoản"}
+                  </Text>
+                </Flex>
+              </Dropdown>
             ) : (
               <Button
                 type="primary"

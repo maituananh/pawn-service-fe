@@ -70,7 +70,7 @@ export const publicRoutes: RouteConfig[] = [
 export const privateRoutes: RouteConfig[] = [
   {
     path: "/my-profile",
-    label: "My profile",
+    label: "Hồ sơ",
     component: MyProfilePage,
     showInMenu: false,
     requiresLayout: true,

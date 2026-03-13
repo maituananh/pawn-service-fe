@@ -21,7 +21,7 @@ const CartPage = () => {
   const { cart, isLoading, removeItem, cartTotal } = useCart() as {
     cart: CartItem[];
     isLoading: boolean;
-    removeItem: (id: number, options?: any) => void;
+    removeItem: (ids: number[], options?: any) => void;
     cartTotal: number;
   };
   const { processPayment, isProcessing } = usePayment();
@@ -62,10 +62,25 @@ const CartPage = () => {
   };
 
   const handleRemove = (productId: number) => {
-    removeItem(productId, {
+    removeItem([productId], {
       onSuccess: () => {
         message.success("Đã xóa sản phẩm");
         setSelectedIds((prev) => prev.filter((id) => id !== productId));
+      },
+    } as any);
+  };
+
+  const handleRemoveSelected = () => {
+    if (selectedIds.length === 0) return;
+
+    const productIdsToDelete = cart
+      .filter((item) => selectedIds.includes(item.cartItemId))
+      .map((item) => item.productId);
+
+    removeItem(productIdsToDelete, {
+      onSuccess: () => {
+        message.success(`Đã xóa ${selectedIds.length} sản phẩm`);
+        setSelectedIds([]);
       },
     } as any);
   };
@@ -290,6 +305,16 @@ const CartPage = () => {
           >
             Bỏ chọn
           </Button>
+          {selectedIds.length > 0 && (
+            <Button
+              type="text"
+              danger
+              onClick={handleRemoveSelected}
+              style={{ fontWeight: 500 }}
+            >
+              Xóa các mục đã chọn
+            </Button>
+          )}
         </Space>
 
         <Space size={32}>

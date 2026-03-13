@@ -73,8 +73,14 @@ const AdminLayout = () => {
 
   const userMenuItems = [
     {
+      key: "profile",
+      label: "Hồ sơ của tôi",
+      icon: <UserOutlined />,
+      onClick: () => navigate("/my-profile"),
+    },
+    {
       key: "logout",
-      label: "Logout",
+      label: "Đăng xuất",
       icon: <LogoutOutlined />,
       danger: true,
       onClick: handleLogout,
