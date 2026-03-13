@@ -11,6 +11,7 @@ export interface Product {
   price: number;
   description?: any;
   quantity: number;
+  availableQty?: number;
   startDate: string;
   endDate: string;
   type: string;
