@@ -100,6 +100,15 @@ const AdminProductsPage: React.FC = () => {
       align: "right" as const,
       render: (_: any, record: Product) => {
         const isDeleted = record.isActived === false;
+        const isSoldOut = record.status === "SOLD_OUT";
+        const isDisabled = isDeleted || isSoldOut;
+        
+        const titleText = isDeleted 
+          ? "Sản phẩm đã bị xoá" 
+          : isSoldOut 
+          ? "Sản phẩm đã bán" 
+          : undefined;
+
         return (
           <Space onClick={(e) => e.stopPropagation()}>
             <Button
@@ -107,8 +116,8 @@ const AdminProductsPage: React.FC = () => {
               shape="circle"
               icon={<EditOutlined />}
               onClick={() => handleEdit(record.id)}
-              disabled={isDeleted}
-              title={isDeleted ? "Sản phẩm đã bị xoá" : "Chỉnh sửa"}
+              disabled={isDisabled}
+              title={titleText || "Chỉnh sửa"}
             />
             <Popconfirm
               title="Xóa sản phẩm"
@@ -116,15 +125,15 @@ const AdminProductsPage: React.FC = () => {
               okText="Xóa"
               cancelText="Hủy"
               onConfirm={() => handleDelete(record.id)}
-              disabled={isDeleted}
+              disabled={isDisabled}
             >
               <Button
                 type="text"
                 shape="circle"
                 danger
                 icon={<DeleteOutlined />}
-                disabled={isDeleted}
-                title={isDeleted ? "Sản phẩm đã bị xoá" : "Xoá"}
+                disabled={isDisabled}
+                title={titleText || "Xoá"}
               />
             </Popconfirm>
           </Space>
@@ -185,10 +194,15 @@ const AdminProductsPage: React.FC = () => {
           columns={columns}
           dataSource={productsPage?.data}
           onRow={(record) => ({
-            onClick: () => handleRowClick(record),
+            onClick: () => {
+              if (record.status !== "SOLD_OUT") {
+                handleRowClick(record);
+              }
+            },
+            style: record.status === "SOLD_OUT" ? { opacity: 0.5, pointerEvents: 'none' as const } : undefined
           })}
           size="middle"
-          rowClassName="row-hover-custom"
+          rowClassName={(record) => record.status === "SOLD_OUT" ? "" : "row-hover-custom"}
           pagination={{
             position: ["bottomRight"],
             total: productsPage?.totalElements,

@@ -217,7 +217,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item label="Số lượng" name="quantity" rules={[{ required: true }]}>
+              <Form.Item label="Số lượng" name="stockQty" rules={[{ required: true }]}>
                 <InputNumber min={1} style={{ width: "100%" }} disabled={readOnly} />
               </Form.Item>
             </Col>

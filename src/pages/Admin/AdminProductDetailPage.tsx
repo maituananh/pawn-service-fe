@@ -44,7 +44,7 @@ const AdminProductDetailPage: React.FC = () => {
         price: Number(values.price),
         categoryId: Number(values.categoryId),
         dailyProfit: Number(values.dailyProfit || 0),
-        quantity: Number(values.quantity || 0),
+        stockQty: Number(values.stockQty || 0),
         startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
         endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
         imageIds: [...oldImageIds, ...newImageIds],
@@ -83,6 +83,8 @@ const AdminProductDetailPage: React.FC = () => {
 
   if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
 
+  const isReadOnly = product?.isActived === false || product?.status === "SOLD_OUT";
+
   return (
     <Flex vertical gap={24} style={{ padding: '24px' }}>
       <Flex align="center" justify="space-between">
@@ -95,7 +97,7 @@ const AdminProductDetailPage: React.FC = () => {
           <Typography.Title level={4} style={{ margin: 0 }}>Chi tiết sản phẩm</Typography.Title>
         </Flex>
         
-        {product?.isActived !== false && (
+        {!isReadOnly && (
           <Popconfirm
             title="Thanh lý sản phẩm"
             description="Bạn có chắc chắn muốn thanh lý sản phẩm này không? Hành động này không thể hoàn tác."
@@ -118,7 +120,7 @@ const AdminProductDetailPage: React.FC = () => {
 
       <ProductForm
         isEdit={true}
-        readOnly={product?.isActived === false}
+        readOnly={isReadOnly}
         initialData={product}
         onFinish={handleUpdate}
         onCancel={() => navigate('/admin/products')}
