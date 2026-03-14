@@ -5,6 +5,13 @@ export interface ChatRequest {
   fileUrl?: string;
 }
 
+export interface OrderBrief {
+  orderId: number;
+  status: string;
+  totalAmount: string;
+  createdAt: string;
+}
+
 export interface ChatResponse {
   result: string;
   type?: string;
@@ -17,6 +24,7 @@ export interface ChatResponse {
   phone?: string;
   address?: string;
   gender?: string;
+  orders?: OrderBrief[];
 }
 
 export interface OcrUserRequest {

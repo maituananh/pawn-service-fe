@@ -2,6 +2,7 @@ import chatApi from "@/api/chatApi";
 import filesApi from "@/api/filesApi";
 import useAuth from "@/hooks/useAuth";
 import {
+  CalendarOutlined,
   CloseOutlined,
   ExpandAltOutlined,
   PictureOutlined,
@@ -19,13 +20,61 @@ import {
   List,
   message,
   Space,
+  Tag,
   Typography,
   Upload,
 } from "antd";
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import robotIcon from "../assets/images/ai-robot-icon.png";
 
 const { Text } = Typography;
+
+// Helper: Format Currency to VND
+const formatVND = (amount: any) => {
+  const value = typeof amount === "string" ? parseFloat(amount) : amount;
+  return (value || 0).toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+};
+
+// Helper: Format Date
+const formatSimpleDate = (dateStr: string) => {
+  if (!dateStr) return "N/A";
+  const date = new Date(dateStr);
+  return isNaN(date.getTime())
+    ? dateStr
+    : date.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+};
+
+// Helper: Status Labels & Colors
+const getStatusBadgeProps = (status: string) => {
+  const s = (status || "").toUpperCase();
+  switch (s) {
+    case "PENDING":
+      return { text: "Chờ thanh toán", color: "#faad14" };
+    case "CONFIRMED":
+    case "PAID":
+      return { text: "Đã xác nhận", color: "#52c41a" };
+    case "SHIPPING":
+      return { text: "Đang giao hàng", color: "#1890ff" };
+    case "DELIVERED":
+    case "COMPLETED":
+      return { text: "Hoàn tất", color: "#2f54eb" };
+    case "CANCELLED":
+    case "FAILED":
+      return { text: "Thất bại", color: "#ff4d4f" };
+    default:
+      return { text: status, color: "#bfbfbf" };
+  }
+};
 
 interface Message {
   id: number;
@@ -171,6 +220,7 @@ const NewAccountForm: React.FC = () => {
 };
 
 const AIAgent: React.FC = () => {
+  const navigate = useNavigate();
   const { isAuthenticated, currentUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -440,6 +490,85 @@ const AIAgent: React.FC = () => {
                           <Text strong>Password:</Text> {item.data.password}
                         </Text>
                       )}
+                    </Flex>
+                  )}
+
+                  {/* ORDER type: show order list */}
+                  {item.type === "ORDER" && item.data?.orders && (
+                    <Flex vertical gap={12} style={{ width: "100%", marginTop: 8 }}>
+                      {item.text && (
+                        <Text style={{ color: "inherit", whiteSpace: "pre-wrap", marginBottom: 4, display: 'block' }}>
+                          {item.text}
+                        </Text>
+                      )}
+                      <Flex align="center" gap={8} style={{ marginBottom: 4 }}>
+                        <span style={{ fontSize: 20 }}>📦</span>
+                        <Text strong style={{ fontSize: 15, color: '#1f1f1f' }}>
+                          Danh sách đơn hàng liên quan
+                        </Text>
+                      </Flex>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                        {item.data.orders.map((order: any) => {
+                          const badge = getStatusBadgeProps(order.status);
+                          return (
+                            <Card
+                              key={order.orderId}
+                              size="small"
+                              hoverable
+                              onClick={() => navigate(`/admin/orders/${order.orderId}`)}
+                              style={{
+                                borderRadius: 14,
+                                border: "1px solid #e8e8e8",
+                                boxShadow: "0 6px 16px rgba(0,0,0,0.04)",
+                                overflow: "hidden",
+                                background: "#fff",
+                                transition: 'all 0.3s'
+                              }}
+                              styles={{ body: { padding: "12px 14px" } }}
+                            >
+                              <Flex justify="space-between" align="start">
+                                <Flex vertical gap={4}>
+                                  <Text strong style={{ fontSize: 14, color: "#1677ff", letterSpacing: 0.5 }}>
+                                    #{order.orderId}
+                                  </Text>
+                                  <Flex align="center" gap={6}>
+                                    <CalendarOutlined style={{ fontSize: 11, color: "#8c8c8c" }} />
+                                    <Text type="secondary" style={{ fontSize: 11 }}>
+                                      {formatSimpleDate(order.createdAt)}
+                                    </Text>
+                                  </Flex>
+                                </Flex>
+                                <Tag
+                                  bordered={false}
+                                  style={{
+                                    backgroundColor: badge.color,
+                                    color: '#fff',
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    padding: "0 10px",
+                                    height: 22,
+                                    lineHeight: "22px",
+                                    borderRadius: 11,
+                                    margin: 0,
+                                    boxShadow: `0 4px 10px ${badge.color}33`,
+                                    textTransform: 'uppercase'
+                                  }}
+                                >
+                                  {badge.text}
+                                </Tag>
+                              </Flex>
+                              <div style={{ marginTop: 10, borderTop: "1px solid #f5f5f5", paddingTop: 10 }}>
+                                <Flex justify="space-between" align="center">
+                                  <Text type="secondary" style={{ fontSize: 12 }}>Tổng cộng</Text>
+                                  <Text strong style={{ fontSize: 16, color: "#f5222d" }}>
+                                    {formatVND(order.totalAmount)}
+                                  </Text>
+                                </Flex>
+                              </div>
+                            </Card>
+                          );
+                        })}
+                      </div>
                     </Flex>
                   )}
 
