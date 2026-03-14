@@ -1,6 +1,6 @@
-import orderApi from '@/api/orderApi';
-import { CheckoutRequest, OrderParams } from '@/type/order.type';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import orderApi from "@/api/orderApi";
+import { CheckoutRequest, OrderParams } from "@/type/order.type";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useOrder = () => {
   const queryClient = useQueryClient();
@@ -12,20 +12,27 @@ export const useOrder = () => {
   const cancelOrderMutation = useMutation({
     mutationFn: (orderId: number) => orderApi.cancelOrder(orderId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
   });
 
   const useGetOrders = (params?: OrderParams) => {
     return useQuery({
-      queryKey: ['orders', params],
+      queryKey: ["orders", params],
       queryFn: () => orderApi.getOrders(params),
+    });
+  };
+
+  const useGetOrdersAdmin = (params?: OrderParams) => {
+    return useQuery({
+      queryKey: ["admin.orders", params],
+      queryFn: () => orderApi.getOrdersAdmin(params),
     });
   };
 
   const useGetOrderDetail = (orderId: number) => {
     return useQuery({
-      queryKey: ['orders', orderId],
+      queryKey: ["orders", orderId],
       queryFn: () => orderApi.getOrderDetail(orderId),
       enabled: !!orderId,
     });
@@ -33,12 +40,15 @@ export const useOrder = () => {
 
   const useGetOrderStatus = (orderId: number) => {
     return useQuery({
-      queryKey: ['orders', 'status', orderId],
+      queryKey: ["orders", "status", orderId],
       queryFn: () => orderApi.getOrderStatus(orderId),
       enabled: !!orderId,
       refetchInterval: (query) => {
         const status = (query.state.data as any)?.status;
-        if (status && ['PAID', 'CANCELLED', 'FAILED', 'COMPLETED'].includes(status)) {
+        if (
+          status &&
+          ["PAID", "CANCELLED", "FAILED", "COMPLETED"].includes(status)
+        ) {
           return false;
         }
         return 3000;
@@ -54,5 +64,6 @@ export const useOrder = () => {
     useGetOrders,
     useGetOrderDetail,
     useGetOrderStatus,
+    useGetOrdersAdmin,
   };
 };

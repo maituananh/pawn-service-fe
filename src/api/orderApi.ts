@@ -5,12 +5,12 @@ import {
   OrderParams,
   OrderStatusResponse,
   PaginatedOrderResponse,
-} from '@/type/order.type';
-import axiosClient from './axiosClient';
+} from "@/type/order.type";
+import axiosClient from "./axiosClient";
 
 const orderApi = {
   checkout: async (data: CheckoutRequest): Promise<CheckoutResponse> => {
-    const url = '/orders/checkout';
+    const url = "/orders/checkout";
     const res = await axiosClient.post<CheckoutResponse>(url, data);
     return (res as any).data || res;
   },
@@ -21,8 +21,18 @@ const orderApi = {
     return (res as any).data || res;
   },
 
-  getOrders: async (params?: OrderParams): Promise<PaginatedOrderResponse | OrderDetailResponse[]> => {
-    const url = '/orders';
+  getOrders: async (
+    params?: OrderParams,
+  ): Promise<PaginatedOrderResponse | OrderDetailResponse[]> => {
+    const url = "/orders";
+    const res = await axiosClient.get(url, { params });
+    return (res as any).data || res;
+  },
+
+  getOrdersAdmin: async (
+    params?: OrderParams,
+  ): Promise<PaginatedOrderResponse | OrderDetailResponse[]> => {
+    const url = "/admin/orders";
     const res = await axiosClient.get(url, { params });
     return (res as any).data || res;
   },
