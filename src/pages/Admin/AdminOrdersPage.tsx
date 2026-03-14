@@ -1,24 +1,26 @@
 import { useOrder } from "@/hooks/useOrder";
-import { OrderDetailResponse, OrderStatus, PaginatedOrderResponse } from "@/type/order.type";
+import {
+  OrderDetailResponse,
+  OrderStatus,
+  PaginatedOrderResponse,
+} from "@/type/order.type";
 import {
   CalendarOutlined,
   EyeOutlined,
-  SearchOutlined,
   FilterOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import {
   Button,
   Card,
   Flex,
   Input,
-  Select,
   Space,
-  Spin,
   Table,
+  Tabs,
   Tag,
   Typography,
   theme,
-  Tabs,
 } from "antd";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -30,23 +32,23 @@ const AdminOrdersPage: React.FC = () => {
   const { token } = theme.useToken();
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(10);
-  const [activeTab, setActiveTab ] = useState<string>("ALL");
+  const [activeTab, setActiveTab] = useState<string>("ALL");
 
-  const { useGetOrders } = useOrder();
-  
+  const { useGetOrdersAdmin } = useOrder();
+
   const orderParams = {
     page: currentPage,
     size: pageSize,
     status: activeTab === "ALL" ? undefined : (activeTab as OrderStatus),
   };
 
-  const { data, isLoading } = useGetOrders(orderParams);
+  const { data, isLoading } = useGetOrdersAdmin(orderParams);
   const ordersPage = data as PaginatedOrderResponse;
 
   const handleRowClick = (record: OrderDetailResponse) => {
     const pathId = record.id || record.orderId;
     if (pathId) {
-       navigate(`/admin/orders/${pathId}`);
+      navigate(`/admin/orders/${pathId}`);
     }
   };
 
@@ -122,8 +124,10 @@ const AdminOrdersPage: React.FC = () => {
       key: "customer",
       render: (text: string, record: OrderDetailResponse) => (
         <Flex vertical gap={0}>
-          <Text style={{ fontSize: 13, fontWeight: 500 }}>{text || 'N/A'}</Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>{record.shippingPhone || 'N/A'}</Text>
+          <Text style={{ fontSize: 13, fontWeight: 500 }}>{text || "N/A"}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {record.shippingPhone || "N/A"}
+          </Text>
         </Flex>
       ),
     },
@@ -143,7 +147,11 @@ const AdminOrdersPage: React.FC = () => {
       render: (_: any, record: OrderDetailResponse) => {
         const currentStatus = record.orderStatus || record.status;
         return (
-          <Tag color={getStatusColor(currentStatus)} bordered={false} style={{ borderRadius: 6, fontWeight: 500 }}>
+          <Tag
+            color={getStatusColor(currentStatus)}
+            bordered={false}
+            style={{ borderRadius: 6, fontWeight: 500 }}
+          >
             {getStatusLabel(currentStatus)}
           </Tag>
         );
@@ -179,28 +187,38 @@ const AdminOrdersPage: React.FC = () => {
 
   return (
     <Flex vertical gap={24}>
-      <Card 
-        style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 16 }}
+      <Card
+        style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)", borderRadius: 16 }}
         title={
           <Flex align="center" justify="space-between" wrap="wrap" gap={16}>
             <Flex vertical gap={4}>
-              <Title level={4} style={{ margin: 0 }}>Quản lý đơn hàng</Title>
-              <Text type="secondary" style={{ fontSize: 13 }}>Theo dõi và cập nhật trạng thái đơn đặt hàng</Text>
+              <Title level={4} style={{ margin: 0 }}>
+                Quản lý đơn hàng
+              </Title>
+              <Text type="secondary" style={{ fontSize: 13 }}>
+                Theo dõi và cập nhật trạng thái đơn đặt hàng
+              </Text>
             </Flex>
             <Flex gap={12} wrap="wrap">
-              <Input 
-                placeholder="Tìm mã đơn hàng..." 
-                prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />} 
+              <Input
+                placeholder="Tìm mã đơn hàng..."
+                prefix={
+                  <SearchOutlined
+                    style={{ color: token.colorTextDescription }}
+                  />
+                }
                 style={{ width: 240, borderRadius: 10 }}
                 allowClear
               />
-              <Button icon={<FilterOutlined />} style={{ borderRadius: 10 }}>Bộ lọc</Button>
+              <Button icon={<FilterOutlined />} style={{ borderRadius: 10 }}>
+                Bộ lọc
+              </Button>
             </Flex>
           </Flex>
         }
       >
-        <Tabs 
-          activeKey={activeTab} 
+        <Tabs
+          activeKey={activeTab}
           onChange={(key) => {
             setActiveTab(key);
             setCurrentPage(0);
@@ -228,7 +246,7 @@ const AdminOrdersPage: React.FC = () => {
               `Hiển thị ${range[0]}-${range[1]} của ${total} đơn hàng`,
             showSizeChanger: false,
           }}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         />
       </Card>
     </Flex>
