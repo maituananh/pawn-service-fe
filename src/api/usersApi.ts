@@ -12,6 +12,15 @@ const usersApi = {
     if (!data) throw new Error("User not found");
     return data;
   },
+
+  async uploadAvatar(file: File): Promise<any> {
+    const formData = new FormData();
+    formData.append("file", file);
+    const { data } = await axiosClient.post<any>("/users/avatar", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  },
 };
 
 export default usersApi;

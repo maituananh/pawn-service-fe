@@ -1,5 +1,7 @@
 import authApi from "@/api/authApi";
 import fileApi from "@/api/filesApi";
+import usersApi from "@/api/usersApi";
+import { getImageUrl } from "@/lib/imageUtils";
 import { UserProfile } from "@/type/user.type";
 import {
   EditOutlined,
@@ -44,16 +46,18 @@ const MyProfilePage: React.FC = () => {
         const profile = await authApi.getProfile();
         setUserProfile(profile);
         form.setFieldsValue(profile);
-        setAvatarUrl(profile.avatarUrl || "https://via.placeholder.com/150");
-        if (profile.avatarUrl) {
-          setAvatarUrl(profile.avatarUrl);
-
+        const initialAvatar =
+          getImageUrl(profile.avatar) ||
+          profile.avatarUrl ||
+          "https://via.placeholder.com/150";
+        setAvatarUrl(initialAvatar);
+        if (profile.avatar || profile.avatarUrl) {
           setAvatarFileList([
             {
               uid: "-1",
               name: "avatar",
               status: "done",
-              url: profile.avatarUrl,
+              url: initialAvatar,
             },
           ]);
         }
@@ -89,23 +93,18 @@ const MyProfilePage: React.FC = () => {
       const values = await form.validateFields();
       setSaving(true);
 
-      let uploadedAvatarUrl = avatarUrl;
-      const avatarFile = form.getFieldValue("avatarFile");
-      if (avatarFile instanceof File) {
-        const res = await fileApi.upload(avatarFile);
-        uploadedAvatarUrl = res.url;
-      }
-
-      let uploadedCccdUrl = userProfile?.avatarUrl || "";
+      let finalAvatar = userProfile?.avatar;
       if (cccdImage.length > 0 && cccdImage[0].originFileObj) {
         const res = await fileApi.upload(cccdImage[0].originFileObj as File);
-        uploadedCccdUrl = res.url;
+        finalAvatar = res.url;
       }
 
+      // Remove cccd fields from payload
+      const { cccdImage: _, ...otherValues } = values;
+
       const payload = {
-        ...values,
-        avatarUrl: uploadedAvatarUrl,
-        cccdImageUrl: uploadedCccdUrl,
+        ...otherValues,
+        avatar: finalAvatar,
       };
 
       const updated = await authApi.updateProfile(payload);
