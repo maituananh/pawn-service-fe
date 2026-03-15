@@ -14,7 +14,8 @@ export type UserProfile = {
   name: string;
   email: string;
   role: string;
-  avatarUrl: string;
+  avatarUrl?: string;
+  avatar?: string;
   phone: string;
   address: string;
   gender?: string;

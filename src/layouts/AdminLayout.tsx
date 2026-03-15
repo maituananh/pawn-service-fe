@@ -28,6 +28,7 @@ import {
 import { useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/images/logo.png";
+import { getImageUrl } from "@/lib/imageUtils";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -171,7 +172,7 @@ const AdminLayout = () => {
                 >
                   <Avatar
                     size={40}
-                    src={`https://ui-avatars.com/api/?name=${currentUser?.name || "User"}&background=random`}
+                    src={getImageUrl(currentUser?.avatar) || `https://ui-avatars.com/api/?name=${currentUser?.name || "User"}&background=random`}
                   />
                   {!collapsed && (
                     <Flex vertical style={{ overflow: "hidden" }}>

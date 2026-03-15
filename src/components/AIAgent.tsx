@@ -27,6 +27,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import robotIcon from "../assets/images/ai-robot-icon.png";
+import { getImageUrl } from "@/lib/imageUtils";
 
 const { Text } = Typography;
 
@@ -387,11 +388,11 @@ const AIAgent: React.FC = () => {
                 align="start"
               >
                 <Avatar
-                  src={item.sender === "user" ? undefined : robotIcon}
-                  icon={item.sender === "user" ? <UserOutlined /> : undefined}
+                  src={item.sender === "user" ? getImageUrl(currentUser?.avatar) : robotIcon}
+                  icon={item.sender === "user" && !currentUser?.avatar ? <UserOutlined /> : undefined}
                   style={{
                     backgroundColor:
-                      item.sender === "user" ? "#1677ff" : "#fff",
+                      item.sender === "user" && !currentUser?.avatar ? "#1677ff" : "#fff",
                     flexShrink: 0,
                     border: item.sender === "ai" ? "1px solid #f0f0f0" : "none",
                   }}
@@ -434,7 +435,12 @@ const AIAgent: React.FC = () => {
                         borderRadius: 8,
                       }}
                     >
-                      <Text strong style={{ marginBottom: 4 }}>Thông tin cá nhân</Text>
+                      <Flex align="center" gap={12} style={{ marginBottom: 8 }}>
+                        {item.data.avatar && (
+                           <Avatar size={40} src={getImageUrl(item.data.avatar)} />
+                        )}
+                        <Text strong style={{ margin: 0 }}>Thông tin cá nhân</Text>
+                      </Flex>
                       {item.data.name && (
                         <Text>
                           <Text strong>Họ tên:</Text> {item.data.name}

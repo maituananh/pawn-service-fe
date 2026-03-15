@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/images/logo.png";
+import { getImageUrl } from "@/lib/imageUtils";
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -205,7 +206,7 @@ const AppHeader = ({ menuItems }: { menuItems: MenuProps["items"] }) => {
                 >
                   <Avatar
                     size="small"
-                    src={`https://ui-avatars.com/api/?name=${currentUser?.name || "User"}&background=random`}
+                    src={getImageUrl(currentUser?.avatar) || `https://ui-avatars.com/api/?name=${currentUser?.name || "User"}&background=random`}
                     icon={<UserOutlined />}
                   />
                   <Text strong style={{ fontSize: 13 }}>
