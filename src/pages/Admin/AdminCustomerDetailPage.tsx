@@ -4,7 +4,6 @@ import { useUsers } from "@/hooks/useUsers";
 import { Product } from "@/type/product.type";
 import {
   DownOutlined,
-  EditOutlined,
   MailOutlined,
   MoreOutlined,
   SaveOutlined,
@@ -143,14 +142,6 @@ const AdminCustomerDetailPage: React.FC = () => {
     }
   };
 
-  const toggleEdit = () => {
-    if (isDisableForm) {
-      setIsDisableForm(false);
-    } else {
-      handleSave();
-    }
-  };
-
   const totalValue = products.reduce((sum, p) => sum + (p.price || 0), 0);
 
   return (
@@ -177,25 +168,33 @@ const AdminCustomerDetailPage: React.FC = () => {
         {/* [UI ONLY] Left Section: Edit Form */}
         <Col xs={24} lg={16}>
           <Card
+            onClick={() => {
+              if (isDisableForm) setIsDisableForm(false);
+            }}
             style={{
               boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
               borderRadius: 12,
+              cursor: "pointer",
             }}
             title={
               <Flex justify="space-between" align="center">
                 <Text strong>Thông tin cá nhân</Text>
-                <Button
-                  type={isDisableForm ? "default" : "primary"}
-                  ghost={isDisableForm}
-                  icon={isDisableForm ? <EditOutlined /> : <SaveOutlined />}
-                  onClick={toggleEdit}
-                >
-                  {isDisableForm ? "Chỉnh sửa" : "Lưu thay đổi"}
-                </Button>
+                {!isDisableForm && (
+                  <Button
+                    type="primary"
+                    icon={<SaveOutlined />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSave();
+                    }}
+                  >
+                    Lưu thay đổi
+                  </Button>
+                )}
               </Flex>
             }
           >
-            <Form form={form} layout="vertical" disabled={isDisableForm}>
+            <Form form={form} layout="vertical">
               <Row gutter={24}>
                 <Col xs={24} md={12}>
                   <Form.Item
@@ -203,40 +202,31 @@ const AdminCustomerDetailPage: React.FC = () => {
                     name="name"
                     rules={[{ required: true }]}
                   >
-                    <Input placeholder="Nhập họ và tên" />
+                    <Input readOnly={isDisableForm} />
                   </Form.Item>
                 </Col>
+
                 <Col xs={24} md={12}>
-                  <Form.Item
-                    label="Địa chỉ Email"
-                    name="email"
-                    rules={[{ type: "email" }]}
-                  >
-                    <Input placeholder="example@gmail.com" />
+                  <Form.Item label="Địa chỉ Email" name="email">
+                    <Input disabled={isDisableForm} />
                   </Form.Item>
                 </Col>
+
                 <Col xs={24} md={12}>
-                  <Form.Item label="Thành phố/Tỉnh" name="city">
-                    <Select placeholder="Chọn thành phố">
-                      <Option value="Paris">Paris</Option>
-                      <Option value="HN">Hà Nội</Option>
-                      <Option value="HCM">TP. Hồ Chí Minh</Option>
-                    </Select>
+                  <Form.Item label="CCCD" name="cardId">
+                    <Input disabled={isDisableForm} />
                   </Form.Item>
                 </Col>
+
                 <Col xs={24} md={12}>
-                  <Form.Item label="Quận/Phường" name="district">
-                    <Input placeholder="Nhập quận/phường" />
+                  <Form.Item label="Địa chỉ" name="address">
+                    <Input disabled={isDisableForm} />
                   </Form.Item>
                 </Col>
-                <Col xs={24} md={12}>
-                  <Form.Item label="Địa chỉ chi tiết" name="address">
-                    <Input placeholder="Số nhà, tên đường..." />
-                  </Form.Item>
-                </Col>
+
                 <Col xs={24} md={12}>
                   <Form.Item label="Số điện thoại" name="phone">
-                    <Input placeholder="09xxxxxxxx" />
+                    <Input disabled={isDisableForm} />
                   </Form.Item>
                 </Col>
               </Row>

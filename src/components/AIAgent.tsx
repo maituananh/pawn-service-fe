@@ -384,17 +384,20 @@ const AIAgent: React.FC = () => {
                         borderRadius: 8,
                       }}
                     >
-                      <Text strong style={{ marginBottom: 4 }}>Thông tin cá nhân</Text>
+                      <Text strong style={{ marginBottom: 4 }}>
+                        Thông tin cá nhân
+                      </Text>
                       {item.data.name && (
                         <Text>
                           <Text strong>Họ tên:</Text> {item.data.name}
                         </Text>
                       )}
-                      {item.data.age !== undefined && item.data.age !== null && (
-                        <Text>
-                          <Text strong>Tuổi:</Text> {item.data.age}
-                        </Text>
-                      )}
+                      {item.data.age !== undefined &&
+                        item.data.age !== null && (
+                          <Text>
+                            <Text strong>Tuổi:</Text> {item.data.age}
+                          </Text>
+                        )}
                       {item.data.gender && (
                         <Text>
                           <Text strong>Giới tính:</Text> {item.data.gender}
@@ -429,7 +432,9 @@ const AIAgent: React.FC = () => {
                         borderRadius: 8,
                       }}
                     >
-                      <Text strong style={{ marginBottom: 4 }}>Thông tin tài khoản</Text>
+                      <Text strong style={{ marginBottom: 4 }}>
+                        Thông tin tài khoản
+                      </Text>
                       {item.data.username && (
                         <Text>
                           <Text strong>Username:</Text> {item.data.username}
@@ -449,7 +454,6 @@ const AIAgent: React.FC = () => {
                       {item.text}
                     </Text>
                   )}
-
 
                   {item.type === "NEW_ACCOUNT" && <NewAccountForm />}
                   {item.imageUrl && (
