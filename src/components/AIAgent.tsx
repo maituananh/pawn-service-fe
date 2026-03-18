@@ -1,6 +1,7 @@
 import chatApi from "@/api/chatApi";
 import filesApi from "@/api/filesApi";
 import useAuth from "@/hooks/useAuth";
+import { getImageUrl } from "@/lib/imageUtils";
 import {
   CalendarOutlined,
   CloseOutlined,
@@ -27,7 +28,6 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import robotIcon from "../assets/images/ai-robot-icon.png";
-import { getImageUrl } from "@/lib/imageUtils";
 
 const { Text } = Typography;
 
@@ -87,139 +87,6 @@ interface Message {
   data?: any;
 }
 
-const NewAccountForm: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [submitResult, setSubmitResult] = useState<string | null>(null);
-  const [resultData, setResultData] = useState<any>(null);
-
-  const handleSubmit = async () => {
-    if (!username || !phone || !email || !file) {
-      message.error("Vui lòng điền đầy đủ thông tin và chọn ảnh!");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const uploadRes = await filesApi.upload(file);
-      const res = await chatApi.sendOcrUser({
-        username,
-        phone,
-        email,
-        fileUrl: uploadRes.url,
-      });
-      message.success("Đã gửi thông tin đăng ký định danh!");
-      setSubmitResult(res.result || "Đã gửi thành công");
-      setResultData(res);
-    } catch (error) {
-      console.error(error);
-      message.error("Có lỗi xảy ra khi gửi thông tin.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (submitResult) {
-    return (
-      <div
-        style={{
-          marginTop: 12,
-          borderTop: "1px solid #f0f0f0",
-          paddingTop: 12,
-        }}
-      >
-        <Text
-          type="success"
-          strong
-          style={{ display: "block", marginBottom: 8 }}
-        >
-          {submitResult}
-        </Text>
-        {resultData?.username && (
-          <Flex
-            vertical
-            gap={4}
-            style={{ background: "#f5f5f5", padding: 12, borderRadius: 8 }}
-          >
-            <Text>
-              <Text strong>Username:</Text> {resultData.username}
-            </Text>
-            {resultData.password && (
-              <Text>
-                <Text strong>Password:</Text> {resultData.password}
-              </Text>
-            )}
-          </Flex>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div
-      style={{ marginTop: 12, borderTop: "1px solid #f0f0f0", paddingTop: 12 }}
-    >
-      <Flex vertical gap={8}>
-        <Input
-          placeholder="Username"
-          size="small"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          disabled={loading}
-        />
-        <Input
-          placeholder="Number phone"
-          size="small"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          disabled={loading}
-        />
-        <Input
-          placeholder="Email"
-          size="small"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={loading}
-        />
-        <Upload
-          showUploadList={true}
-          maxCount={1}
-          beforeUpload={(f) => {
-            setFile(f);
-            return false;
-          }}
-          onRemove={() => setFile(null)}
-          fileList={
-            file
-              ? ([{ uid: "-1", name: file.name, status: "done" }] as any)
-              : []
-          }
-        >
-          <Button
-            icon={<PictureOutlined />}
-            size="small"
-            block
-            disabled={loading}
-          >
-            Identity Cards (CCCD)
-          </Button>
-        </Upload>
-        <Button
-          type="primary"
-          size="small"
-          onClick={handleSubmit}
-          loading={loading}
-        >
-          Gửi
-        </Button>
-      </Flex>
-    </div>
-  );
-};
-
 const AIAgent: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, currentUser } = useAuth();
@@ -240,6 +107,42 @@ const AIAgent: React.FC = () => {
     null,
   );
   const chatBodyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const history = await chatApi.getHistory();
+        if (history && history.length > 0) {
+          const mappedMessages: Message[] = [];
+          history.forEach((item, index) => {
+            const time = new Date(item.timestamp);
+            const userMsg: Message = {
+              id: time.getTime() * 2 + index,
+              text: item.userMessage,
+              sender: "user",
+              timestamp: time,
+            };
+            const aiMsg: Message = {
+              id: time.getTime() * 2 + index + 1,
+              text: item.aiResponse.data.reply,
+              sender: "ai",
+              timestamp: time,
+              type: item.aiResponse.data.intent,
+              data: item.aiResponse.data.result,
+            };
+            mappedMessages.push(userMsg, aiMsg);
+          });
+          setMessages(mappedMessages);
+        }
+      } catch (error) {
+        console.error("Failed to fetch chat history:", error);
+      }
+    };
+
+    if (isOpen) {
+      fetchHistory();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (chatBodyRef.current) {
@@ -285,11 +188,11 @@ const AIAgent: React.FC = () => {
 
       const aiMsg: Message = {
         id: Date.now() + 1,
-        text: chatRes.result,
+        text: chatRes.reply,
         sender: "ai",
         timestamp: new Date(),
-        type: chatRes.type,
-        data: chatRes,
+        type: chatRes.intent,
+        data: chatRes.result,
       };
       setMessages((prev) => [...prev, aiMsg]);
     } catch (error) {
@@ -388,11 +291,21 @@ const AIAgent: React.FC = () => {
                 align="start"
               >
                 <Avatar
-                  src={item.sender === "user" ? getImageUrl(currentUser?.avatar) : robotIcon}
-                  icon={item.sender === "user" && !currentUser?.avatar ? <UserOutlined /> : undefined}
+                  src={
+                    item.sender === "user"
+                      ? getImageUrl(currentUser?.avatar)
+                      : robotIcon
+                  }
+                  icon={
+                    item.sender === "user" && !currentUser?.avatar ? (
+                      <UserOutlined />
+                    ) : undefined
+                  }
                   style={{
                     backgroundColor:
-                      item.sender === "user" && !currentUser?.avatar ? "#1677ff" : "#fff",
+                      item.sender === "user" && !currentUser?.avatar
+                        ? "#1677ff"
+                        : "#fff",
                     flexShrink: 0,
                     border: item.sender === "ai" ? "1px solid #f0f0f0" : "none",
                   }}
@@ -424,7 +337,7 @@ const AIAgent: React.FC = () => {
                     </Flex>
                   )}
 
-                  {/* PROFILE type: show profile card without result text */}
+                  {/* PROFILE type: show profile card */}
                   {item.type === "PROFILE" && item.data && (
                     <Flex
                       vertical
@@ -435,22 +348,40 @@ const AIAgent: React.FC = () => {
                         borderRadius: 8,
                       }}
                     >
+                      {item.text && (
+                        <Text
+                          style={{
+                            color: "inherit",
+                            whiteSpace: "pre-wrap",
+                            marginBottom: 8,
+                            display: "block",
+                          }}
+                        >
+                          {item.text}
+                        </Text>
+                      )}
                       <Flex align="center" gap={12} style={{ marginBottom: 8 }}>
                         {item.data.avatar && (
-                           <Avatar size={40} src={getImageUrl(item.data.avatar)} />
+                          <Avatar
+                            size={40}
+                            src={getImageUrl(item.data.avatar)}
+                          />
                         )}
-                        <Text strong style={{ margin: 0 }}>Thông tin cá nhân</Text>
+                        <Text strong style={{ margin: 0 }}>
+                          Thông tin cá nhân
+                        </Text>
                       </Flex>
                       {item.data.name && (
                         <Text>
                           <Text strong>Họ tên:</Text> {item.data.name}
                         </Text>
                       )}
-                      {item.data.age !== undefined && item.data.age !== null && (
-                        <Text>
-                          <Text strong>Tuổi:</Text> {item.data.age}
-                        </Text>
-                      )}
+                      {item.data.age !== undefined &&
+                        item.data.age !== null && (
+                          <Text>
+                            <Text strong>Tuổi:</Text> {item.data.age}
+                          </Text>
+                        )}
                       {item.data.gender && (
                         <Text>
                           <Text strong>Giới tính:</Text> {item.data.gender}
@@ -474,7 +405,7 @@ const AIAgent: React.FC = () => {
                     </Flex>
                   )}
 
-                  {/* OCR_IDENTITY type: show username/password without result text */}
+                  {/* OCR_IDENTITY type: show username/password */}
                   {item.type === "OCR_IDENTITY" && item.data && (
                     <Flex
                       vertical
@@ -485,7 +416,21 @@ const AIAgent: React.FC = () => {
                         borderRadius: 8,
                       }}
                     >
-                      <Text strong style={{ marginBottom: 4 }}>Thông tin tài khoản</Text>
+                      {item.text && (
+                        <Text
+                          style={{
+                            color: "inherit",
+                            whiteSpace: "pre-wrap",
+                            marginBottom: 8,
+                            display: "block",
+                          }}
+                        >
+                          {item.text}
+                        </Text>
+                      )}
+                      <Text strong style={{ marginBottom: 4 }}>
+                        Thông tin tài khoản
+                      </Text>
                       {item.data.username && (
                         <Text>
                           <Text strong>Username:</Text> {item.data.username}
@@ -501,19 +446,36 @@ const AIAgent: React.FC = () => {
 
                   {/* ORDER type: show order list */}
                   {item.type === "ORDER" && item.data?.orders && (
-                    <Flex vertical gap={12} style={{ width: "100%", marginTop: 8 }}>
+                    <Flex
+                      vertical
+                      gap={12}
+                      style={{ width: "100%", marginTop: 8 }}
+                    >
                       {item.text && (
-                        <Text style={{ color: "inherit", whiteSpace: "pre-wrap", marginBottom: 4, display: 'block' }}>
+                        <Text
+                          style={{
+                            color: "inherit",
+                            whiteSpace: "pre-wrap",
+                            marginBottom: 4,
+                            display: "block",
+                          }}
+                        >
                           {item.text}
                         </Text>
                       )}
                       <Flex align="center" gap={8} style={{ marginBottom: 4 }}>
                         <span style={{ fontSize: 20 }}>📦</span>
-                        <Text strong style={{ fontSize: 15, color: '#1f1f1f' }}>
+                        <Text strong style={{ fontSize: 15, color: "#1f1f1f" }}>
                           Danh sách đơn hàng liên quan
                         </Text>
                       </Flex>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 12,
+                        }}
+                      >
                         {item.data.orders.map((order: any) => {
                           const badge = getStatusBadgeProps(order.status);
                           return (
@@ -521,25 +483,39 @@ const AIAgent: React.FC = () => {
                               key={order.orderId}
                               size="small"
                               hoverable
-                              onClick={() => navigate(`/admin/orders/${order.orderId}`)}
+                              onClick={() =>
+                                navigate(`/admin/orders/${order.orderId}`)
+                              }
                               style={{
                                 borderRadius: 14,
                                 border: "1px solid #e8e8e8",
                                 boxShadow: "0 6px 16px rgba(0,0,0,0.04)",
                                 overflow: "hidden",
                                 background: "#fff",
-                                transition: 'all 0.3s'
+                                transition: "all 0.3s",
                               }}
                               styles={{ body: { padding: "12px 14px" } }}
                             >
                               <Flex justify="space-between" align="start">
                                 <Flex vertical gap={4}>
-                                  <Text strong style={{ fontSize: 14, color: "#1677ff", letterSpacing: 0.5 }}>
+                                  <Text
+                                    strong
+                                    style={{
+                                      fontSize: 14,
+                                      color: "#1677ff",
+                                      letterSpacing: 0.5,
+                                    }}
+                                  >
                                     #{order.orderId}
                                   </Text>
                                   <Flex align="center" gap={6}>
-                                    <CalendarOutlined style={{ fontSize: 11, color: "#8c8c8c" }} />
-                                    <Text type="secondary" style={{ fontSize: 11 }}>
+                                    <CalendarOutlined
+                                      style={{ fontSize: 11, color: "#8c8c8c" }}
+                                    />
+                                    <Text
+                                      type="secondary"
+                                      style={{ fontSize: 11 }}
+                                    >
                                       {formatSimpleDate(order.createdAt)}
                                     </Text>
                                   </Flex>
@@ -548,7 +524,7 @@ const AIAgent: React.FC = () => {
                                   bordered={false}
                                   style={{
                                     backgroundColor: badge.color,
-                                    color: '#fff',
+                                    color: "#fff",
                                     fontSize: 10,
                                     fontWeight: 600,
                                     padding: "0 10px",
@@ -557,16 +533,30 @@ const AIAgent: React.FC = () => {
                                     borderRadius: 11,
                                     margin: 0,
                                     boxShadow: `0 4px 10px ${badge.color}33`,
-                                    textTransform: 'uppercase'
+                                    textTransform: "uppercase",
                                   }}
                                 >
                                   {badge.text}
                                 </Tag>
                               </Flex>
-                              <div style={{ marginTop: 10, borderTop: "1px solid #f5f5f5", paddingTop: 10 }}>
+                              <div
+                                style={{
+                                  marginTop: 10,
+                                  borderTop: "1px solid #f5f5f5",
+                                  paddingTop: 10,
+                                }}
+                              >
                                 <Flex justify="space-between" align="center">
-                                  <Text type="secondary" style={{ fontSize: 12 }}>Tổng cộng</Text>
-                                  <Text strong style={{ fontSize: 16, color: "#f5222d" }}>
+                                  <Text
+                                    type="secondary"
+                                    style={{ fontSize: 12 }}
+                                  >
+                                    Tổng cộng
+                                  </Text>
+                                  <Text
+                                    strong
+                                    style={{ fontSize: 16, color: "#f5222d" }}
+                                  >
                                     {formatVND(order.totalAmount)}
                                   </Text>
                                 </Flex>
@@ -579,14 +569,71 @@ const AIAgent: React.FC = () => {
                   )}
 
                   {/* Default: show result text for non-typed messages */}
-                  {!item.type && (
+                  {(!item.type || item.type === "DEFAULT") && (
                     <Text style={{ color: "inherit", whiteSpace: "pre-wrap" }}>
                       {item.text}
                     </Text>
                   )}
 
-
-                  {item.type === "NEW_ACCOUNT" && <NewAccountForm />}
+                  {(item.type === "NEW_ACCOUNT" ||
+                    item.type === "CREATE_ACCOUNT") && (
+                    <Flex vertical gap={4}>
+                      {item.text && (
+                        <Text
+                          style={{
+                            color: "inherit",
+                            whiteSpace: "pre-wrap",
+                            marginBottom: 8,
+                            display: "block",
+                          }}
+                        >
+                          {item.text}
+                        </Text>
+                      )}
+                      {item.data &&
+                        (item.data.username || item.data.password) && (
+                          <Flex
+                            vertical
+                            gap={4}
+                            style={{
+                              background:
+                                item.sender === "user"
+                                  ? "rgba(255,255,255,0.1)"
+                                  : "#f5f5f5",
+                              padding: 12,
+                              borderRadius: 8,
+                              border:
+                                item.sender === "user"
+                                  ? "1px solid rgba(255,255,255,0.2)"
+                                  : "1px solid #e8e8e8",
+                            }}
+                          >
+                            <Text
+                              strong
+                              style={{ color: "inherit", marginBottom: 4 }}
+                            >
+                              Thông tin tài khoản mới:
+                            </Text>
+                            {item.data.username && (
+                              <Text style={{ color: "inherit" }}>
+                                <Text strong style={{ color: "inherit" }}>
+                                  Username:
+                                </Text>{" "}
+                                {item.data.username}
+                              </Text>
+                            )}
+                            {item.data.password && (
+                              <Text style={{ color: "inherit" }}>
+                                <Text strong style={{ color: "inherit" }}>
+                                  Password:
+                                </Text>{" "}
+                                {item.data.password}
+                              </Text>
+                            )}
+                          </Flex>
+                        )}
+                    </Flex>
+                  )}
                   {item.imageUrl && (
                     <img
                       src={item.imageUrl}
