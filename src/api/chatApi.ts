@@ -1,8 +1,19 @@
-import axiosClient from './axiosClient';
+import axiosClient from "./axiosClient";
 
 export interface ChatRequest {
   content: string;
   fileUrl?: string;
+}
+
+export interface ApiResponse<T> {
+  status: string;
+  data: T;
+  error: string | null;
+  meta?: {
+    sessionId: string;
+    responseTime: number;
+    [key: string]: any;
+  };
 }
 
 export interface OrderBrief {
@@ -12,11 +23,8 @@ export interface OrderBrief {
   createdAt: string;
 }
 
-export interface ChatResponse {
-  result: string;
-  type?: string;
+export interface ProfileResult {
   username?: string;
-  password?: string;
   name?: string;
   age?: number;
   email?: string;
@@ -24,24 +32,49 @@ export interface ChatResponse {
   phone?: string;
   address?: string;
   gender?: string;
-  orders?: OrderBrief[];
+  avatar?: string;
 }
 
-export interface OcrUserRequest {
+export interface OrderResult {
+  message?: string;
+  orders: OrderBrief[];
+}
+
+export interface CreateAccountResult {
+  missingFields?: string[];
   username?: string;
-  phone?: string;
-  email?: string;
-  fileUrl?: string;
+  password?: string;
+}
+
+export interface ChatResponse {
+  reply: string;
+  intent: string;
+  step: number;
+  stepTotal: number;
+  collectingField: string | null;
+  result: ProfileResult | OrderResult | CreateAccountResult | any;
+  messages: any[];
+  complete: boolean;
+}
+
+export interface HistoryItem {
+  userMessage: string;
+  aiResponse: ApiResponse<ChatResponse>;
+  timestamp: string;
 }
 
 const chatApi = {
   async sendMessage(payload: ChatRequest): Promise<ChatResponse> {
-    const { data } = await axiosClient.post<ChatResponse>('/chat', payload);
-    return data;
+    const res = await axiosClient.post<ApiResponse<ChatResponse>>(
+      "/chat",
+      payload,
+    );
+    return res.data.data;
   },
-  async sendOcrUser(payload: OcrUserRequest): Promise<any> {
-    const { data } = await axiosClient.post('/chat/ocr/user', payload);
-    return data;
+  async getHistory(): Promise<HistoryItem[]> {
+    const res = await axiosClient.get<HistoryItem[]>("/chat/history");
+    // axiosClient returns res.data which is the array
+    return (res as any).data || res;
   },
 };
 
