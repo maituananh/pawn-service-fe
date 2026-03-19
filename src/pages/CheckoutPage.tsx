@@ -1,3 +1,4 @@
+import useAuth from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { useOrder } from "@/hooks/useOrder";
 import { CartItem } from "@/type/cart.type";
@@ -31,10 +32,21 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cart } = useCart() as { cart: CartItem[] };
+  const { currentUser } = useAuth();
   const { checkout, isCheckingOut } = useOrder();
   const [form] = Form.useForm();
 
   const cartItemIds = location.state?.cartItemIds as number[];
+
+  useEffect(() => {
+    if (currentUser) {
+      form.setFieldsValue({
+        shippingName: currentUser.name,
+        shippingPhone: currentUser.phone,
+        shippingAddress: currentUser.address,
+      });
+    }
+  }, [currentUser, form]);
 
   useEffect(() => {
     if (!cartItemIds || cartItemIds.length === 0) {
