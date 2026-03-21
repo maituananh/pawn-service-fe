@@ -1,15 +1,17 @@
-import usersApi from '@/api/usersApi';
-import { UserProfile } from '@/type/user.type';
-import { useQuery } from '@tanstack/react-query';
+import usersApi from "@/api/usersApi";
+import { UserProfile } from "@/type/user.type";
+import { useQuery } from "@tanstack/react-query";
 
-const USERS_QUERY_KEY = ['products'];
+const USERS_QUERY_KEY = ["users"];
 
 export const useUsers = () => {
-  const { data, isFetching, isError, error, refetch } = useQuery<UserProfile[]>({
-    queryKey: USERS_QUERY_KEY,
-    queryFn: usersApi.getAll,
-    retry: 1,
-  });
+  const { data, isFetching, isError, error, refetch } = useQuery<UserProfile[]>(
+    {
+      queryKey: USERS_QUERY_KEY,
+      queryFn: usersApi.getAll,
+      retry: 1,
+    },
+  );
 
   return {
     users: data ?? [],
