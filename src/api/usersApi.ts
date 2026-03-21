@@ -13,6 +13,11 @@ const usersApi = {
     return data;
   },
 
+  update: async (id: number, payload: any) => {
+    const { data } = await axiosClient.put(`/users/${id}`, payload);
+    return data;
+  },
+
   async uploadAvatar(file: File): Promise<any> {
     const formData = new FormData();
     formData.append("file", file);
