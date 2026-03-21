@@ -21,6 +21,11 @@ const usersApi = {
     });
     return data;
   },
+
+  update: async (id: number, payload: any) => {
+    const { data } = await axiosClient.put(`/users/${id}`, payload);
+    return data;
+  },
 };
 
 export default usersApi;

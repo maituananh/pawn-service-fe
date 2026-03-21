@@ -1,4 +1,5 @@
 // [UI ONLY] Redesigned AdminCustomerDetailPage with improved layout and styling
+import usersApi from "@/api/usersApi";
 import { useProducts } from "@/hooks/useProducts";
 import { useUsers } from "@/hooks/useUsers";
 import { Product } from "@/type/product.type";
@@ -10,6 +11,7 @@ import {
   UpOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Avatar,
   Button,
@@ -31,7 +33,7 @@ import {
   type TableProps,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -84,6 +86,8 @@ const dropdownItems = [
 const AdminCustomerDetailPage: React.FC = () => {
   const { id } = useParams();
   const { token } = theme.useToken();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const [form] = Form.useForm();
 
@@ -131,13 +135,24 @@ const AdminCustomerDetailPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const values = await form.validateFields();
-      console.log("Update user:", values);
+      if (!customer) {
+        message.error("Không có dữ liệu khách hàng");
+        return;
+      }
 
-      message.success("Cập nhật thành công (UI Only)");
+      const values = await form.validateFields();
+
+      await usersApi.update(customer.id, values);
+
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+
+      message.success("Cập nhật thành công");
+
+      navigate("/admin/customers");
 
       setIsDisableForm(true);
-    } catch {
+    } catch (err) {
+      console.error(err);
       message.error("Cập nhật thất bại");
     }
   };
