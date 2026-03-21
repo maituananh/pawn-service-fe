@@ -1,5 +1,4 @@
 import { useCart } from "@/hooks/useCart";
-import { usePayment } from "@/hooks/usePayment";
 import { CartItem } from "@/type/cart.type";
 import {
   Button,
@@ -24,7 +23,6 @@ const CartPage = () => {
     removeItem: (ids: number[], options?: any) => void;
     cartTotal: number;
   };
-  const { processPayment, isProcessing } = usePayment();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const formatCurrency = (value: number) =>
@@ -346,7 +344,6 @@ const CartPage = () => {
                   : "none",
             }}
             onClick={handlePayment}
-            loading={isProcessing}
           >
             Mua ngay ({selectedIds.length})
           </Button>
