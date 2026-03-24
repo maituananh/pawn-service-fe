@@ -19,7 +19,7 @@ import {
   UploadFile,
 } from "antd";
 import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const { Title, Text } = Typography;
 
@@ -91,6 +91,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const { categories } = useCategories();
   const { users } = useUsers();
   const { token } = theme.useToken();
+  const initialStartDate = useRef<dayjs.Dayjs | null>(null);
 
   const fillCustomerFields = (userId: any) => {
     if (!userId || !users) return;
@@ -115,6 +116,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
         categoryId: initialData.categoryId || 1,
         stockQty: initialData.stockQty ?? 1,
       };
+
+      if (initialData.startDate) {
+        initialStartDate.current = dayjs(initialData.startDate);
+      }
 
       form.setFieldsValue(formattedData);
 
@@ -142,8 +147,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
       form={form}
       layout="vertical"
       onFinish={(values) => {
-        if (!values.stockQty) values.stockQty = 1;
-        return onFinish(values, fileList);
+        const payload = {
+          ...values,
+          startDate: values.startDate
+            ? values.startDate.format("YYYY-MM-DD")
+            : null,
+          endDate: values.endDate ? values.endDate.format("YYYY-MM-DD") : null,
+          stockQty: values.stockQty || 1,
+        };
+
+        console.log("PAYLOAD:", payload);
+
+        return onFinish(payload, fileList);
       }}
       validateTrigger={["onChange", "onBlur"]}
       requiredMark="optional"
@@ -297,8 +312,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   placeholder="Chọn ngày"
                   disabled={readOnly}
                   disabledDate={(current) => {
-                    return current && current < dayjs().startOf("day");
+                    if (!current) return false;
+                    const today = dayjs().startOf("day");
+
+                    if (!isEdit) {
+                      return current < today;
+                    }
+                    if (isEdit && initialStartDate.current) {
+                      return current < initialStartDate.current.startOf("day");
+                    }
+                    return false;
                   }}
+                  onChange={() => form.setFieldValue("endDate", null)}
                 />
               </Form.Item>
             </Col>
@@ -335,12 +360,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   placeholder="Chọn ngày"
                   disabled={readOnly}
                   disabledDate={(current) => {
+                    if (!current) return false;
+
                     const start = form.getFieldValue("startDate");
                     const today = dayjs().startOf("day");
 
-                    if (!current) return false;
-
-                    if (current < today) return true;
+                    if (!isEdit && current < today) return true;
 
                     if (start && current < start.startOf("day")) return true;
 
