@@ -50,9 +50,7 @@ const CartPage = () => {
 
   const calculateSelectedTotal = () => {
     return activeItems
-      .filter((item: CartItem) =>
-        selectedIds.includes(item.cartItemId),
-      )
+      .filter((item: CartItem) => selectedIds.includes(item.cartItemId))
       .reduce(
         (sum: number, item: CartItem) => sum + item.price * item.quantity,
         0,

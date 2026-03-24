@@ -1,6 +1,5 @@
 import authApi from "@/api/authApi";
 import fileApi from "@/api/filesApi";
-import usersApi from "@/api/usersApi";
 import { getImageUrl } from "@/lib/imageUtils";
 import { UserProfile } from "@/type/user.type";
 import {
@@ -171,7 +170,7 @@ const MyProfilePage: React.FC = () => {
                   loading={saving}
                   onClick={handleSave}
                 >
-                  Lưu
+                  Lưu Thay Đổi
                 </Button>
               ) : (
                 <Button
