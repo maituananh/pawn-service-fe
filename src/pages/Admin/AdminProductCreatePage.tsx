@@ -9,67 +9,62 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 const AdminProductCreatePage: React.FC = () => {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const [loading, setLoading] = useState(false);
 
-  const handleFinish = async (values: any, fileList: UploadFile[]) => {
-    try {
-      if (fileList.length !== 4) {
-        message.error("Vui lòng cung cấp đầy đủ 4 hình ảnh chi tiết");
-        return;
-      }
+    const handleFinish = async (values: any, fileList: UploadFile[]) => {
+        try {
+            if (fileList.length !== 4) {
+                message.error("Vui lòng cung cấp đầy đủ 4 hình ảnh chi tiết");
+                return;
+            }
 
-      setLoading(true);
+            setLoading(true);
 
-      const imageIds = await Promise.all(
-        fileList.map(async (f) => {
-          const res = await fileApi.upload(f.originFileObj as File);
-          return res.id;
-        })
-      );
+            const imageIds = await Promise.all(
+                fileList.map(async (f) => {
+                    const res = await fileApi.upload(f.originFileObj as File);
+                    return res.id;
+                })
+            );
 
-      const payload = {
-        name: values.name,
-        price: Number(values.price),
-        startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
-        endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
-        categoryId: Number(values.categoryId),
-        code: values.code,
-        customerId: values.customerId, 
-        type: values.type,
-        dailyProfit: Number(values.dailyProfit),
-        stockQty: Number(values.stockQty),
-        description: values.description || "",
-        imageIds,
-      };
+            const payload = {
+                name: values.name,
+                price: Number(values.price),
+                startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
+                endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
+                categoryId: Number(values.categoryId),
+                code: values.code,
+                customerId: values.customerId,
+                type: values.type,
+                dailyProfit: Number(values.dailyProfit),
+                stockQty: Number(values.stockQty),
+                description: values.description || "",
+                imageIds
+            };
 
-      await productsApi.create(payload);
-      
-      message.success("Tạo hợp đồng cầm cố mới thành công!");
-      await queryClient.invalidateQueries({ queryKey: ["products"] });
-      navigate("/admin/products", { replace: true });
-    } catch (error: any) {
-      // Handled globally
-    } finally {
-      setLoading(false);
-    }
-  };
+            await productsApi.create(payload);
 
-  const handleCancel = () => {
-    navigate("/admin/products", { replace: true });
-  };
+            message.success("Tạo hợp đồng cầm cố mới thành công!");
+            await queryClient.invalidateQueries({ queryKey: ["products"] });
+            navigate("/admin/products", { replace: true });
+        } catch (error: any) {
+            // Handled globally
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <Flex vertical gap={24}>
-      <ProductForm 
-        onFinish={handleFinish} 
-        onCancel={handleCancel} 
-        loading={loading}
-        isEdit={false}
-      />
-    </Flex>
-  );
+    const handleCancel = () => {
+        navigate("/admin/products", { replace: true });
+    };
+
+    return (
+        <Flex vertical gap={24}>
+            <ProductForm onFinish={handleFinish} onCancel={handleCancel} loading={loading} isEdit={false} />
+        </Flex>
+    );
 };
 
 export default AdminProductCreatePage;

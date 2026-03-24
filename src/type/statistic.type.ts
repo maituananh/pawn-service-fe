@@ -1,5 +1,5 @@
 export type Statistic = {
-  numberOfProduct: number;
-  numberOfUser: number;
-  numberOfUserActive: number;
+    numberOfProduct: number;
+    numberOfUser: number;
+    numberOfUserActive: number;
 };

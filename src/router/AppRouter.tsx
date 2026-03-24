@@ -25,101 +25,101 @@ import NotFoundPage from "../pages/NotFoundPage";
 import { PrivateRoute } from "./PrivateRoute";
 
 export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      { index: true, element: <HomePage /> },
-      { path: "products", element: <ProductsPage /> },
-      { path: "products/:id", element: <ProductDetailPage /> },
-      {
-        path: "mycart",
-        element: <PrivateRoute element={<CartPage />} />,
-      },
-      {
-        path: "payment-success",
-        element: <PrivateRoute element={<PaymentSuccess />} />,
-      },
-      {
-        path: "checkout",
-        element: <PrivateRoute element={<CheckoutPage />} />,
-      },
-      {
-        path: "orders",
-        element: <PrivateRoute element={<OrdersPage />} />,
-      },
-      {
-        path: "orders/:id",
-        element: <PrivateRoute element={<OrderDetailPage />} />,
-      },
-    ],
-  },
-  {
-    path: "/login",
-    children: [{ index: true, element: <LoginPage /> }],
-  },
-  {
-    path: "/my-profile",
-    element: <MainLayout />,
-    children: [{ index: true, element: <MyProfilePage /> }],
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
-  },
-  {
-    path: "/admin",
-    element: <AdminLayout />,
-    children: [
-      { index: true, element: <HomePage /> },
-      {
-        path: "dashboard",
-        element: <PrivateRoute element={<AdminDashboardPage />} />,
-      },
-      {
-        path: "customers",
-        element: <PrivateRoute element={<AdminCustomersPage />} />,
-      },
-      {
-        path: "customers/:id",
-        element: <PrivateRoute element={<AdminCustomerDetailPage />} />,
-      },
-      {
-        path: "products",
-        element: <PrivateRoute element={<AdminProductsPage />} />,
-      },
+    {
+        path: "/",
+        element: <MainLayout />,
+        children: [
+            { index: true, element: <HomePage /> },
+            { path: "products", element: <ProductsPage /> },
+            { path: "products/:id", element: <ProductDetailPage /> },
+            {
+                path: "mycart",
+                element: <PrivateRoute element={<CartPage />} />
+            },
+            {
+                path: "payment-success",
+                element: <PrivateRoute element={<PaymentSuccess />} />
+            },
+            {
+                path: "checkout",
+                element: <PrivateRoute element={<CheckoutPage />} />
+            },
+            {
+                path: "orders",
+                element: <PrivateRoute element={<OrdersPage />} />
+            },
+            {
+                path: "orders/:id",
+                element: <PrivateRoute element={<OrderDetailPage />} />
+            }
+        ]
+    },
+    {
+        path: "/login",
+        children: [{ index: true, element: <LoginPage /> }]
+    },
+    {
+        path: "/my-profile",
+        element: <MainLayout />,
+        children: [{ index: true, element: <MyProfilePage /> }]
+    },
+    {
+        path: "*",
+        element: <NotFoundPage />
+    },
+    {
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+            { index: true, element: <HomePage /> },
+            {
+                path: "dashboard",
+                element: <PrivateRoute element={<AdminDashboardPage />} />
+            },
+            {
+                path: "customers",
+                element: <PrivateRoute element={<AdminCustomersPage />} />
+            },
+            {
+                path: "customers/:id",
+                element: <PrivateRoute element={<AdminCustomerDetailPage />} />
+            },
+            {
+                path: "products",
+                element: <PrivateRoute element={<AdminProductsPage />} />
+            },
 
-      {
-        path: "categories",
-        element: <PrivateRoute element={<AdminCategoriesPage />} />,
-      },
+            {
+                path: "categories",
+                element: <PrivateRoute element={<AdminCategoriesPage />} />
+            },
 
-      {
-        path: "categories/new",
-        element: <PrivateRoute element={<AdminCategoryFormPage />} />,
-      },
+            {
+                path: "categories/new",
+                element: <PrivateRoute element={<AdminCategoryFormPage />} />
+            },
 
-      {
-        path: "categories/:id",
-        element: <PrivateRoute element={<AdminCategoryFormPage />} />,
-      },
+            {
+                path: "categories/:id",
+                element: <PrivateRoute element={<AdminCategoryFormPage />} />
+            },
 
-      {
-        path: "products/:id",
-        element: <PrivateRoute element={<AdminProductDetailPage />} />,
-      },
-      {
-        path: "products/create",
-        element: <PrivateRoute element={<AdminProductCreatePage />} />,
-      },
-      {
-        path: "orders",
-        element: <PrivateRoute element={<AdminOrdersPage />} />,
-      },
-      {
-        path: "orders/:id",
-        element: <PrivateRoute element={<OrderDetailPage />} />,
-      },
-    ],
-  },
+            {
+                path: "products/:id",
+                element: <PrivateRoute element={<AdminProductDetailPage />} />
+            },
+            {
+                path: "products/create",
+                element: <PrivateRoute element={<AdminProductCreatePage />} />
+            },
+            {
+                path: "orders",
+                element: <PrivateRoute element={<AdminOrdersPage />} />
+            },
+            {
+                path: "orders/:id",
+                element: <PrivateRoute element={<OrderDetailPage />} />
+            }
+        ]
+    }
 ]);

@@ -9,34 +9,34 @@ import AIAgent from "../components/AIAgent";
 const { Content } = Layout;
 
 const MainLayout = () => {
-  const { role } = useAuth();
+    const { role } = useAuth();
 
-  const menuItems = [...publicRoutes, ...privateRoutes]
-    .filter(
-      (route) =>
-        route.showInMenu && 
-        (!route.roles || route.roles.includes(role)) &&
-        (!route.path.startsWith('/admin') || route.path === '/admin/dashboard')
-    )
-    .map((route) => ({
-      key: route.path,
-      label: <Link to={route.path}>{route.label}</Link>,
-    }));
+    const menuItems = [...publicRoutes, ...privateRoutes]
+        .filter(
+            (route) =>
+                route.showInMenu &&
+                (!route.roles || route.roles.includes(role)) &&
+                (!route.path.startsWith("/admin") || route.path === "/admin/dashboard")
+        )
+        .map((route) => ({
+            key: route.path,
+            label: <Link to={route.path}>{route.label}</Link>
+        }));
 
-  return (
-    <div className="main-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <AppHeader menuItems={menuItems} />
+    return (
+        <div className="main-layout" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+            <AppHeader menuItems={menuItems} />
 
-      <Content className="main-content px-4" style={{ flex: 1 }}>
-        <div className="site-layout-background">
-          <Outlet />
+            <Content className="main-content px-4" style={{ flex: 1 }}>
+                <div className="site-layout-background">
+                    <Outlet />
+                </div>
+            </Content>
+
+            <AppFooter />
+            <AIAgent />
         </div>
-      </Content>
-
-      <AppFooter />
-      <AIAgent />
-    </div>
-  );
+    );
 };
 
 export default MainLayout;

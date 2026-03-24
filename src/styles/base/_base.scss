@@ -1,94 +1,94 @@
-@use 'variables' as *;
+@use "variables" as *;
 
 // Text color classes
 .text-white {
-  color: $color-white;
+    color: $color-white;
 }
 
 .text-black {
-  color: $color-black;
+    color: $color-black;
 }
 
 .text-dark {
-  color: $color-text-dark;
+    color: $color-text-dark;
 }
 
 .text-light {
-  color: $color-text-light;
+    color: $color-text-light;
 }
 
 .text-muted {
-  color: $color-text-muted;
+    color: $color-text-muted;
 }
 
 .text-red {
-  color: $color-red !important;
+    color: $color-red !important;
 }
 
 .text-blue {
-  color: $color-blue;
+    color: $color-blue;
 }
 
 // Background color classes
 .bg-white {
-  background-color: $color-white;
+    background-color: $color-white;
 }
 
 .bg-black {
-  background-color: $color-black;
+    background-color: $color-black;
 }
 
 .bg-gray-light {
-  background-color: $color-gray-light;
+    background-color: $color-gray-light;
 }
 
 .bg-gray-dark {
-  background-color: $color-gray-dark;
+    background-color: $color-gray-dark;
 }
 
 .bg-primary {
-  background-color: $color-primary;
+    background-color: $color-primary;
 }
 
 .bg-secondary {
-  background-color: $color-secondary;
+    background-color: $color-secondary;
 }
 
 .bg-success {
-  background-color: $color-success;
+    background-color: $color-success;
 }
 
 .bg-danger {
-  background-color: $color-danger;
+    background-color: $color-danger;
 }
 
 .bg-warning {
-  background-color: $color-warning;
+    background-color: $color-warning;
 }
 
 .bg-info {
-  background-color: $color-info;
+    background-color: $color-info;
 }
 
 .bg-light {
-  background-color: $color-light;
+    background-color: $color-light;
 }
 
 .bg-dark {
-  background-color: $color-dark;
+    background-color: $color-dark;
 }
 
 .bg-red-dark {
-  background-color: $color-red-dark;
+    background-color: $color-red-dark;
 }
 
 .radius-16 {
-  border-radius: 16px;
+    border-radius: 16px;
 }
 
 .container {
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 16px;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 16px;
 }

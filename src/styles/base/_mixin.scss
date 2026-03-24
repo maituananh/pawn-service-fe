@@ -1,74 +1,73 @@
 @mixin spacing($property, $value) {
-  #{$property}: $value;
+    #{$property}: $value;
 }
 
 @mixin margin($value) {
-  margin: $value;
-  margin-top: $value;
-  margin-right: $value;
-  margin-bottom: $value;
-  margin-left: $value;
+    margin: $value;
+    margin-top: $value;
+    margin-right: $value;
+    margin-bottom: $value;
+    margin-left: $value;
 }
 
 @mixin padding($value) {
-  padding: $value;
-  padding-top: $value;
-  padding-right: $value;
-  padding-bottom: $value;
-  padding-left: $value;
+    padding: $value;
+    padding-top: $value;
+    padding-right: $value;
+    padding-bottom: $value;
+    padding-left: $value;
 }
 
 @function create-class($property, $value) {
-  @return ".#{$property}-#{$value}";
+    @return ".#{$property}-#{$value}";
 }
 
 @for $i from 0 through 20 {
+    #{create-class('m', $i)} {
+        @include spacing(margin, $i * 4px);
+    }
 
-  #{create-class('m', $i)} {
-    @include spacing(margin, $i * 4px);
-  }
+    #{create-class('mt', $i)} {
+        @include spacing(margin-top, $i * 4px);
+    }
 
-  #{create-class('mt', $i)} {
-    @include spacing(margin-top, $i * 4px);
-  }
+    #{create-class('mb', $i)} {
+        @include spacing(margin-bottom, $i * 4px);
+    }
 
-  #{create-class('mb', $i)} {
-    @include spacing(margin-bottom, $i * 4px);
-  }
+    #{create-class('ml', $i)} {
+        @include spacing(margin-left, $i * 4px);
+    }
 
-  #{create-class('ml', $i)} {
-    @include spacing(margin-left, $i * 4px);
-  }
+    #{create-class('mr', $i)} {
+        @include spacing(margin-right, $i * 4px);
+    }
 
-  #{create-class('mr', $i)} {
-    @include spacing(margin-right, $i * 4px);
-  }
+    #{create-class('p', $i)} {
+        @include spacing(padding, $i * 4px);
+    }
 
-  #{create-class('p', $i)} {
-    @include spacing(padding, $i * 4px);
-  }
+    #{create-class('pt', $i)} {
+        @include spacing(padding-top, $i * 4px);
+    }
 
-  #{create-class('pt', $i)} {
-    @include spacing(padding-top, $i * 4px);
-  }
+    #{create-class('pb', $i)} {
+        @include spacing(padding-bottom, $i * 4px);
+    }
 
-  #{create-class('pb', $i)} {
-    @include spacing(padding-bottom, $i * 4px);
-  }
+    #{create-class('pl', $i)} {
+        @include spacing(padding-left, $i * 4px);
+    }
 
-  #{create-class('pl', $i)} {
-    @include spacing(padding-left, $i * 4px);
-  }
-
-  #{create-class('pr', $i)} {
-    @include spacing(padding-right, $i * 4px);
-  }
+    #{create-class('pr', $i)} {
+        @include spacing(padding-right, $i * 4px);
+    }
 }
 
 @mixin text-ellipsis($lines: 2) {
-  display: -webkit-box;
-  -webkit-line-clamp: $lines;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

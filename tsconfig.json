@@ -1,15 +1,15 @@
 {
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "module": "ESNext",  
-    "baseUrl": ".",
-    "lib": ["es2016", "dom"],
-    "paths": {
-      "@/*": ["src/*"],
-      "@assets/*": ["assets/*"]
-    },
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-  }
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "module": "ESNext",
+        "baseUrl": ".",
+        "lib": ["es2016", "dom"],
+        "paths": {
+            "@/*": ["src/*"],
+            "@assets/*": ["assets/*"]
+        },
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
+    }
 }
