@@ -1,13 +1,20 @@
-import { Button, Flex, message, Popconfirm, Spin, Typography, UploadFile } from 'antd';
-import { ShoppingOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import fileApi from '@/api/filesApi';
-import productsApi from '@/api/productsApi';
-import ProductForm from '@/components/admin/ProductForm';
-import { useProduct } from '@/hooks/useProduct';
-import dayjs from 'dayjs';
-import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import fileApi from "@/api/filesApi";
+import productsApi from "@/api/productsApi";
+import ProductForm from "@/components/admin/ProductForm";
+import { useProduct } from "@/hooks/useProduct";
+import { ArrowLeftOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  Button,
+  Flex,
+  message,
+  Popconfirm,
+  Spin,
+  Typography,
+  UploadFile,
+} from "antd";
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminProductDetailPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,7 +28,7 @@ const AdminProductDetailPage: React.FC = () => {
 
   // 2. Hàm xử lý Update (giữ nguyên logic upload ảnh nếu có thay đổi)
   const handleUpdate = async (values: any, fileList: UploadFile[]) => {
-    console.log("handleUpdate")
+    console.log("handleUpdate");
     try {
       setLoading(true);
 
@@ -36,7 +43,7 @@ const AdminProductDetailPage: React.FC = () => {
         newFiles.map(async (f) => {
           const res = await fileApi.upload(f.originFileObj as File);
           return res.id;
-        })
+        }),
       );
 
       const payload = {
@@ -45,16 +52,18 @@ const AdminProductDetailPage: React.FC = () => {
         categoryId: Number(values.categoryId),
         dailyProfit: Number(values.dailyProfit || 0),
         stockQty: Number(values.stockQty || 0),
-        startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
-        endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
+        startDate: values.startDate,
+        endDate: values.endDate,
         imageIds: [...oldImageIds, ...newImageIds],
       };
 
       await productsApi.update(productId, payload);
-      message.success('Cập nhật sản phẩm thành công!');
+      message.success("Cập nhật sản phẩm thành công!");
       await queryClient.invalidateQueries({ queryKey: ["products"] });
-      navigate('/admin/products'); 
+      navigate("/admin/products");
+      await refetch();
     } catch (error) {
+      console.error(error);
       // Handled globally
     } finally {
       setLoading(false);
@@ -65,9 +74,9 @@ const AdminProductDetailPage: React.FC = () => {
     try {
       setLoading(true);
       await productsApi.liquidation(productId);
-      message.success('Thanh lý sản phẩm thành công!');
+      message.success("Thanh lý sản phẩm thành công!");
       await queryClient.invalidateQueries({ queryKey: ["products"] });
-      navigate('/admin/products');
+      navigate("/admin/products");
     } catch (error) {
       // Handled globally
     } finally {
@@ -75,28 +84,32 @@ const AdminProductDetailPage: React.FC = () => {
     }
   };
 
-  if (isLoading) return (
-    <div style={{ textAlign: 'center', padding: '50px' }}>
-      <Spin size="large" tip="Đang tải dữ liệu..." />
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>
+        <Spin size="large" tip="Đang tải dữ liệu..." />
+      </div>
+    );
 
   if (isError) return <div>Đã xảy ra lỗi khi tải sản phẩm!</div>;
 
-  const isReadOnly = product?.isActived === false || product?.status === "SOLD_OUT";
+  const isReadOnly =
+    product?.isActived === false || product?.status === "SOLD_OUT";
 
   return (
-    <Flex vertical gap={24} style={{ padding: '24px' }}>
+    <Flex vertical gap={24} style={{ padding: "24px" }}>
       <Flex align="center" justify="space-between">
         <Flex align="center" gap={16}>
-          <Button 
-            icon={<ArrowLeftOutlined />} 
-            onClick={() => navigate('/admin/products')}
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate("/admin/products")}
             type="text"
           />
-          <Typography.Title level={4} style={{ margin: 0 }}>Chi tiết sản phẩm</Typography.Title>
+          <Typography.Title level={4} style={{ margin: 0 }}>
+            Chi tiết sản phẩm
+          </Typography.Title>
         </Flex>
-        
+
         {!isReadOnly && (
           <Popconfirm
             title="Thanh lý sản phẩm"
@@ -106,8 +119,8 @@ const AdminProductDetailPage: React.FC = () => {
             cancelText="Hủy"
             okButtonProps={{ danger: true, loading: loading }}
           >
-            <Button 
-              danger 
+            <Button
+              danger
               icon={<ShoppingOutlined />}
               size="large"
               style={{ borderRadius: 8, fontWeight: 600 }}
@@ -123,7 +136,7 @@ const AdminProductDetailPage: React.FC = () => {
         readOnly={isReadOnly}
         initialData={product}
         onFinish={handleUpdate}
-        onCancel={() => navigate('/admin/products')}
+        onCancel={() => navigate("/admin/products")}
         loading={loading}
       />
     </Flex>
