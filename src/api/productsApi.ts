@@ -34,6 +34,7 @@ const productsApi = {
     name?: string;
     categoryIds?: number[];
     status?: string;
+    customerId?: number;
   }): Promise<Page<Product>> {
     const { data } = await axiosClient.get<Page<Product>>("/products/search", {
       params: query,
@@ -48,11 +49,14 @@ const productsApi = {
   async getRelated(
     id: number,
     page: number = 1,
-    size: number = 5
+    size: number = 5,
   ): Promise<Page<Product>> {
-    const { data } = await axiosClient.get<Page<Product>>(`/products/${id}/related`, {
-      params: { page, size },
-    });
+    const { data } = await axiosClient.get<Page<Product>>(
+      `/products/${id}/related`,
+      {
+        params: { page, size },
+      },
+    );
     return data;
   },
 };
