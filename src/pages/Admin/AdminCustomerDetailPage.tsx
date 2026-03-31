@@ -42,15 +42,15 @@ const productColumns: TableProps<Product>["columns"] = [
       let label = "N/A";
 
       switch (status) {
-        case "ACTIVE":
+        case "LIQUIDATION":
           color = "green";
-          label = "Mới cầm";
+          label = "Thanh lí";
           break;
 
-        case "EXTENDED":
-        case "RENEWED":
+        case "NEW":
+        case "NEW":
           color = "blue";
-          label = "Đã gia hạn";
+          label = "Mới cầm";
           break;
 
         case "IN_PROGRESS":
