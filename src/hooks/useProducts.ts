@@ -11,6 +11,7 @@ export const useProducts = (query?: {
   name?: string;
   categoryIds?: number[];
   status?: string;
+  customerId?: number;
 }) => {
   const { data, isFetching, isError, error, refetch } = useQuery<Page<Product>>(
     {
@@ -22,9 +23,11 @@ export const useProducts = (query?: {
           name: query?.name,
           categoryIds: query?.categoryIds,
           status: query?.status,
+          customerId: query?.customerId,
         }),
-      retry: 1,
-    }
+      enabled:
+        query?.customerId !== undefined ? !isNaN(query.customerId) : true,
+    },
   );
 
   return {

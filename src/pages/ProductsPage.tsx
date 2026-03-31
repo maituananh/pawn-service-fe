@@ -8,7 +8,6 @@ import {
   Flex,
   Input,
   Pagination,
-  Tag,
   Typography,
 } from "antd";
 import { useState } from "react";
@@ -89,9 +88,10 @@ const ProductsPage = () => {
           <Input.Search
             placeholder="Tên sản phẩm..."
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-            style={{ borderRadius: 8 }}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
 
@@ -147,7 +147,8 @@ const ProductsPage = () => {
         >
           {productsPage?.data?.map((product: Product) => {
             const isOutOfStock =
-              (product.availableQty ?? product.stockQty) <= 0 || product.status === "SOLD_OUT";
+              (product.availableQty ?? product.stockQty) <= 0 ||
+              product.status === "SOLD_OUT";
 
             return (
               <Link

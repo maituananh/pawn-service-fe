@@ -37,9 +37,50 @@ const productColumns: TableProps<Product>["columns"] = [
   {
     title: "Trạng thái",
     dataIndex: "status",
-    render: (status: string | undefined) => (
-      <Tag color={status ? "green" : "default"}>{status || "N/A"}</Tag>
-    ),
+    render: (status: string | undefined) => {
+      let color = "default";
+      let label = "N/A";
+
+      switch (status) {
+        case "LIQUIDATION":
+          color = "green";
+          label = "Thanh lí";
+          break;
+
+        case "NEW":
+        case "NEW":
+          color = "blue";
+          label = "Mới cầm";
+          break;
+
+        case "IN_PROGRESS":
+          color = "gold";
+          label = "Đang cầm";
+          break;
+
+        case "EXPIRED":
+          color = "red";
+          label = "Đã quá hạn";
+          break;
+
+        default:
+          color = "default";
+          label = status || "N/A";
+      }
+
+      return (
+        <Tag
+          color={color}
+          style={{
+            borderRadius: 20,
+            padding: "4px 12px",
+            fontWeight: 500,
+          }}
+        >
+          {label}
+        </Tag>
+      );
+    },
   },
   {
     title: "Tên sản phẩm",
@@ -49,14 +90,16 @@ const productColumns: TableProps<Product>["columns"] = [
   {
     title: "Giá",
     dataIndex: "price",
-    render: (price: number) => `${price?.toLocaleString()} đ`,
+    render: (price: number) => `${price?.toLocaleString("vi-VN")} đ`,
   },
   { title: "Loại", dataIndex: "type" },
   { title: "Ngày bắt đầu", dataIndex: "startDate" },
+
   {
     title: "Lợi nhuận/ngày",
     dataIndex: "dailyProfit",
-    render: (v: number) => `${v}%`,
+    render: (v: number | undefined) =>
+      v ? `${v.toLocaleString("vi-VN")} đ` : "N/A",
   },
 ];
 
@@ -73,7 +116,9 @@ const AdminCustomerDetailPage: React.FC = () => {
   const [form] = Form.useForm();
 
   const { users } = useUsers();
-  const { productsPage } = useProducts();
+  const { productsPage } = useProducts({
+    customerId: Number(id),
+  });
 
   const [customer, setCustomer] = useState<any>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -92,10 +137,7 @@ const AdminCustomerDetailPage: React.FC = () => {
   };
 
   const fetchProducts = () => {
-    const userProducts: Product[] =
-      productsPage?.data?.filter((p) => String(p.user?.id) === String(id)) ||
-      [];
-    setProducts(userProducts);
+    setProducts(productsPage?.data || []);
   };
 
   useEffect(() => {
@@ -230,6 +272,10 @@ const AdminCustomerDetailPage: React.FC = () => {
           dataSource={tableRowsVisible ? products : []}
           rowKey="id"
           pagination={false}
+          onRow={(record) => ({
+            onClick: () => navigate(`/products/${record.id}`),
+            style: { cursor: "pointer" },
+          })}
         />
       </Card>
     </Flex>
