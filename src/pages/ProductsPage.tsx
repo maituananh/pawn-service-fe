@@ -265,19 +265,14 @@ const ProductsPage = () => {
                         position: "absolute",
                         top: 12,
                         right: 12,
-                        background: "rgba(255,255,255,0.88)",
-                        backdropFilter: "blur(8px)",
+                        background: "#fff",
+                        padding: "4px 10px",
                         borderRadius: 999,
-                        padding: "3px 10px",
                         fontSize: 10,
                         fontWeight: 700,
-                        color: "#555",
-                        letterSpacing: "0.07em",
-                        textTransform: "uppercase",
-                        border: "1px solid rgba(0,0,0,0.06)",
                       }}
                     >
-                      {product.type || "Tài sản"}
+                      {product.category?.name || "Không có danh mục"}
                     </div>
                   </div>
 
