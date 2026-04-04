@@ -1,16 +1,16 @@
 // Product card premium hover effects
 
 .product-card-hover {
-  &:hover > div {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14) !important;
-    transform: translateY(-4px) !important;
+    &:hover > div {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14) !important;
+        transform: translateY(-4px) !important;
 
-    .product-card-img {
-      transform: scale(1.06);
-    }
+        .product-card-img {
+            transform: scale(1.06);
+        }
 
-    .card-arrow {
-      transform: translateX(3px) !important;
+        .card-arrow {
+            transform: translateX(3px) !important;
+        }
     }
-  }
 }

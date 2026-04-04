@@ -1,53 +1,53 @@
 export interface Category {
-  id: number;
-  name: string;
+    id: number;
+    name: string;
 }
 
 export interface Product {
-  id: number;
-  code: string;
-
-  name: string;
-  price: number;
-
-  image?: string;
-  images?: {
     id: number;
-    url: string;
-  }[];
+    code: string;
 
-  description?: string;
+    name: string;
+    price: number;
 
-  stockQty: number;
-  availableQty?: number;
+    image?: string;
+    images?: {
+        id: number;
+        url: string;
+    }[];
 
-  startDate: string;
-  endDate: string;
+    description?: string;
 
-  status?: string;
-  isActived?: boolean;
+    stockQty: number;
+    availableQty?: number;
 
-  dailyProfit?: number;
+    startDate: string;
+    endDate: string;
 
-  category?: Category;
+    status?: string;
+    isActived?: boolean;
+
+    dailyProfit?: number;
+
+    category?: Category;
 }
 
 export interface ProductCreateRequest {
-  name: string;
-  price: number;
+    name: string;
+    price: number;
 
-  startDate: string;
-  endDate: string;
+    startDate: string;
+    endDate: string;
 
-  categoryId: number;
+    categoryId: number;
 
-  code: string;
-  customerId: number;
+    code: string;
+    customerId: number;
 
-  dailyProfit: number;
-  stockQty: number;
+    dailyProfit: number;
+    stockQty: number;
 
-  description: string;
+    description: string;
 
-  imageIds: number[];
+    imageIds: number[];
 }

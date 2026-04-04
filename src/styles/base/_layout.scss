@@ -1,103 +1,103 @@
 .d-block {
-  display: block;
+    display: block;
 }
 
 .d-inline-block {
-  display: inline-block;
+    display: inline-block;
 }
 
 .d-flex {
-  display: flex;
+    display: flex;
 }
 
 .d-inline-flex {
-  display: inline-flex;
+    display: inline-flex;
 }
 
 .d-none {
-  display: none;
+    display: none;
 }
 
 .flex-centered {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .flex-row-centered {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }
 
 .flex-column-centered {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .flex-column {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .flex-row {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
 }
 
 .flex-row-reverse {
-  display: flex;
-  flex-direction: row-reverse;
+    display: flex;
+    flex-direction: row-reverse;
 }
 
 .flex-column-reverse {
-  display: flex;
-  flex-direction: column-reverse;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .justify-center {
-  justify-content: center;
+    justify-content: center;
 }
 
 .justify-between {
-  justify-content: space-between;
+    justify-content: space-between;
 }
 
 .justify-around {
-  justify-content: space-around;
+    justify-content: space-around;
 }
 
 .justify-start {
-  justify-content: flex-start;
+    justify-content: flex-start;
 }
 
 .justify-end {
-  justify-content: flex-end;
+    justify-content: flex-end;
 }
 
 .align-start {
-  align-items: flex-start;
+    align-items: flex-start;
 }
 
 .align-end {
-  align-items: flex-end;
+    align-items: flex-end;
 }
 
 .align-center {
-  align-items: center;
+    align-items: center;
 }
 
 .align-stretch {
-  align-items: stretch;
+    align-items: stretch;
 }
 
 .align-baseline {
-  align-items: baseline;
+    align-items: baseline;
 }
 
 .flex-1 {
-  flex: 1;
+    flex: 1;
 }
 
 .w-100 {
-  width: 100%;
+    width: 100%;
 }
