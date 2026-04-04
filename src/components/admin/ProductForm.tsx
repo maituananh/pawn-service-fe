@@ -112,7 +112,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         ...initialData,
         startDate: initialData.startDate ? dayjs(initialData.startDate) : null,
         endDate: initialData.endDate ? dayjs(initialData.endDate) : null,
-        customerId: initialData.customerId || 1,
+        customerId: initialData.customerId ?? undefined,
         categoryId: initialData.categoryId || 1,
         stockQty: initialData.stockQty ?? 1,
       };
@@ -154,6 +154,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
             : null,
           endDate: values.endDate ? values.endDate.format("YYYY-MM-DD") : null,
           stockQty: values.stockQty || 1,
+
+          imageIds: fileList
+            .map((f) => f.response?.id || f.uid)
+            .filter((id) => !isNaN(Number(id)))
+            .map((id) => Number(id)),
         };
 
         console.log("PAYLOAD:", payload);
@@ -189,27 +194,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   placeholder="Ví dụ: iPhone 15 Pro Max"
                   disabled={readOnly}
                 />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={12}>
-              <Form.Item
-                label="Loại sản phẩm"
-                name="type"
-                rules={[{ required: true, message: "Chọn loại" }]}
-              >
-                <Select
-                  placeholder="Chọn phân loại chính"
-                  onChange={() => form.setFieldValue("categoryId", undefined)}
-                  disabled={readOnly}
-                >
-                  <Select.Option value="PHONE">Điện thoại</Select.Option>
-                  <Select.Option value="LAPTOP">
-                    Máy tính / Laptop
-                  </Select.Option>
-                  <Select.Option value="MOTORBIKE">Xe máy</Select.Option>
-                  <Select.Option value="GOLD">Vàng bạc / Đá quý</Select.Option>
-                </Select>
               </Form.Item>
             </Col>
 
