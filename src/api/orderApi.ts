@@ -21,15 +21,27 @@ const orderApi = {
         return (res as any).data || res;
     },
 
-    getOrders: async (params?: OrderParams): Promise<PaginatedOrderResponse | OrderDetailResponse[]> => {
+    getOrders: async (): Promise<OrderDetailResponse[]> => {
         const url = "/orders";
-        const res = await axiosClient.get(url, { params });
+        const res = await axiosClient.get<OrderDetailResponse[]>(url);
         return (res as any).data || res;
     },
 
-    getOrdersAdmin: async (params?: OrderParams): Promise<PaginatedOrderResponse | OrderDetailResponse[]> => {
+    getOrdersPaginated: async (params?: OrderParams): Promise<PaginatedOrderResponse> => {
+        const url = "/orders";
+        const res = await axiosClient.get<PaginatedOrderResponse>(url, { params });
+        return (res as any).data || res;
+    },
+
+    getOrdersAdmin: async (): Promise<OrderDetailResponse[]> => {
         const url = "/admin/orders";
-        const res = await axiosClient.get(url, { params });
+        const res = await axiosClient.get<OrderDetailResponse[]>(url);
+        return (res as any).data || res;
+    },
+
+    getOrdersAdminPaginated: async (params?: OrderParams): Promise<PaginatedOrderResponse> => {
+        const url = "/admin/orders";
+        const res = await axiosClient.get<PaginatedOrderResponse>(url, { params });
         return (res as any).data || res;
     },
 
@@ -39,9 +51,18 @@ const orderApi = {
         return (res as any).data || res;
     },
 
-    cancelOrder: async (orderId: number): Promise<void> => {
+    cancelOrder: async (orderId: number) => {
         const url = `/orders/${orderId}/cancel`;
-        await axiosClient.post(url);
+        return await axiosClient.post(url);
+    },
+
+    getDashboardOrders: async (): Promise<{
+        totalOrders: number;
+        recentOrders: OrderDetailResponse[];
+    }> => {
+        const url = "/admin/orders/dashboard";
+        const res = await axiosClient.get(url);
+        return res?.data ?? res;
     }
 };
 
