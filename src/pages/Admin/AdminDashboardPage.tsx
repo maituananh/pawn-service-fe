@@ -10,25 +10,18 @@ import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YA
 
 const { Title, Text } = Typography;
 
-const chartData = [
-    { name: "Feb", value: 30000 },
-    { name: "Mar", value: 45000 },
-    { name: "Apr", value: 40000 },
-    { name: "May", value: 60000 },
-    { name: "Jun", value: 45591 },
-    { name: "Jul", value: 50000 },
-    { name: "Aug", value: 65000 },
-    { name: "Sep", value: 70000 },
-    { name: "Oct", value: 68000 },
-    { name: "Nov", value: 72000 },
-    { name: "Dec", value: 80000 }
-];
-
 const statusColors: { [key: string]: string } = {
     PENDING: "orange",
     CONFIRMED: "blue",
     CANCELLED: "red",
     FAILED: "red"
+};
+
+const productStatusColors: { [key: string]: string } = {
+    IN_PROGRESS: "processing",
+    LIQUIDATION: "warning",
+    SOLD_OUT: "error",
+    COMPLETED: "success"
 };
 
 const AdminDashboardPage: React.FC = () => {
@@ -48,15 +41,11 @@ const AdminDashboardPage: React.FC = () => {
 
     const chartData = useMemo(() => {
         const now = new Date();
-
-        // 🔥 30 DAYS
         if (range === "30") {
             const result: any[] = [];
-
             for (let i = 29; i >= 0; i--) {
                 const d = new Date();
                 d.setDate(now.getDate() - i);
-
                 let count = 0;
                 for (const o of orders) {
                     const od = new Date(o.createdAt);
@@ -68,24 +57,20 @@ const AdminDashboardPage: React.FC = () => {
                         count++;
                     }
                 }
-
                 result.push({
                     name: `${d.getDate()}/${d.getMonth() + 1}`,
                     value: count
                 });
             }
-
             return result;
         }
 
         const months = range === "6" ? 6 : 12;
         const result: any[] = [];
-
         for (let i = months - 1; i >= 0; i--) {
             const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
             const month = d.getMonth();
             const year = d.getFullYear();
-
             let count = 0;
             for (const o of orders) {
                 const od = new Date(o.createdAt);
@@ -93,13 +78,11 @@ const AdminDashboardPage: React.FC = () => {
                     count++;
                 }
             }
-
             result.push({
                 name: `T${month + 1}`,
                 value: count
             });
         }
-
         return result;
     }, [orders, range]);
 
@@ -110,7 +93,10 @@ const AdminDashboardPage: React.FC = () => {
     const recentOrders = sortedOrders.slice(0, 5).map((item: any) => ({
         key: item.id ?? item.orderId,
         name: item.orderId ?? "---",
-        user: item.shippingName || "N/A",
+
+        user: item.customerName || "N/A",
+        cccd: item.cardId || item.card_id || "---",
+
         price: `${(item.totalAmount ?? 0).toLocaleString()} VND`,
         date: item.createdAt,
         status: item.orderStatus ?? item.status ?? "PENDING"
@@ -125,8 +111,8 @@ const AdminDashboardPage: React.FC = () => {
             render: (_: any, record: any) => (
                 <Flex vertical>
                     <Text strong>{record.user}</Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                        #{record.name}
+                    <Text type="secondary" style={{ fontSize: 11 }}>
+                        {record.cccd}
                     </Text>
                 </Flex>
             )
@@ -134,11 +120,6 @@ const AdminDashboardPage: React.FC = () => {
         {
             title: "Giá",
             dataIndex: "price"
-        },
-        {
-            title: "Ngày",
-            dataIndex: "date",
-            render: (value: string) => (value ? new Date(value).toLocaleString("vi-VN") : "---")
         },
         {
             title: "Trạng thái",
@@ -150,16 +131,16 @@ const AdminDashboardPage: React.FC = () => {
     const productColumns = [
         {
             title: "Tên sản phẩm",
-            dataIndex: "name"
+            dataIndex: "name",
+            render: (text: string) => <Text strong>{text}</Text>
         },
-        {
-            title: "Khách hàng",
-            render: (_: any, record: any) => record.customer?.name || "N/A"
-        },
+
         {
             title: "Giá",
             dataIndex: "price",
-            render: (val: number) => <Text style={{ color: token.colorError }}>{(val ?? 0).toLocaleString()} VND</Text>
+            render: (val: number) => (
+                <Text style={{ color: token.colorError, fontWeight: 500 }}>{(val ?? 0).toLocaleString()} VND</Text>
+            )
         },
         {
             title: "Số lượng",
@@ -168,7 +149,7 @@ const AdminDashboardPage: React.FC = () => {
         {
             title: "Trạng thái",
             dataIndex: "status",
-            render: (status: string) => <Tag color="blue">{status}</Tag>
+            render: (status: string) => <Tag color={productStatusColors[status] || "default"}>{status}</Tag>
         }
     ];
 
@@ -178,10 +159,7 @@ const AdminDashboardPage: React.FC = () => {
 
             <Flex gap={24} wrap="wrap">
                 <Card
-                    style={{
-                        flex: "1 1 60%",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
-                    }}
+                    style={{ flex: "1 1 60%", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
                     title={
                         <Flex vertical gap={4}>
                             <Title level={5} style={{ margin: 0 }}>
@@ -224,10 +202,7 @@ const AdminDashboardPage: React.FC = () => {
                 </Card>
 
                 <Card
-                    style={{
-                        flex: "1 1 35%",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
-                    }}
+                    style={{ flex: "1 1 35%", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
                     title={
                         <Title level={5} style={{ margin: 0 }}>
                             Giao dịch gần đây
@@ -244,7 +219,7 @@ const AdminDashboardPage: React.FC = () => {
                         dataSource={recentOrders}
                         loading={isLoading}
                         pagination={false}
-                        size="middle"
+                        size="small"
                     />
                 </Card>
             </Flex>
