@@ -53,7 +53,7 @@ const orderApi = {
 
     cancelOrder: async (orderId: number) => {
         const url = `/orders/${orderId}/cancel`;
-        return await axiosClient.post(url);
+        return axiosClient.post(url);
     },
 
     getDashboardOrders: async (): Promise<{
