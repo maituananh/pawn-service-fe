@@ -1,5 +1,5 @@
 import { useOrder } from "@/hooks/useOrder";
-import { OrderDetailResponse, OrderStatus } from "@/type/order.type";
+import { OrderDetailResponse, OrderStatus, PaginatedOrderResponse } from "@/type/order.type";
 import { CalendarOutlined, EyeOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Card, Flex, Input, Space, Table, Tabs, Tag, Typography, theme } from "antd";
 import React, { useState } from "react";
@@ -14,7 +14,7 @@ const AdminOrdersPage: React.FC = () => {
     const [pageSize] = useState(10);
     const [activeTab, setActiveTab] = useState<string>("ALL");
 
-    const orderHook = useOrder();
+    const { useGetOrdersAdmin } = useOrder();
 
     const orderParams = {
         page: currentPage,
@@ -22,8 +22,8 @@ const AdminOrdersPage: React.FC = () => {
         status: activeTab === "ALL" ? undefined : (activeTab as OrderStatus)
     };
 
-    const { data, isLoading } = orderHook.useGetOrdersAdminPaginated(orderParams);
-    const ordersPage = data;
+    const { data, isLoading } = useGetOrdersAdmin(orderParams);
+    const ordersPage = data as PaginatedOrderResponse;
 
     const handleRowClick = (record: OrderDetailResponse) => {
         const pathId = record.id || record.orderId;
@@ -35,12 +35,18 @@ const AdminOrdersPage: React.FC = () => {
     const getStatusColor = (status: OrderStatus) => {
         switch (status) {
             case OrderStatus.CONFIRMED:
-                return "blue";
+            case OrderStatus.PAID:
+                return "success";
+            case OrderStatus.DELIVERED:
+            case OrderStatus.COMPLETED:
+                return "cyan";
             case OrderStatus.PENDING:
-                return "orange";
+                return "processing";
             case OrderStatus.CANCELLED:
             case OrderStatus.FAILED:
-                return "red";
+                return "error";
+            case OrderStatus.SHIPPING:
+                return "warning";
             default:
                 return "default";
         }
@@ -49,13 +55,19 @@ const AdminOrdersPage: React.FC = () => {
     const getStatusLabel = (status: OrderStatus) => {
         switch (status) {
             case OrderStatus.PENDING:
-                return "Chờ xử lý";
+                return "Chờ thanh toán";
             case OrderStatus.CONFIRMED:
+            case OrderStatus.PAID:
                 return "Đã xác nhận";
+            case OrderStatus.SHIPPING:
+                return "Đang giao hàng";
+            case OrderStatus.DELIVERED:
+            case OrderStatus.COMPLETED:
+                return "Đã giao hàng";
             case OrderStatus.CANCELLED:
-                return "Đã huỷ";
+                return "Đã hủy";
             case OrderStatus.FAILED:
-                return "Thất bại";
+                return "Thanh toán lỗi";
             default:
                 return status;
         }
@@ -145,9 +157,11 @@ const AdminOrdersPage: React.FC = () => {
 
     const tabItems = [
         { key: "ALL", label: "Tất cả đơn hàng" },
-        { key: OrderStatus.PENDING, label: "Chờ xử lý" },
+        { key: OrderStatus.PENDING, label: "Chờ thanh toán" },
         { key: OrderStatus.CONFIRMED, label: "Đã xác nhận" },
-        { key: OrderStatus.CANCELLED, label: "Đã huỷ" },
+        { key: OrderStatus.SHIPPING, label: "Đang giao hàng" },
+        { key: OrderStatus.DELIVERED, label: "Đã giao hàng" },
+        { key: OrderStatus.CANCELLED, label: "Đã hủy" },
         { key: OrderStatus.FAILED, label: "Thất bại" }
     ];
 
@@ -190,7 +204,6 @@ const AdminOrdersPage: React.FC = () => {
                 />
 
                 <Table
-                    rowKey="orderId"
                     columns={columns}
                     dataSource={ordersPage?.data || []}
                     onRow={(record) => ({
