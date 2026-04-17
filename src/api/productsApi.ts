@@ -8,6 +8,11 @@ const productsApi = {
         return data ?? [];
     },
 
+    async getActive(): Promise<Product[]> {
+        const { data } = await axiosClient.get<Product[]>("/products/active");
+        return data ?? [];
+    },
+
     async getById(id: number): Promise<Product> {
         const { data } = await axiosClient.get<Product>(`/products/${id}`);
         if (!data) throw new Error("Product not found");

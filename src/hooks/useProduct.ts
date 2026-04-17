@@ -19,3 +19,15 @@ export const useRelatedProducts = (id: number, page: number = 1, size: number = 
         staleTime: 1000 * 60 * 5
     });
 };
+
+export const useGetActiveProducts = (page: number = 0, size: number = 5) => {
+    return useQuery({
+        queryKey: ["active-products", page, size],
+        queryFn: () =>
+            productsApi.search({
+                page,
+                size
+            }),
+        staleTime: 1000 * 60 * 5
+    });
+};
