@@ -115,6 +115,132 @@ const columns = [
 
 const AdminDashboardPage: React.FC = () => {
     const { token } = theme.useToken();
+    const navigate = useNavigate();
+
+    const [range, setRange] = useState("12");
+
+    const orderHook = useOrder();
+    const { data, isLoading } = orderHook.useGetOrdersAdminPaginated({
+        page: 0,
+        size: 1000
+    });
+
+    const orders = data?.data || [];
+    const totalOrders = data?.totalElements || 0;
+
+    const chartData = useMemo(() => {
+        const now = new Date();
+        if (range === "30") {
+            const result: any[] = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(now.getDate() - i);
+                let count = 0;
+                for (const o of orders) {
+                    const od = new Date(o.createdAt);
+                    if (
+                        od.getDate() === d.getDate() &&
+                        od.getMonth() === d.getMonth() &&
+                        od.getFullYear() === d.getFullYear()
+                    ) {
+                        count++;
+                    }
+                }
+                result.push({
+                    name: `${d.getDate()}/${d.getMonth() + 1}`,
+                    value: count
+                });
+            }
+            return result;
+        }
+
+        const months = range === "6" ? 6 : 12;
+        const result: any[] = [];
+        for (let i = months - 1; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const month = d.getMonth();
+            const year = d.getFullYear();
+            let count = 0;
+            for (const o of orders) {
+                const od = new Date(o.createdAt);
+                if (od.getMonth() === month && od.getFullYear() === year) {
+                    count++;
+                }
+            }
+            result.push({
+                name: `T${month + 1}`,
+                value: count
+            });
+        }
+        return result;
+    }, [orders, range]);
+
+    const sortedOrders = [...orders].sort(
+        (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    const recentOrders = sortedOrders.slice(0, 5).map((item: any) => ({
+        key: item.id ?? item.orderId,
+        name: item.orderId ?? "---",
+
+        user: item.shippingName || "N/A",
+        cccd: item.shippingPhone || "---",
+
+        price: `${(item.totalAmount ?? 0).toLocaleString()} VND`,
+        date: item.createdAt,
+        status: item.orderStatus ?? item.status ?? "PENDING"
+    }));
+
+    const { data: productData, isLoading: productLoading } = useGetActiveProducts(0, 5);
+    const products = productData?.data || [];
+
+    const recentColumns = [
+        {
+            title: "Khách hàng",
+            render: (_: any, record: any) => (
+                <Flex vertical>
+                    <Text strong>{record.user}</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>
+                        {record.cccd}
+                    </Text>
+                </Flex>
+            )
+        },
+        {
+            title: "Giá",
+            dataIndex: "price"
+        },
+        {
+            title: "Trạng thái",
+            dataIndex: "status",
+            render: (status: string) => <Tag color={statusColors[status]}>{status}</Tag>
+        }
+    ];
+
+    const productColumns = [
+        {
+            title: "Tên sản phẩm",
+            dataIndex: "name",
+            render: (text: string) => <Text strong>{text}</Text>
+        },
+
+        {
+            title: "Giá",
+            dataIndex: "price",
+            render: (val: number) => (
+                <Text style={{ color: token.colorError, fontWeight: 500 }}>{(val ?? 0).toLocaleString()} VND</Text>
+            )
+        },
+        {
+            title: "Số lượng",
+            dataIndex: "availableQty"
+        },
+        {
+            title: "Trạng thái",
+            dataIndex: "status",
+            render: (status: string) => <Tag color={productStatusColors[status] || "default"}>{status}</Tag>
+        }
+    ];
 
     return (
         <Flex vertical gap={24}>
