@@ -94,8 +94,8 @@ const AdminDashboardPage: React.FC = () => {
         key: item.id ?? item.orderId,
         name: item.orderId ?? "---",
 
-        user: item.customerName || "N/A",
-        cccd: item.cardId || item.card_id || "---",
+        user: item.shippingName || "N/A",
+        cccd: item.shippingPhone || "---",
 
         price: `${(item.totalAmount ?? 0).toLocaleString()} VND`,
         date: item.createdAt,
