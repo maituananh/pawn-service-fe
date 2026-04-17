@@ -16,24 +16,17 @@ export const useOrder = () => {
         }
     });
 
-    const useGetOrders = () => {
+    const useGetOrders = (params?: OrderParams) => {
         return useQuery({
-            queryKey: ["orders"],
-            queryFn: orderApi.getOrders
+            queryKey: ["orders", params],
+            queryFn: () => orderApi.getOrders(params)
         });
     };
 
-    const useGetOrdersAdmin = () => {
+    const useGetOrdersAdmin = (params?: OrderParams) => {
         return useQuery({
-            queryKey: ["admin.orders"],
-            queryFn: orderApi.getOrdersAdmin
-        });
-    };
-
-    const useGetOrdersAdminPaginated = (params?: OrderParams) => {
-        return useQuery({
-            queryKey: ["admin.orders", "paginated", params],
-            queryFn: () => orderApi.getOrdersAdminPaginated(params)
+            queryKey: ["admin.orders", params],
+            queryFn: () => orderApi.getOrdersAdmin(params)
         });
     };
 
@@ -51,9 +44,8 @@ export const useOrder = () => {
             queryFn: () => orderApi.getOrderStatus(orderId),
             enabled: !!orderId,
             refetchInterval: (query) => {
-                const status = (query.state.data as any)?.paymentStatus;
-
-                if (status && ["SUCCESS", "FAILED", "REFUNDED"].includes(status)) {
+                const status = (query.state.data as any)?.status;
+                if (status && ["PAID", "CANCELLED", "FAILED", "COMPLETED"].includes(status)) {
                     return false;
                 }
                 return 3000;
@@ -69,7 +61,6 @@ export const useOrder = () => {
         useGetOrders,
         useGetOrderDetail,
         useGetOrderStatus,
-        useGetOrdersAdmin,
-        useGetOrdersAdminPaginated
+        useGetOrdersAdmin
     };
 };
