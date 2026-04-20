@@ -11,9 +11,6 @@ import {
     SearchOutlined,
     UploadOutlined
 } from "@ant-design/icons";
-import { Typography } from "antd";
-
-const { Title, Paragraph, Text } = Typography;
 
 const steps = [
     {

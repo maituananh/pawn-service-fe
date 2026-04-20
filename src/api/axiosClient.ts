@@ -1,22 +1,18 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
-import authApi from "./authApi";
 import { errorEmitter } from "@/lib/errorEmitter";
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import authApi from "./authApi";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 const REFRESH_URL = import.meta.env.VITE_API_REFRESH_URL || "";
 
-export type CustomAxiosInstance = AxiosInstance & {
-    get: <T = any>(url: string, config?: any) => Promise<T>;
-    post: <T = any>(url: string, data?: any, config?: any) => Promise<T>;
-    put: <T = any>(url: string, data?: any, config?: any) => Promise<T>;
-    delete: <T = any>(url: string, config?: any) => Promise<T>;
-};
+export type CustomAxiosInstance = AxiosInstance;
 
-const axiosClient = axios.create({
+const axiosClient: CustomAxiosInstance = axios.create({
     baseURL: BASE_URL,
     headers: { "Content-Type": "application/json" }
 });
 
-export const axiosRefresh = axios.create({
+export const axiosRefresh: AxiosInstance = axios.create({
     baseURL: REFRESH_URL,
     headers: { "Content-Type": "application/json" }
 });
@@ -24,10 +20,10 @@ export const axiosRefresh = axios.create({
 let isRefreshing = false;
 let failedQueue: Array<{
     resolve: (token: string) => void;
-    reject: (error: any) => void;
+    reject: (error: unknown) => void;
 }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
     failedQueue.forEach((p) => {
         if (error) p.reject(error);
         else p.resolve(token!);
@@ -35,23 +31,26 @@ const processQueue = (error: any, token: string | null = null) => {
     failedQueue = [];
 };
 
-axiosClient.interceptors.request.use((config) => {
+axiosClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("access_token");
     if (token && token !== "undefined" && config.url !== "/auth/refresh-token") {
-        config.headers["Authorization"] = `Bearer ${token}`;
+        config.headers.set("Authorization", `Bearer ${token}`);
     }
     return config;
 });
 
 axiosClient.interceptors.response.use(
     (res) => res,
-    async (error: AxiosError & { config?: any }) => {
-        const originalRequest = error.config;
+    async (error: AxiosError) => {
+        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
         // Extract error message from response
-        const errorData = error.response?.data as any;
+        const errorData = error.response?.data as Record<string, unknown> | undefined;
         const errorMessage =
-            errorData?.message || errorData?.error || error.message || "Lỗi hệ thống, vui lòng thử lại sau";
+            (errorData?.message as string) ||
+            (errorData?.error as string) ||
+            error.message ||
+            "Lỗi hệ thống, vui lòng thử lại sau";
 
         // Build full detail string for the "View Detail" popup
         const fullDetail = JSON.stringify(
@@ -82,15 +81,15 @@ axiosClient.interceptors.response.use(
             errorEmitter.emit({ message: errorMessage, fullDetail });
         }
 
-        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+        if (isAuthError && !originalRequest._retry) {
             originalRequest._retry = true;
 
             if (isRefreshing) {
-                return new Promise((resolve, reject) => {
+                return new Promise<string>((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
                     .then((token) => {
-                        originalRequest.headers["Authorization"] = `Bearer ${token}`;
+                        originalRequest.headers.set("Authorization", `Bearer ${token}`);
                         return axiosClient(originalRequest);
                     })
                     .catch((err) => Promise.reject(err));
@@ -111,7 +110,7 @@ axiosClient.interceptors.response.use(
 
                 processQueue(null, accessToken);
 
-                originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+                originalRequest.headers.set("Authorization", `Bearer ${accessToken}`);
                 return await axiosClient(originalRequest);
             } catch (err) {
                 console.error("❌ Refresh token failed, logging out...");
@@ -141,4 +140,4 @@ axiosClient.interceptors.response.use(
     }
 );
 
-export default axiosClient as CustomAxiosInstance;
+export default axiosClient;

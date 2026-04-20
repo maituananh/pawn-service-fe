@@ -2,11 +2,11 @@
 import fileApi from "@/api/filesApi";
 import productsApi from "@/api/productsApi";
 import ProductForm from "@/components/admin/ProductForm";
-import { message, UploadFile, Flex } from "antd";
+import { useQueryClient } from "@tanstack/react-query";
+import { Flex, message, UploadFile } from "antd";
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 
 const AdminProductCreatePage: React.FC = () => {
     const navigate = useNavigate();

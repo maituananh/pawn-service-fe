@@ -1,9 +1,9 @@
+import "@/styles/styles.scss";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "antd/dist/reset.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import "antd/dist/reset.css";
-import "@/styles/styles.scss";
 
 const queryClient = new QueryClient();
 

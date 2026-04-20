@@ -1,7 +1,7 @@
 import { ConfigProvider } from "antd";
 import { RouterProvider } from "react-router-dom";
-import { router } from "./router/AppRouter";
 import ErrorToast from "./components/ErrorToast";
+import { router } from "./router/AppRouter";
 
 // [UI ONLY] Global theme configuration for Ant Design v5
 const themeConfig = {

@@ -1,5 +1,5 @@
 // [UI ONLY] Redesigned StatisticCard with premium fintech aesthetic
-import { Card, Statistic, theme, Flex } from "antd";
+import { Card, Flex, Statistic, theme } from "antd";
 
 export default function StatisticCard({
     title,

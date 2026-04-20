@@ -1,7 +1,7 @@
 // [UI ONLY] Redesigned AdminDashboardPage with modern layout and consistent typography
 import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { ExportOutlined, MoreOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Card, Flex, Space, Table, Tabs, Tag, Typography, theme } from "antd";
+import { Button, Card, Flex, Table, Tabs, Tag, Typography, theme } from "antd";
 import React from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 

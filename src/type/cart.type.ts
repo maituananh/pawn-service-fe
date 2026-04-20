@@ -1,14 +1,14 @@
 export interface CartItem {
     cartItemId: number;
     productId: number;
-    oldPrice: any;
-    images: any;
+    oldPrice: number | null;
+    images: string[];
     category: string;
     image: string;
     id: number;
     name: string;
     price: number;
-    description?: any;
+    description?: string;
     quantity: number;
     startDate: string;
     endDate: string;

@@ -1,6 +1,7 @@
 // [UI ONLY] Redesigned AdminLayout with fixed 220px sidebar and modern fintech aesthetic
 import AIAgent from "@/components/AIAgent";
 import useAuth from "@/hooks/useAuth";
+import { getImageUrl } from "@/lib/imageUtils";
 import { privateRoutes } from "@/router/router.config";
 import {
     AppstoreOutlined,
@@ -17,7 +18,6 @@ import { Avatar, Button, Drawer, Dropdown, Flex, Input, Layout, Menu, Typography
 import { useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/images/logo.png";
-import { getImageUrl } from "@/lib/imageUtils";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;

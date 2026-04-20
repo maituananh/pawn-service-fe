@@ -3,7 +3,7 @@ import categoriesApi from "@/api/categoriesApi";
 import { CategoryCreateRequest } from "@/type/category.type";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button, Card, Form, Input, message, Space, Spin, Typography, Flex, theme } from "antd";
+import { Button, Card, Flex, Form, Input, message, Spin, theme, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 

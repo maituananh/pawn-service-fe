@@ -20,7 +20,7 @@ const AdminProductDetailPage: React.FC = () => {
 
     // 2. Hàm xử lý Update (giữ nguyên logic upload ảnh nếu có thay đổi)
     const handleUpdate = async (values: any, fileList: UploadFile[]) => {
-        console.log("handleUpdate");
+        console.info("handleUpdate");
         try {
             setLoading(true);
 

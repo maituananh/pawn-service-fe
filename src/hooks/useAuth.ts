@@ -23,7 +23,7 @@ const useAuth = () => {
             localStorage.setItem("access_token", accessToken);
             localStorage.setItem("refresh_token", refreshToken);
             queryClient.setQueryData<UserProfile>(AUTH_QUERY_KEY, user);
-            console.log("user", user);
+            console.info("user", user);
             try {
                 const user = await authApi.getProfile();
                 queryClient.setQueryData<UserProfile>(AUTH_QUERY_KEY, user);

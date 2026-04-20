@@ -1,5 +1,5 @@
+import { Button, Card, Col, Form, Input, Row, Select, Space, Typography } from "antd";
 import React, { useMemo } from "react";
-import { Row, Col, Typography, Button, Card, Form, Input, Select, Space } from "antd";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -47,7 +47,7 @@ const PaymentPage: React.FC = () => {
     }, [itemsToPay]);
 
     const onFinish = (values: any) => {
-        console.log("Payment details submitted:", values);
+        console.info("Payment details submitted:", values);
     };
 
     return (

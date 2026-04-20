@@ -233,7 +233,7 @@ const ProductDetailPage: React.FC = () => {
                 <Col xs={24} lg={12}>
                     <div className="product-header">
                         <Tag color="blue" style={{ marginBottom: 12, borderRadius: 20 }}>
-                            {product.category?.name || product.category || "Chưa phân loại"}
+                            {product.category?.name || "Chưa phân loại"}
                         </Tag>
                         <Title
                             level={1}
@@ -257,11 +257,6 @@ const ProductDetailPage: React.FC = () => {
                             >
                                 {product.price.toLocaleString()} <small>vnđ</small>
                             </Text>
-                            {product.oldPrice && (
-                                <Text delete style={{ fontSize: 20, color: "#999" }}>
-                                    {product.oldPrice.toLocaleString()} vnđ
-                                </Text>
-                            )}
                         </Flex>
 
                         <Paragraph
@@ -290,9 +285,6 @@ const ProductDetailPage: React.FC = () => {
                                 <Text strong code>
                                     {product.code}
                                 </Text>
-                            </Descriptions.Item>
-                            <Descriptions.Item label="Loại sản phẩm">
-                                <Tag color="cyan">{product.type}</Tag>
                             </Descriptions.Item>
                             <Descriptions.Item label="Tình trạng">
                                 <Badge

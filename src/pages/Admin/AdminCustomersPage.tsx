@@ -3,12 +3,11 @@ import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { useUsers } from "@/hooks/useUsers";
 import { UserProfile } from "@/type/user.type";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Card, Flex, Select, Space, Spin, Table, theme, Typography, type TableProps } from "antd";
+import { Button, Card, Flex, Space, Spin, Table, theme, Typography, type TableProps } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Text } = Typography;
 
 const AdminCustomersPage: React.FC = () => {
     const navigate = useNavigate();
