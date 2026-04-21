@@ -2,6 +2,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
 
+// https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react()],
     resolve: {
@@ -9,6 +10,7 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src")
         }
     },
+    // @ts-ignore
     test: {
         globals: true,
         environment: "jsdom",
@@ -23,7 +25,7 @@ export default defineConfig({
                 "src/env.d.ts",
                 "eslint.config.js",
                 "global.d.ts",
-                "vite.config.js"
+                "vite.config.ts"
             ]
         }
     }
