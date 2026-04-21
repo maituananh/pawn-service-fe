@@ -186,11 +186,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             >
                                 <Select
                                     placeholder="Chọn danh mục con"
-                                    options={categories?.map((u: any) => ({
-                                        label: u.name,
-                                        value: u.id
-                                    }))}
-                                    disabled={readOnly}
+                                    options={categories
+                                      ?.filter((u: any) => u.isActive !== false) 
+                                    .map((u: any) => ({
+                                      label: u.name,
+                                    value: u.id
+                }))
+            }
+            disabled={readOnly}
                                 />
                             </Form.Item>
                         </Col>

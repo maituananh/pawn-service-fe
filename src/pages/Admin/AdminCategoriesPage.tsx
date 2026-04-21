@@ -82,26 +82,43 @@ const AdminCategoriesPage: React.FC = () => {
                 </Tag>
             )
         },
-        {
-            title: "Hành động",
-            key: "actions",
-            align: "right" as const,
-            render: (_: any, record: Category) => (
-                <Space onClick={(e) => e.stopPropagation()}>
-                    <Button type="text" shape="circle" icon={<EditOutlined />} onClick={() => handleEdit(record.id)} />
+       {
+        title: "Hành động",
+         key: "actions",
+    align: "right" as const,
+    render: (_: any, record: Category) => {
 
-                    <Popconfirm
-                        title="Xóa danh mục"
-                        description="Tất cả sản phẩm thuộc danh mục này sẽ bị ảnh hưởng. Bạn có chắc muốn xóa không?"
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        onConfirm={() => handleDelete(record.id)}
-                    >
-                        <Button type="text" shape="circle" danger icon={<DeleteOutlined />} />
-                    </Popconfirm>
-                </Space>
-            )
+        if (record.isActive === false) {
+            return null;
         }
+        
+        return (
+            <Space onClick={(e) => e.stopPropagation()}>
+                <Button 
+                    type="text" 
+                    shape="circle" 
+                    icon={<EditOutlined />} 
+                    onClick={() => handleEdit(record.id)} 
+                />
+
+                <Popconfirm
+                    title="Xóa danh mục"
+                    description="Tất cả sản phẩm thuộc danh mục này sẽ bị ảnh hưởng. Bạn có chắc muốn xóa không?"
+                    okText="Xóa"
+                    cancelText="Hủy"
+                    onConfirm={() => handleDelete(record.id)}
+                >
+                    <Button 
+                        type="text" 
+                        shape="circle" 
+                        danger 
+                        icon={<DeleteOutlined />} 
+                    />
+                </Popconfirm>
+            </Space>
+        );
+    }
+}
     ];
 
     if (isLoading)
