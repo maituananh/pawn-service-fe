@@ -10,7 +10,6 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src")
         }
     },
-    // @ts-ignore
     test: {
         globals: true,
         environment: "jsdom",
@@ -25,7 +24,8 @@ export default defineConfig({
                 "src/env.d.ts",
                 "eslint.config.js",
                 "global.d.ts",
-                "vite.config.ts"
+                "vite.config.ts",
+                "coverage/"
             ]
         }
     }

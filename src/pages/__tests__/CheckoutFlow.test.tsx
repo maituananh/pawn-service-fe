@@ -1,9 +1,11 @@
 import cartApi from "@/api/cartApi";
 import orderApi from "@/api/orderApi";
 import useAuth from "@/hooks/useAuth";
+import { CartItem } from "@/type/cart.type";
+import { CheckoutResponse } from "@/type/order.type";
+import { UserProfile } from "@/type/user.type";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import React from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import CartPage from "../CartPage";
@@ -20,7 +22,7 @@ describe("Checkout Flow Integration", () => {
         vi.clearAllMocks();
         localStorage.setItem("access_token", "test-token");
         queryClient = new QueryClient({
-            defaultOptions: { 
+            defaultOptions: {
                 queries: { retry: false },
                 mutations: { retry: false }
             }
@@ -28,9 +30,9 @@ describe("Checkout Flow Integration", () => {
 
         vi.mocked(useAuth).mockReturnValue({
             isAuthenticated: true,
-            currentUser: { name: "Test User", phone: "0123456789", address: "Hanoi" } as any,
+            currentUser: { name: "Test User", phone: "0123456789", address: "Hanoi" } as unknown as UserProfile,
             role: "CUSTOMER",
-            login: vi.fn() as any,
+            login: vi.fn(),
             logout: vi.fn(),
             isLoadingLogin: false
         });
@@ -51,21 +53,29 @@ describe("Checkout Flow Integration", () => {
     };
 
     it("successfully completes checkout flow from cart to success", async () => {
-        const mockCartItems = [ 
-            { 
-                cartItemId: 1, 
-                productId: 101, 
-                productName: "Laptop", 
-                price: 10000000, 
-                quantity: 1, 
-                image: "", 
-                isActived: true, 
-                status: "READY" 
+        const mockCartItems: CartItem[] = [
+            {
+                cartItemId: 1,
+                productId: 101,
+                productName: "Laptop",
+                price: 10000000,
+                quantity: 1,
+                image: "",
+                isActived: true,
+                status: "READY",
+                id: 101,
+                name: "Laptop",
+                oldPrice: null,
+                images: [],
+                category: "Electronics",
+                startDate: "",
+                endDate: "",
+                type: "SALE"
             }
         ];
-        
-        vi.mocked(cartApi.getMyCart).mockResolvedValue({ items: mockCartItems } as any);
-        vi.mocked(orderApi.checkout).mockResolvedValue({ orderId: 456 } as any);
+
+        vi.mocked(cartApi.getMyCart).mockResolvedValue({ items: mockCartItems } as unknown as any);
+        vi.mocked(orderApi.checkout).mockResolvedValue({ orderId: 456 } as unknown as CheckoutResponse);
 
         renderFlow();
 

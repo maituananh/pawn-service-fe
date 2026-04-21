@@ -39,12 +39,12 @@ describe("orderApi", () => {
         expect(result).toEqual(mockResponse);
     });
 
-    it("getOrders calls /orders with params", async () => {
+    it("getOrdersPaginated calls /orders with params", async () => {
         const params = { page: 0, size: 10 };
         const mockResponse = { content: [] };
         (axiosClient.get as any).mockResolvedValue({ data: mockResponse });
 
-        const result = await orderApi.getOrders(params);
+        const result = await orderApi.getOrdersPaginated(params as any);
 
         expect(axiosClient.get).toHaveBeenCalledWith("/orders", { params });
         expect(result).toEqual(mockResponse);
@@ -55,7 +55,7 @@ describe("orderApi", () => {
 
         await orderApi.getOrdersAdmin();
 
-        expect(axiosClient.get).toHaveBeenCalledWith("/admin/orders", { params: undefined });
+        expect(axiosClient.get).toHaveBeenCalledWith("/admin/orders");
     });
 
     it("getOrderDetail calls /orders/:id", async () => {

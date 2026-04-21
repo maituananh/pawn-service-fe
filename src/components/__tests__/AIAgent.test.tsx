@@ -79,7 +79,7 @@ describe("AIAgent", () => {
 
         const input = screen.getByPlaceholderText("Nhập nội dung...");
         fireEvent.change(input, { target: { value: "Who are you?" } });
-        
+
         // Find send button (the one with SendOutlined)
         const sendBtn = screen.getByRole("button", { name: /send/i });
         fireEvent.click(sendBtn);

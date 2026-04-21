@@ -1,27 +1,25 @@
-import productsApi from "@/api/productsApi";
-import filesApi from "@/api/filesApi";
 import categoriesApi from "@/api/categoriesApi";
+import productsApi from "@/api/productsApi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import React from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import AdminProductsPage from "../AdminProductsPage";
 import AdminProductCreatePage from "../AdminProductCreatePage";
+import AdminProductsPage from "../AdminProductsPage";
 
 // Mock matchMedia for antd
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
+Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(), // deprecated
+        removeListener: vi.fn(), // deprecated
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn()
+    }))
 });
 
 vi.mock("@/api/productsApi");
@@ -41,12 +39,12 @@ describe("Admin Product Management Integration", () => {
         vi.clearAllMocks();
         localStorage.setItem("access_token", "admin-token");
         queryClient = new QueryClient({
-            defaultOptions: { 
+            defaultOptions: {
                 queries: { retry: false },
                 mutations: { retry: false }
             }
         });
-        
+
         vi.mocked(categoriesApi.getAll).mockResolvedValue([]);
     });
 

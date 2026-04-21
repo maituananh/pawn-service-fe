@@ -1,6 +1,5 @@
 import useAuth from "@/hooks/useAuth";
 import { render, screen } from "@testing-library/react";
-import React from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { PrivateRoute } from "../PrivateRoute";
@@ -45,7 +44,10 @@ describe("PrivateRoute", () => {
             <MemoryRouter initialEntries={["/admin"]}>
                 <Routes>
                     <Route path="/" element={<div>Home Page</div>} />
-                    <Route path="/admin" element={<PrivateRoute roles={["ADMIN"]} element={<div>Admin Content</div>} />} />
+                    <Route
+                        path="/admin"
+                        element={<PrivateRoute roles={["ADMIN"]} element={<div>Admin Content</div>} />}
+                    />
                 </Routes>
             </MemoryRouter>
         );
@@ -67,7 +69,10 @@ describe("PrivateRoute", () => {
         render(
             <MemoryRouter initialEntries={["/admin"]}>
                 <Routes>
-                    <Route path="/admin" element={<PrivateRoute roles={["ADMIN"]} element={<div>Admin Content</div>} />} />
+                    <Route
+                        path="/admin"
+                        element={<PrivateRoute roles={["ADMIN"]} element={<div>Admin Content</div>} />}
+                    />
                 </Routes>
             </MemoryRouter>
         );

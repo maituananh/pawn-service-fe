@@ -10,7 +10,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 
 export default defineConfig([
-    globalIgnores(["dist", "node_modules", ".agents"]),
+    globalIgnores(["dist", "node_modules", ".agents", "coverage", "src/assets"]),
     {
         files: ["**/*.{ts,tsx}"],
         extends: [
