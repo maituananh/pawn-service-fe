@@ -1,13 +1,10 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { LoginPayload } from "@/type/user.type";
 import { Spin } from "antd";
 import UserAuthForm from "../components/UserAuthForm";
 import useAuth from "../hooks/useAuth";
-import { LoginPayload } from "@/type/user.type";
 
 const LoginPage = () => {
     const { login, isLoadingLogin, isAuthenticated } = useAuth();
-    const navigate = useNavigate();
 
     // useEffect(() => {
     //   if (isAuthenticated) {
@@ -16,15 +13,17 @@ const LoginPage = () => {
     // }, [isAuthenticated, navigate]);
 
     const handleLogin = (values: LoginPayload) => {
-        login(values);
+        login(values).catch(() => {
+            // Error managed by useAuth's onError
+        });
     };
 
     const handleLoginGoogle = () => {
-        console.log("Redirecting to Google Auth...");
+        console.info("Redirecting to Google Auth...");
     };
 
     const handleLoginFacebook = () => {
-        console.log("Redirecting to Facebook Auth...");
+        console.info("Redirecting to Facebook Auth...");
     };
 
     if (isAuthenticated && !isLoadingLogin) {

@@ -1,15 +1,16 @@
 import js from "@eslint/js";
-import globals from "globals";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import prettier from "eslint-plugin-prettier";
 import eslintConfigPrettier from "eslint-config-prettier";
+import prettier from "eslint-plugin-prettier";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import unusedImports from "eslint-plugin-unused-imports";
 import { defineConfig, globalIgnores } from "eslint/config";
+import globals from "globals";
 
 export default defineConfig([
-    globalIgnores(["dist", "node_modules", ".agents"]),
+    globalIgnores(["dist", "node_modules", ".agents", "coverage", "src/assets"]),
     {
         files: ["**/*.{ts,tsx}"],
         extends: [
@@ -32,13 +33,24 @@ export default defineConfig([
         },
         plugins: {
             "@typescript-eslint": tsPlugin,
+            "unused-imports": unusedImports,
             prettier
         },
         rules: {
             ...tsPlugin.configs.recommended.rules,
             "no-undef": "off",
             "@typescript-eslint/no-explicit-any": "warn",
-            "@typescript-eslint/no-unused-vars": ["warn", { vars: "all" }],
+            "@typescript-eslint/no-unused-vars": "off",
+            "unused-imports/no-unused-imports": "warn",
+            "unused-imports/no-unused-vars": [
+                "warn",
+                {
+                    vars: "all",
+                    varsIgnorePattern: "^_",
+                    args: "after-used",
+                    argsIgnorePattern: "^_"
+                }
+            ],
             "react-hooks/exhaustive-deps": "warn",
             "no-console": ["warn", { allow: ["info", "warn", "error"] }],
             "no-return-await": "off",
@@ -56,7 +68,8 @@ export default defineConfig([
                     arrowParens: "always",
                     jsxSingleQuote: false,
                     bracketSameLine: false,
-                    endOfLine: "lf"
+                    endOfLine: "auto",
+                    plugins: ["prettier-plugin-organize-imports"]
                 }
             ]
         }

@@ -2,15 +2,15 @@ import UserAuthForm from "@/components/UserAuthForm";
 
 const RegisterPage = () => {
     const handleRegister = (values: any) => {
-        console.log("Register:", values);
+        console.info("Register:", values);
     };
 
     const handleRegisterGoogle = () => {
-        console.log("handleRegisterGoogle");
+        console.info("handleRegisterGoogle");
     };
 
     const handleRegisterFacebook = () => {
-        console.log("handleRegisterFacebook");
+        console.info("handleRegisterFacebook");
     };
     return (
         <UserAuthForm

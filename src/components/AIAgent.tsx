@@ -1,4 +1,4 @@
-import chatApi from "@/api/chatApi";
+import chatApi, { CreateAccountResult, OrderBrief, OrderResult, ProfileResult } from "@/api/chatApi";
 import filesApi from "@/api/filesApi";
 import useAuth from "@/hooks/useAuth";
 import { getImageUrl } from "@/lib/imageUtils";
@@ -19,7 +19,7 @@ import robotIcon from "../assets/images/ai-robot-icon.png";
 const { Text } = Typography;
 
 // Helper: Format Currency to VND
-const formatVND = (amount: any) => {
+const formatVND = (amount: number | string | undefined | null) => {
     const value = typeof amount === "string" ? parseFloat(amount) : amount;
     return (value || 0).toLocaleString("vi-VN", {
         style: "currency",
@@ -71,7 +71,7 @@ interface Message {
     timestamp: Date;
     imageUrl?: string;
     type?: string;
-    data?: any;
+    data?: unknown;
 }
 
 const AIAgent: React.FC = () => {
@@ -317,54 +317,44 @@ const AIAgent: React.FC = () => {
                                                 borderRadius: 8
                                             }}
                                         >
-                                            {item.text && (
-                                                <Text
-                                                    style={{
-                                                        color: "inherit",
-                                                        whiteSpace: "pre-wrap",
-                                                        marginBottom: 8,
-                                                        display: "block"
-                                                    }}
-                                                >
-                                                    {item.text}
+                                            {(item.data as ProfileResult).avatar && (
+                                                <Avatar
+                                                    size={40}
+                                                    src={getImageUrl((item.data as ProfileResult).avatar)}
+                                                />
+                                            )}
+                                            <Text strong style={{ margin: 0 }}>
+                                                Thông tin cá nhân
+                                            </Text>
+                                            {(item.data as ProfileResult).name && (
+                                                <Text>
+                                                    <Text strong>Họ tên:</Text> {(item.data as ProfileResult).name}
                                                 </Text>
                                             )}
-                                            <Flex align="center" gap={12} style={{ marginBottom: 8 }}>
-                                                {item.data.avatar && (
-                                                    <Avatar size={40} src={getImageUrl(item.data.avatar)} />
+                                            {(item.data as ProfileResult).age !== undefined &&
+                                                (item.data as ProfileResult).age !== null && (
+                                                    <Text>
+                                                        <Text strong>Tuổi:</Text> {(item.data as ProfileResult).age}
+                                                    </Text>
                                                 )}
-                                                <Text strong style={{ margin: 0 }}>
-                                                    Thông tin cá nhân
-                                                </Text>
-                                            </Flex>
-                                            {item.data.name && (
+                                            {(item.data as ProfileResult).gender && (
                                                 <Text>
-                                                    <Text strong>Họ tên:</Text> {item.data.name}
+                                                    <Text strong>Giới tính:</Text> {(item.data as ProfileResult).gender}
                                                 </Text>
                                             )}
-                                            {item.data.age !== undefined && item.data.age !== null && (
+                                            {(item.data as ProfileResult).phone && (
                                                 <Text>
-                                                    <Text strong>Tuổi:</Text> {item.data.age}
+                                                    <Text strong>SĐT:</Text> {(item.data as ProfileResult).phone}
                                                 </Text>
                                             )}
-                                            {item.data.gender && (
+                                            {(item.data as ProfileResult).email && (
                                                 <Text>
-                                                    <Text strong>Giới tính:</Text> {item.data.gender}
+                                                    <Text strong>Email:</Text> {(item.data as ProfileResult).email}
                                                 </Text>
                                             )}
-                                            {item.data.phone && (
+                                            {(item.data as ProfileResult).address && (
                                                 <Text>
-                                                    <Text strong>SĐT:</Text> {item.data.phone}
-                                                </Text>
-                                            )}
-                                            {item.data.email && (
-                                                <Text>
-                                                    <Text strong>Email:</Text> {item.data.email}
-                                                </Text>
-                                            )}
-                                            {item.data.address && (
-                                                <Text>
-                                                    <Text strong>Địa chỉ:</Text> {item.data.address}
+                                                    <Text strong>Địa chỉ:</Text> {(item.data as ProfileResult).address}
                                                 </Text>
                                             )}
                                         </Flex>
@@ -381,29 +371,19 @@ const AIAgent: React.FC = () => {
                                                 borderRadius: 8
                                             }}
                                         >
-                                            {item.text && (
-                                                <Text
-                                                    style={{
-                                                        color: "inherit",
-                                                        whiteSpace: "pre-wrap",
-                                                        marginBottom: 8,
-                                                        display: "block"
-                                                    }}
-                                                >
-                                                    {item.text}
-                                                </Text>
-                                            )}
                                             <Text strong style={{ marginBottom: 4 }}>
                                                 Thông tin tài khoản
                                             </Text>
-                                            {item.data.username && (
+                                            {(item.data as CreateAccountResult).username && (
                                                 <Text>
-                                                    <Text strong>Username:</Text> {item.data.username}
+                                                    <Text strong>Username:</Text>{" "}
+                                                    {(item.data as CreateAccountResult).username}
                                                 </Text>
                                             )}
-                                            {item.data.password && (
+                                            {(item.data as CreateAccountResult).password && (
                                                 <Text>
-                                                    <Text strong>Password:</Text> {item.data.password}
+                                                    <Text strong>Password:</Text>{" "}
+                                                    {(item.data as CreateAccountResult).password}
                                                 </Text>
                                             )}
                                         </Flex>
@@ -437,7 +417,7 @@ const AIAgent: React.FC = () => {
                                                     gap: 12
                                                 }}
                                             >
-                                                {item.data.orders.map((order: any) => {
+                                                {(item.data as OrderResult).orders.map((order: OrderBrief) => {
                                                     const badge = getStatusBadgeProps(order.status);
                                                     return (
                                                         <Card
@@ -528,56 +508,46 @@ const AIAgent: React.FC = () => {
 
                                     {(item.type === "NEW_ACCOUNT" || item.type === "CREATE_ACCOUNT") && (
                                         <Flex vertical gap={4}>
-                                            {item.text && (
-                                                <Text
-                                                    style={{
-                                                        color: "inherit",
-                                                        whiteSpace: "pre-wrap",
-                                                        marginBottom: 8,
-                                                        display: "block"
-                                                    }}
-                                                >
-                                                    {item.text}
-                                                </Text>
-                                            )}
-                                            {item.data && (item.data.username || item.data.password) && (
-                                                <Flex
-                                                    vertical
-                                                    gap={4}
-                                                    style={{
-                                                        background:
-                                                            item.sender === "user"
-                                                                ? "rgba(255,255,255,0.1)"
-                                                                : "#f5f5f5",
-                                                        padding: 12,
-                                                        borderRadius: 8,
-                                                        border:
-                                                            item.sender === "user"
-                                                                ? "1px solid rgba(255,255,255,0.2)"
-                                                                : "1px solid #e8e8e8"
-                                                    }}
-                                                >
-                                                    <Text strong style={{ color: "inherit", marginBottom: 4 }}>
-                                                        Thông tin tài khoản mới:
-                                                    </Text>
-                                                    {item.data.username && (
-                                                        <Text style={{ color: "inherit" }}>
-                                                            <Text strong style={{ color: "inherit" }}>
-                                                                Username:
-                                                            </Text>{" "}
-                                                            {item.data.username}
+                                            {item.data &&
+                                                ((item.data as CreateAccountResult).username ||
+                                                    (item.data as CreateAccountResult).password) && (
+                                                    <Flex
+                                                        vertical
+                                                        gap={4}
+                                                        style={{
+                                                            background:
+                                                                item.sender === "user"
+                                                                    ? "rgba(255,255,255,0.1)"
+                                                                    : "#f5f5f5",
+                                                            padding: 12,
+                                                            borderRadius: 8,
+                                                            border:
+                                                                item.sender === "user"
+                                                                    ? "1px solid rgba(255,255,255,0.2)"
+                                                                    : "1px solid #e8e8e8"
+                                                        }}
+                                                    >
+                                                        <Text strong style={{ color: "inherit", marginBottom: 4 }}>
+                                                            Thông tin tài khoản mới:
                                                         </Text>
-                                                    )}
-                                                    {item.data.password && (
-                                                        <Text style={{ color: "inherit" }}>
-                                                            <Text strong style={{ color: "inherit" }}>
-                                                                Password:
-                                                            </Text>{" "}
-                                                            {item.data.password}
-                                                        </Text>
-                                                    )}
-                                                </Flex>
-                                            )}
+                                                        {(item.data as CreateAccountResult).username && (
+                                                            <Text style={{ color: "inherit" }}>
+                                                                <Text strong style={{ color: "inherit" }}>
+                                                                    Username:
+                                                                </Text>{" "}
+                                                                {(item.data as CreateAccountResult).username}
+                                                            </Text>
+                                                        )}
+                                                        {(item.data as CreateAccountResult).password && (
+                                                            <Text style={{ color: "inherit" }}>
+                                                                <Text strong style={{ color: "inherit" }}>
+                                                                    Password:
+                                                                </Text>{" "}
+                                                                {(item.data as CreateAccountResult).password}
+                                                            </Text>
+                                                        )}
+                                                    </Flex>
+                                                )}
                                         </Flex>
                                     )}
                                     {item.imageUrl && (

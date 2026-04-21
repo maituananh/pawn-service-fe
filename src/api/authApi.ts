@@ -3,7 +3,7 @@ import axiosClient, { axiosRefresh } from "./axiosClient";
 
 const authApi = {
     login: async (payload: LoginPayload): Promise<LoginResponse> => {
-        const res = await axiosClient.post("/auth/token", payload);
+        const res = await axiosClient.post<LoginResponse>("/auth/token", payload);
         return res.data;
     },
 
@@ -12,7 +12,7 @@ const authApi = {
     },
 
     getProfile: async (): Promise<UserProfile> => {
-        const res = await axiosClient.get("/users/me");
+        const res = await axiosClient.get<UserProfile>("/users/me");
         return res.data;
     },
 
@@ -22,7 +22,7 @@ const authApi = {
     },
 
     refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken?: string }> => {
-        const res = await axiosRefresh.post(
+        const res = await axiosRefresh.post<{ accessToken: string; refreshToken?: string }>(
             "/auth/refresh-token",
             { refreshToken },
             { headers: { "Content-Type": "application/json" } }

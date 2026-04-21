@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import productsApi from "../productsApi";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import axiosClient from "../axiosClient";
+import productsApi from "../productsApi";
 
 // Mock axiosClient
 vi.mock("../axiosClient", () => {

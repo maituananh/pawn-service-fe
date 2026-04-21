@@ -2,9 +2,9 @@ import useAuth from "@/hooks/useAuth";
 import { privateRoutes, publicRoutes } from "@/router/router.config";
 import { Layout } from "antd";
 import { Link, Outlet } from "react-router-dom";
+import AIAgent from "../components/AIAgent";
 import AppFooter from "../components/Footer";
 import AppHeader from "../components/Header";
-import AIAgent from "../components/AIAgent";
 
 const { Content } = Layout;
 

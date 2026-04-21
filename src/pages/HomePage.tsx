@@ -14,7 +14,7 @@ import Step3Image from "@/assets/images/step3.png";
 import Step4Image from "@/assets/images/step4.png";
 import Product4Image from "@/assets/images/watch.png";
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 
 const steps = [
     { image: Step1Image, title: "Bước 1", desc: "Gửi thông tin tài sản" },

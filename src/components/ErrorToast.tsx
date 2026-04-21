@@ -1,6 +1,6 @@
+import { errorEmitter } from "@/lib/errorEmitter";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { errorEmitter } from "@/lib/errorEmitter";
 
 interface ToastItem {
     id: number;

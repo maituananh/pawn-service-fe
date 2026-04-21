@@ -16,8 +16,8 @@ import {
     Spin,
     Table,
     Tag,
-    Typography,
-    theme
+    theme,
+    Typography
 } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";

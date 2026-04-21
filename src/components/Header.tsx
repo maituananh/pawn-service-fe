@@ -1,12 +1,12 @@
 // [UI ONLY] Redesigned AppHeader for a premium fintech feel
 import useAuth from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
+import { getImageUrl } from "@/lib/imageUtils";
 import { LoginOutlined, LogoutOutlined, MenuOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Badge, Button, Drawer, Dropdown, Flex, Layout, Menu, theme, Typography, type MenuProps } from "antd";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import logoImage from "../assets/images/logo.png";
-import { getImageUrl } from "@/lib/imageUtils";
 
 const { Header } = Layout;
 const { Text } = Typography;

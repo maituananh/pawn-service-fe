@@ -4,7 +4,7 @@ import StatisticCard from "@/components/StatisticCard";
 import { Statistic } from "@/type/statistic.type";
 import { DesktopOutlined, ShoppingOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Row, Col } from "antd";
+import { Col, Row } from "antd";
 
 const STATISTICS_QUERY_KEY = ["statistics"];
 

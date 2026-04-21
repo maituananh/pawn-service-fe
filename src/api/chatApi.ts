@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import axiosClient from "./axiosClient";
 
 export interface ChatRequest {
@@ -12,7 +13,7 @@ export interface ApiResponse<T> {
     meta?: {
         sessionId: string;
         responseTime: number;
-        [key: string]: any;
+        [key: string]: unknown;
     };
 }
 
@@ -52,8 +53,8 @@ export interface ChatResponse {
     step: number;
     stepTotal: number;
     collectingField: string | null;
-    result: ProfileResult | OrderResult | CreateAccountResult | any;
-    messages: any[];
+    result: ProfileResult | OrderResult | CreateAccountResult | Record<string, unknown> | null;
+    messages: unknown[];
     complete: boolean;
 }
 
@@ -70,8 +71,10 @@ const chatApi = {
     },
     async getHistory(): Promise<HistoryItem[]> {
         const res = await axiosClient.get<HistoryItem[]>("/chat/history");
-        // axiosClient returns res.data which is the array
-        return (res as any).data || res;
+        // Axios get<T> returns AxiosResponse<T>
+        // Depending on whether axiosClient was cast or not, res might be AxiosResponse or the data
+        // My previous fix to axiosClient.ts makes it a standard AxiosInstance
+        return (res as unknown as AxiosResponse<HistoryItem[]>).data;
     }
 };
 

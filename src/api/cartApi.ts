@@ -1,7 +1,8 @@
+import { CartItem } from "@/type/cart.type";
 import axiosClient from "./axiosClient";
 
 const cartApi = {
-    async getMyCart(): Promise<any> {
+    async getMyCart(): Promise<CartItem[]> {
         const { data } = await axiosClient.get("/carts");
         return data;
     },

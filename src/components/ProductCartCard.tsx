@@ -1,4 +1,4 @@
-import { Checkbox, Button, Typography } from "antd";
+import { Button, Checkbox, Typography } from "antd";
 
 const { Text } = Typography;
 
