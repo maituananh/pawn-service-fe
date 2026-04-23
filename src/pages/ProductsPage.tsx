@@ -86,12 +86,15 @@ const ProductsPage = () => {
                     </Typography.Title>
                     <Checkbox.Group style={{ width: "100%" }} value={checkedCategories} onChange={handleCategoryChange}>
                         <Flex vertical gap={12}>
-                            {categories.map((opt) => (
-                                <Checkbox key={opt.id} value={opt.id} style={{ fontSize: 14 }}>
-                                    {opt.name}
-                                </Checkbox>
-                            ))}
-                        </Flex>
+                                     {categories           
+                                             ?.filter((opt: any) => opt.isActive !== false) 
+                                                .map((opt: any) => (
+                        <Checkbox key={opt.id} value={opt.id} style={{ fontSize: 14 }}>
+                                                {opt.name}
+                    </Checkbox>
+                ))
+            }
+        </Flex>
                     </Checkbox.Group>
                 </div>
 

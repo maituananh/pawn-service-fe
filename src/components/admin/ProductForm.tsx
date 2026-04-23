@@ -186,8 +186,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             >
                                 <Select
                                     placeholder="Chọn danh mục con"
-                                    options={categories
-                                      ?.filter((u: any) => u.isActive !== false) 
+                                   options={categories
+                                         ?.filter((cat: any) => cat.isActive !== false)
                                     .map((u: any) => ({
                                       label: u.name,
                                     value: u.id
