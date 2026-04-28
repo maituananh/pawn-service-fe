@@ -1,9 +1,9 @@
 // [UI ONLY] Redesigned AdminCategoryFormPage with improved layout and styling
 import categoriesApi from "@/api/categoriesApi";
 import { CategoryCreateRequest } from "@/type/category.type";
-import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, SaveOutlined, WarningOutlined } from "@ant-design/icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button, Card, Flex, Form, Input, message, Spin, theme, Typography } from "antd";
+import { Alert, Button, Card, Flex, Form, Input, message, Spin, theme, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -14,6 +14,7 @@ const AdminCategoryFormPage: React.FC = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const { id } = useParams();
+    const [isDeleted, setIsDeleted] = useState(false);
     const [loading, setLoading] = useState(false);
     const isEdit = !!id;
     const queryClient = useQueryClient();
@@ -27,6 +28,8 @@ const AdminCategoryFormPage: React.FC = () => {
                 setLoading(true);
 
                 const data = await categoriesApi.getById(Number(id));
+
+                setIsDeleted(data.isActive === false);
 
                 form.setFieldsValue({
                     name: data.name,
@@ -43,6 +46,7 @@ const AdminCategoryFormPage: React.FC = () => {
     }, [id, form, isEdit]);
 
     const handleSubmit = async (values: any) => {
+        if (isDeleted) return;
         try {
             setLoading(true);
 
@@ -97,7 +101,25 @@ const AdminCategoryFormPage: React.FC = () => {
                 </Button>
             </Flex>
 
-            <Card style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)", borderRadius: 12, maxWidth: 800 }}>
+            {isDeleted && (
+                <Alert
+                    message="Danh mục này đã bị xóa"
+                    description="Bạn không thể chỉnh sửa hoặc cập nhật thông tin cho danh mục đã ở trạng thái xóa."
+                    type="warning"
+                    showIcon
+                    icon={<WarningOutlined />}
+                    style={{ borderRadius: 12, maxWidth: 800 }}
+                />
+            )}
+
+            <Card
+                style={{
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    borderRadius: 12,
+                    maxWidth: 800,
+                    opacity: isDeleted ? 0.6 : 1
+                }}
+            >
                 <Form
                     form={form}
                     layout="vertical"
@@ -106,6 +128,7 @@ const AdminCategoryFormPage: React.FC = () => {
                         isActive: true
                     }}
                     requiredMark="optional"
+                    style={isDeleted ? { pointerEvents: "none" } : {}}
                 >
                     <Form.Item
                         label="Tên danh mục"
@@ -132,19 +155,22 @@ const AdminCategoryFormPage: React.FC = () => {
                             size="large"
                             onClick={() => navigate("/admin/categories")}
                             style={{ borderRadius: 8, minWidth: 100 }}
+                            disabled={isDeleted}
                         >
                             Hủy
                         </Button>
-                        <Button
-                            type="primary"
-                            size="large"
-                            htmlType="submit"
-                            icon={<SaveOutlined />}
-                            loading={loading}
-                            style={{ borderRadius: 8, minWidth: 120 }}
-                        >
-                            {isEdit ? "Cập nhật" : "Tạo danh mục"}
-                        </Button>
+                        {!isDeleted && (
+                            <Button
+                                type="primary"
+                                size="large"
+                                htmlType="submit"
+                                icon={<SaveOutlined />}
+                                loading={loading}
+                                style={{ borderRadius: 8, minWidth: 120 }}
+                            >
+                                {isEdit ? "Cập nhật" : "Tạo danh mục"}
+                            </Button>
+                        )}
                     </Flex>
                 </Form>
             </Card>

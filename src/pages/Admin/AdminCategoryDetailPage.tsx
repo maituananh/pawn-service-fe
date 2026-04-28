@@ -15,6 +15,8 @@ const AdminCategoryDetailPage = () => {
         enabled: !!categoryId
     });
 
+    const isDeleted = data && data.isActive === false;
+
     const deleteMutation = useMutation({
         mutationFn: (id: number) => categoriesApi.delete(id),
 
@@ -65,6 +67,14 @@ const AdminCategoryDetailPage = () => {
 
     return (
         <Card title="Thông tin danh mục" extra={<Button onClick={() => navigate(-1)}>Quay lại</Button>}>
+            {isDeleted && (
+                <Alert
+                    message="Danh mục này đã bị xóa và không thể chỉnh sửa."
+                    type="warning"
+                    showIcon
+                    style={{ marginBottom: 20 }}
+                />
+            )}
             <Form layout="vertical">
                 <Form.Item label="Tên">
                     <Input value={data?.name} disabled />
