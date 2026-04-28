@@ -28,7 +28,7 @@ const AdminCategoryFormPage: React.FC = () => {
                 setLoading(true);
 
                 const data = await categoriesApi.getById(Number(id));
-                
+
                 setIsDeleted(data.isActive === false);
 
                 form.setFieldsValue({
@@ -112,8 +112,14 @@ const AdminCategoryFormPage: React.FC = () => {
                 />
             )}
 
-
-            <Card style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)", borderRadius: 12, maxWidth: 800 , opacity: isDeleted ? 0.6 : 1}}>
+            <Card
+                style={{
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    borderRadius: 12,
+                    maxWidth: 800,
+                    opacity: isDeleted ? 0.6 : 1
+                }}
+            >
                 <Form
                     form={form}
                     layout="vertical"

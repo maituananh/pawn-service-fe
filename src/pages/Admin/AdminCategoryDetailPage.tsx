@@ -67,11 +67,11 @@ const AdminCategoryDetailPage = () => {
 
     return (
         <Card title="Thông tin danh mục" extra={<Button onClick={() => navigate(-1)}>Quay lại</Button>}>
-           {isDeleted && (
-                <Alert 
-                    message="Danh mục này đã bị xóa và không thể chỉnh sửa." 
-                    type="warning" 
-                    showIcon 
+            {isDeleted && (
+                <Alert
+                    message="Danh mục này đã bị xóa và không thể chỉnh sửa."
+                    type="warning"
+                    showIcon
                     style={{ marginBottom: 20 }}
                 />
             )}
