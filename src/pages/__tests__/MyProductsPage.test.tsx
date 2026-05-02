@@ -73,7 +73,7 @@ describe("MyProductsPage", () => {
 
         renderPage();
         expect(screen.getByText(/Bạn chưa có sản phẩm nào/i)).toBeInTheDocument();
-        
+
         const exploreBtn = screen.getByRole("button", { name: /Khám phá ngay/i });
         fireEvent.click(exploreBtn);
         expect(mockNavigate).toHaveBeenCalledWith("/");
@@ -127,7 +127,7 @@ describe("MyProductsPage", () => {
 
         // Check currency formatting
         expect(screen.getByText(/15.000.000/)).toBeInTheDocument();
-        
+
         // Check navigation to details
         const detailBtns = screen.getAllByText(/Xem chi tiết/i);
         fireEvent.click(detailBtns[0]);
