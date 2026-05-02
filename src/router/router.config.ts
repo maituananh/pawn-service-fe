@@ -9,6 +9,7 @@ import AdminProductDetailPage from "@/pages/Admin/AdminProductDetailPage";
 import AdminProductsPage from "@/pages/Admin/AdminProductsPage";
 import CartPage from "@/pages/CartPage";
 import CheckoutPage from "@/pages/CheckoutPage";
+import MyProductsPage from "@/pages/MyProductsPage";
 import MyProfilePage from "@/pages/MyProfilePage";
 import OrderDetailPage from "@/pages/OrderDetailPage";
 import OrdersPage from "@/pages/OrdersPage";
@@ -73,6 +74,14 @@ export const privateRoutes: RouteConfig[] = [
         label: "Hồ sơ",
         component: MyProfilePage,
         showInMenu: false,
+        requiresLayout: true,
+        roles: ["ADMIN", "CUSTOMER"]
+    },
+    {
+        path: "/my-products",
+        label: "Sản phẩm đã cầm của tôi",
+        component: MyProductsPage,
+        showInMenu: true,
         requiresLayout: true,
         roles: ["ADMIN", "CUSTOMER"]
     },

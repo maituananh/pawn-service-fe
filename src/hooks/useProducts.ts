@@ -35,3 +35,18 @@ export const useProducts = (query?: {
         refetch
     };
 };
+
+export const useMyProducts = () => {
+    const { data, isFetching, isError, error, refetch } = useQuery<Product[]>({
+        queryKey: ["my-products"],
+        queryFn: () => productsApi.getMyProducts()
+    });
+
+    return {
+        products: data ?? [],
+        isLoading: isFetching,
+        isError,
+        error,
+        refetch
+    };
+};

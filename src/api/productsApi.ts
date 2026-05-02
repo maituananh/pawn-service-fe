@@ -51,6 +51,10 @@ const productsApi = {
             params: { page, size }
         });
         return data;
+    },
+    async getMyProducts(): Promise<Product[]> {
+        const { data } = await axiosClient.get<Product[]>("/products/me");
+        return data ?? [];
     }
 };
 
