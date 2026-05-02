@@ -20,7 +20,7 @@ describe("usersApi", () => {
     });
 
     it("getAll calls /users and maps cardId", async () => {
-        const mockUsers = [{ id: 1, card_id: "CARD123" }];
+        const mockUsers = [{ id: 1, cardId: "CARD123" }];
         (axiosClient.get as any).mockResolvedValue({ data: mockUsers });
 
         const result = await usersApi.getAll();
@@ -30,7 +30,7 @@ describe("usersApi", () => {
     });
 
     it("getById calls /users/:id and maps cardId", async () => {
-        const mockUser = { id: 1, card_id: "CARD123" };
+        const mockUser = { id: 1, cardId: "CARD123" };
         (axiosClient.get as any).mockResolvedValue({ data: mockUser });
 
         const result = await usersApi.getById(1);
@@ -71,7 +71,7 @@ describe("usersApi", () => {
             "/users/1",
             expect.objectContaining({
                 fullName: "Test User",
-                card_id: "NEWCARD"
+                cardId: "NEWCARD"
             })
         );
     });

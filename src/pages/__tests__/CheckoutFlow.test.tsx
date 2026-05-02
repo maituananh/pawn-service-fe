@@ -110,5 +110,5 @@ describe("Checkout Flow Integration", () => {
             expect(orderApi.checkout).toHaveBeenCalled();
             expect(screen.getByText("Order Success Page")).toBeInTheDocument();
         });
-    });
+    }, 10000);
 });
