@@ -7,7 +7,7 @@ const usersApi = {
 
         return (data ?? []).map((u) => ({
             ...u,
-            cardId: u.cardId || u.card_id || ""
+            cardId: u.cardId || ""
         }));
     },
 
@@ -17,7 +17,7 @@ const usersApi = {
 
         return {
             ...data,
-            cardId: data.cardId || data.card_id || ""
+            cardId: data.cardId || ""
         };
     },
 
@@ -35,10 +35,8 @@ const usersApi = {
     update: async (id: number, payload: any) => {
         const newPayload = {
             ...payload,
-            card_id: payload.cardId || ""
+            cardId: payload.cardId || ""
         };
-
-        delete newPayload.cardId;
 
         return axiosClient.put(`/users/${id}`, newPayload);
     }

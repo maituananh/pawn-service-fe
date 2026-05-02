@@ -33,16 +33,13 @@ interface ProductFormProps {
 }
 
 const SaveButton = ({ form, loading, fileList }: { form: any; loading: boolean; fileList: any[] }) => {
-    const [submittable, setSubmittable] = useState(false);
     const values = Form.useWatch([], form);
     const { token } = theme.useToken();
 
-    useEffect(() => {
-        form.validateFields({ validateOnly: true }).then(
-            () => setSubmittable(true),
-            () => setSubmittable(false)
-        );
-    }, [values, form, fileList]);
+    // The button is enabled as long as it's not read-only.
+    // We use isFieldsTouched to track if any changes were made.
+    const isTouched = form.isFieldsTouched(true) || fileList.length > 0;
+    const isReadOnly = (form as any)._readOnly;
 
     return (
         <Button
@@ -50,13 +47,14 @@ const SaveButton = ({ form, loading, fileList }: { form: any; loading: boolean; 
             size="large"
             htmlType="submit"
             loading={loading}
-            disabled={!submittable || (form as any)._readOnly}
+            disabled={isReadOnly}
             icon={<SaveOutlined />}
             style={{
                 minWidth: 120,
                 borderRadius: 8,
-                background: submittable && !(form as any)._readOnly ? token.colorSuccess : undefined,
-                borderColor: submittable && !(form as any)._readOnly ? token.colorSuccess : undefined
+                background: !isReadOnly ? token.colorSuccess : undefined,
+                borderColor: !isReadOnly ? token.colorSuccess : undefined,
+                opacity: isTouched || !isReadOnly ? 1 : 0.5
             }}
         >
             Lưu tài sản
@@ -92,15 +90,24 @@ const ProductForm: React.FC<ProductFormProps> = ({
     };
 
     useEffect(() => {
+        console.log("initialData", initialData);
+
         if (initialData) {
             (form as any)._readOnly = readOnly;
+
+            const customerId = initialData.user?.id ?? initialData.customerId;
+            const categoryId = initialData.category?.id ?? initialData.categoryId;
+
             const formattedData = {
                 ...initialData,
                 startDate: initialData.startDate ? dayjs(initialData.startDate) : null,
                 endDate: initialData.endDate ? dayjs(initialData.endDate) : null,
-                customerId: initialData.customerId ?? undefined,
-                categoryId: initialData.categoryId || 1,
-                stockQty: initialData.stockQty ?? 1
+                customerId: customerId ? Number(customerId) : undefined,
+                categoryId: categoryId ? Number(categoryId) : 1,
+                stockQty: initialData.stockQty ?? 1,
+                address: initialData.user?.address,
+                phone: initialData.user?.phone,
+                idCard: initialData.user?.cardId
             };
 
             if (initialData.startDate) {

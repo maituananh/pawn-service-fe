@@ -29,8 +29,8 @@ const AdminCustomersPage: React.FC = () => {
 
         {
             title: "CCCD",
-            dataIndex: "card_id",
-            key: "card_id"
+            dataIndex: "cardId",
+            key: "cardId"
         },
 
         {
