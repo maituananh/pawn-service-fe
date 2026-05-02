@@ -2,7 +2,14 @@
 import useAuth from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { getImageUrl } from "@/lib/imageUtils";
-import { LoginOutlined, LogoutOutlined, MenuOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
+import {
+    InboxOutlined,
+    LoginOutlined,
+    LogoutOutlined,
+    MenuOutlined,
+    ShoppingCartOutlined,
+    UserOutlined
+} from "@ant-design/icons";
 import { Avatar, Badge, Button, Drawer, Dropdown, Flex, Layout, Menu, theme, Typography, type MenuProps } from "antd";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -141,6 +148,12 @@ const AppHeader = ({ menuItems }: { menuItems: MenuProps["items"] }) => {
                                             label: "Hồ sơ của tôi",
                                             icon: <UserOutlined />,
                                             onClick: () => navigate("/my-profile")
+                                        },
+                                        {
+                                            key: "my-products",
+                                            label: "Sản phẩm đã cầm của tôi",
+                                            icon: <InboxOutlined />,
+                                            onClick: () => navigate("/my-products")
                                         },
                                         {
                                             key: "logout",
