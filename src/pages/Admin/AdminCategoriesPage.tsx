@@ -3,23 +3,9 @@ import categoriesApi from "@/api/categoriesApi";
 import { useCategories } from "@/hooks/useCategories";
 import { Category } from "@/type/category.type";
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import {
-    Button,
-    Card,
-    Flex,
-    Input,
-    message,
-    Popconfirm,
-    Select,
-    Space,
-    Spin,
-    Table,
-    Tag,
-    theme,
-    Typography
-} from "antd";
+import { Button, Card, Flex, Input, message, Popconfirm, Select, Space, Table, Tag, theme, Typography } from "antd";
 import dayjs from "dayjs";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
@@ -27,8 +13,32 @@ const { Option } = Select;
 
 const AdminCategoriesPage: React.FC = () => {
     const navigate = useNavigate();
-    const { categories, isLoading, isError, refetch } = useCategories();
     const { token } = theme.useToken();
+    const { categories, isLoading, isError, refetch } = useCategories();
+
+    const [searchText, setSearchText] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchText);
+        }, 500);
+
+        return () => clearTimeout(handler);
+    }, [searchText]);
+
+    const filteredCategories = useMemo(() => {
+        if (!debouncedSearch.trim()) {
+            return categories;
+        }
+
+        const searchLower = debouncedSearch.toLowerCase();
+        return categories.filter(
+            (item) =>
+                item.name.toLowerCase().includes(searchLower) ||
+                (item.note && item.note.toLowerCase().includes(searchLower))
+        );
+    }, [debouncedSearch, categories]);
 
     const handleRowClick = (record: Category) => {
         navigate(`/admin/categories/${record.id}`);
@@ -115,13 +125,6 @@ const AdminCategoriesPage: React.FC = () => {
         }
     ];
 
-    if (isLoading)
-        return (
-            <Flex align="center" justify="center" style={{ minHeight: "400px" }}>
-                <Spin size="large" tip="Đang tải danh mục..." />
-            </Flex>
-        );
-
     if (isError)
         return (
             <Flex align="center" justify="center" style={{ minHeight: "400px" }}>
@@ -150,6 +153,8 @@ const AdminCategoriesPage: React.FC = () => {
                                 prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />}
                                 style={{ width: 240, borderRadius: 8 }}
                                 allowClear
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
                             />
 
                             <Select defaultValue="newest" style={{ width: 160 }} variant="filled">
@@ -172,7 +177,8 @@ const AdminCategoriesPage: React.FC = () => {
                 <Table
                     rowKey="id"
                     columns={columns}
-                    dataSource={categories}
+                    dataSource={filteredCategories}
+                    loading={isLoading}
                     onRow={(record) => ({
                         onClick: () => handleRowClick(record)
                     })}

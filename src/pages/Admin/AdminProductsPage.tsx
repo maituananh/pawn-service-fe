@@ -4,22 +4,8 @@ import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/type/product.type";
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import {
-    Button,
-    Card,
-    Flex,
-    Input,
-    message,
-    Popconfirm,
-    Select,
-    Space,
-    Spin,
-    Table,
-    Tag,
-    theme,
-    Typography
-} from "antd";
-import React from "react";
+import { Button, Card, Flex, Input, message, Popconfirm, Select, Space, Table, Tag, theme, Typography } from "antd";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
@@ -27,8 +13,26 @@ const { Option } = Select;
 
 const AdminProductsPage: React.FC = () => {
     const navigate = useNavigate();
-    const { productsPage, isLoading, isError, error, refetch } = useProducts();
     const { token } = theme.useToken();
+
+    const [searchText, setSearchText] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [page, setPage] = useState(1);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchText);
+            setPage(1);
+        }, 500);
+
+        return () => clearTimeout(handler);
+    }, [searchText]);
+
+    const { productsPage, isLoading, isError, refetch } = useProducts({
+        name: searchText,
+        page: page,
+        size: 15
+    });
 
     const handleRowClick = (record: Product) => {
         navigate(`/admin/products/${record.id}`);
@@ -137,13 +141,6 @@ const AdminProductsPage: React.FC = () => {
         }
     ];
 
-    if (isLoading)
-        return (
-            <Flex align="center" justify="center" style={{ minHeight: "440px" }}>
-                <Spin size="large" tip="Đang tải danh sách sản phẩm..." />
-            </Flex>
-        );
-
     if (isError)
         return (
             <Flex align="center" justify="center" style={{ minHeight: "440px" }}>
@@ -174,6 +171,8 @@ const AdminProductsPage: React.FC = () => {
                                 prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />}
                                 style={{ width: 240, borderRadius: 8 }}
                                 allowClear
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
                             />
                             <Select defaultValue="newest" style={{ width: 160 }} variant="filled">
                                 <Option value="newest">Mới nhất trước</Option>
@@ -194,6 +193,8 @@ const AdminProductsPage: React.FC = () => {
                 <Table
                     columns={columns}
                     dataSource={productsPage?.data}
+                    rowKey="id"
+                    loading={isLoading}
                     onRow={(record) => ({
                         onClick: () => {
                             if (record.status !== "SOLD_OUT") {
