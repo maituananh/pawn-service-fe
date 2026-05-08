@@ -288,7 +288,22 @@ const AIAgent: React.FC = () => {
                                         boxShadow: "0 2px 5px rgba(0,0,0,0.05)"
                                     }}
                                 >
-                                    {/* ERROR type: show error message */}
+                                    {/* 1. Main Text Content: Always show for User or AI (except special ERROR handling) */}
+                                    {item.type !== "ERROR" && item.text && (
+                                        <Text
+                                            style={{
+                                                color: "inherit",
+                                                whiteSpace: "pre-wrap",
+                                                display: "block",
+                                                marginBottom:
+                                                    (item.type && item.type !== "DEFAULT") || item.imageUrl ? 8 : 0
+                                            }}
+                                        >
+                                            {item.text}
+                                        </Text>
+                                    )}
+
+                                    {/* 2. ERROR type: show error message with icon */}
                                     {item.type === "ERROR" && (
                                         <Flex
                                             gap={6}
@@ -306,7 +321,7 @@ const AIAgent: React.FC = () => {
                                         </Flex>
                                     )}
 
-                                    {/* PROFILE type: show profile card */}
+                                    {/* 3. PROFILE type: show profile card */}
                                     {item.type === "PROFILE" && item.data && (
                                         <Flex
                                             vertical
@@ -314,7 +329,8 @@ const AIAgent: React.FC = () => {
                                             style={{
                                                 background: "#fafafa",
                                                 padding: 12,
-                                                borderRadius: 8
+                                                borderRadius: 8,
+                                                border: "1px solid #e8e8e8"
                                             }}
                                         >
                                             {(item.data as ProfileResult).avatar && (
@@ -323,7 +339,7 @@ const AIAgent: React.FC = () => {
                                                     src={getImageUrl((item.data as ProfileResult).avatar)}
                                                 />
                                             )}
-                                            <Text strong style={{ margin: 0 }}>
+                                            <Text strong style={{ margin: "0 0 4px 0" }}>
                                                 Thông tin cá nhân
                                             </Text>
                                             {(item.data as ProfileResult).name && (
@@ -360,50 +376,61 @@ const AIAgent: React.FC = () => {
                                         </Flex>
                                     )}
 
-                                    {/* OCR_IDENTITY type: show username/password */}
-                                    {item.type === "OCR_IDENTITY" && item.data && (
-                                        <Flex
-                                            vertical
-                                            gap={4}
-                                            style={{
-                                                background: "#fafafa",
-                                                padding: 12,
-                                                borderRadius: 8
-                                            }}
-                                        >
-                                            <Text strong style={{ marginBottom: 4 }}>
-                                                Thông tin tài khoản
-                                            </Text>
-                                            {(item.data as CreateAccountResult).username && (
-                                                <Text>
-                                                    <Text strong>Username:</Text>{" "}
-                                                    {(item.data as CreateAccountResult).username}
+                                    {/* 4. OCR_IDENTITY / CREATE_ACCOUNT In-Progress: show extracted info if available */}
+                                    {(item.type === "OCR_IDENTITY" || item.type === "CREATE_ACCOUNT") &&
+                                        item.data &&
+                                        !(item.data as CreateAccountResult).username && (
+                                            <Flex
+                                                vertical
+                                                gap={4}
+                                                style={{
+                                                    background: "#fafafa",
+                                                    padding: 12,
+                                                    borderRadius: 8,
+                                                    border: "1px solid #e8e8e8"
+                                                }}
+                                            >
+                                                <Text strong style={{ marginBottom: 4 }}>
+                                                    Thông tin trích xuất:
                                                 </Text>
-                                            )}
-                                            {(item.data as CreateAccountResult).password && (
-                                                <Text>
-                                                    <Text strong>Password:</Text>{" "}
-                                                    {(item.data as CreateAccountResult).password}
-                                                </Text>
-                                            )}
-                                        </Flex>
-                                    )}
+                                                {/* Generic extraction display: handle nested objects like 'extracted' */}
+                                                {(() => {
+                                                    const renderValue = (val: any): React.ReactNode => {
+                                                        if (typeof val === "object" && val !== null) {
+                                                            return (
+                                                                <Flex vertical gap={2} style={{ paddingLeft: 12 }}>
+                                                                    {Object.entries(val).map(([k, v]) => (
+                                                                        <div key={k}>
+                                                                            <Text strong>{k}:</Text> {renderValue(v)}
+                                                                        </div>
+                                                                    ))}
+                                                                </Flex>
+                                                            );
+                                                        }
+                                                        return String(val);
+                                                    };
 
-                                    {/* ORDER type: show order list */}
+                                                    return Object.entries(item.data as any).map(([key, value]) => {
+                                                        if (
+                                                            !value ||
+                                                            key === "missingFields" ||
+                                                            key === "username" ||
+                                                            key === "password"
+                                                        )
+                                                            return null;
+                                                        return (
+                                                            <div key={key}>
+                                                                <Text strong>{key}:</Text> {renderValue(value)}
+                                                            </div>
+                                                        );
+                                                    });
+                                                })()}
+                                            </Flex>
+                                        )}
+
+                                    {/* 5. ORDER type: show order list */}
                                     {item.type === "ORDER" && item.data?.orders && (
                                         <Flex vertical gap={12} style={{ width: "100%", marginTop: 8 }}>
-                                            {item.text && (
-                                                <Text
-                                                    style={{
-                                                        color: "inherit",
-                                                        whiteSpace: "pre-wrap",
-                                                        marginBottom: 4,
-                                                        display: "block"
-                                                    }}
-                                                >
-                                                    {item.text}
-                                                </Text>
-                                            )}
                                             <Flex align="center" gap={8} style={{ marginBottom: 4 }}>
                                                 <span style={{ fontSize: 20 }}>📦</span>
                                                 <Text strong style={{ fontSize: 15, color: "#1f1f1f" }}>
@@ -501,55 +528,49 @@ const AIAgent: React.FC = () => {
                                         </Flex>
                                     )}
 
-                                    {/* Default: show result text for non-typed messages */}
-                                    {(!item.type || item.type === "DEFAULT") && (
-                                        <Text style={{ color: "inherit", whiteSpace: "pre-wrap" }}>{item.text}</Text>
-                                    )}
-
-                                    {(item.type === "NEW_ACCOUNT" || item.type === "CREATE_ACCOUNT") && (
-                                        <Flex vertical gap={4}>
-                                            {item.data &&
-                                                ((item.data as CreateAccountResult).username ||
-                                                    (item.data as CreateAccountResult).password) && (
-                                                    <Flex
-                                                        vertical
-                                                        gap={4}
-                                                        style={{
-                                                            background:
-                                                                item.sender === "user"
-                                                                    ? "rgba(255,255,255,0.1)"
-                                                                    : "#f5f5f5",
-                                                            padding: 12,
-                                                            borderRadius: 8,
-                                                            border:
-                                                                item.sender === "user"
-                                                                    ? "1px solid rgba(255,255,255,0.2)"
-                                                                    : "1px solid #e8e8e8"
-                                                        }}
-                                                    >
-                                                        <Text strong style={{ color: "inherit", marginBottom: 4 }}>
-                                                            Thông tin tài khoản mới:
-                                                        </Text>
-                                                        {(item.data as CreateAccountResult).username && (
-                                                            <Text style={{ color: "inherit" }}>
-                                                                <Text strong style={{ color: "inherit" }}>
-                                                                    Username:
-                                                                </Text>{" "}
-                                                                {(item.data as CreateAccountResult).username}
-                                                            </Text>
-                                                        )}
-                                                        {(item.data as CreateAccountResult).password && (
-                                                            <Text style={{ color: "inherit" }}>
-                                                                <Text strong style={{ color: "inherit" }}>
-                                                                    Password:
-                                                                </Text>{" "}
-                                                                {(item.data as CreateAccountResult).password}
-                                                            </Text>
-                                                        )}
-                                                    </Flex>
+                                    {/* 6. NEW_ACCOUNT / CREATE_ACCOUNT Success: show credentials */}
+                                    {(item.type === "NEW_ACCOUNT" || item.type === "CREATE_ACCOUNT") &&
+                                        item.data &&
+                                        ((item.data as CreateAccountResult).username ||
+                                            (item.data as CreateAccountResult).password) && (
+                                            <Flex
+                                                vertical
+                                                gap={4}
+                                                style={{
+                                                    background:
+                                                        item.sender === "user" ? "rgba(255,255,255,0.1)" : "#f5f5f5",
+                                                    padding: 12,
+                                                    borderRadius: 8,
+                                                    border:
+                                                        item.sender === "user"
+                                                            ? "1px solid rgba(255,255,255,0.2)"
+                                                            : "1px solid #e8e8e8",
+                                                    marginTop: 4
+                                                }}
+                                            >
+                                                <Text strong style={{ color: "inherit", marginBottom: 4 }}>
+                                                    Thông tin tài khoản mới:
+                                                </Text>
+                                                {(item.data as CreateAccountResult).username && (
+                                                    <Text style={{ color: "inherit" }}>
+                                                        <Text strong style={{ color: "inherit" }}>
+                                                            Username:
+                                                        </Text>{" "}
+                                                        {(item.data as CreateAccountResult).username}
+                                                    </Text>
                                                 )}
-                                        </Flex>
-                                    )}
+                                                {(item.data as CreateAccountResult).password && (
+                                                    <Text style={{ color: "inherit" }}>
+                                                        <Text strong style={{ color: "inherit" }}>
+                                                            Password:
+                                                        </Text>{" "}
+                                                        {(item.data as CreateAccountResult).password}
+                                                    </Text>
+                                                )}
+                                            </Flex>
+                                        )}
+
+                                    {/* 7. Image content */}
                                     {item.imageUrl && (
                                         <img
                                             src={item.imageUrl}
