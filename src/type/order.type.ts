@@ -73,5 +73,6 @@ export interface OrderParams {
     page?: number;
     size?: number;
     status?: OrderStatus;
+    orderId?: number;
     orderStatus?: OrderStatus; // Backup param name
 }

@@ -13,6 +13,7 @@ export const useOrder = () => {
         mutationFn: (orderId: number) => orderApi.cancelOrder(orderId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["orders"] });
+            queryClient.invalidateQueries({ queryKey: ["admin.orders"] });
         }
     });
 
@@ -23,10 +24,10 @@ export const useOrder = () => {
         });
     };
 
-    const useGetOrdersAdmin = () => {
+    const useGetOrdersAdmin = (params?: OrderParams) => {
         return useQuery({
-            queryKey: ["admin.orders"],
-            queryFn: orderApi.getOrdersAdmin
+            queryKey: ["admin.orders", params],
+            queryFn: () => orderApi.getOrdersAdminPaginated(params)
         });
     };
 
