@@ -55,7 +55,7 @@ describe("orderApi", () => {
 
         await orderApi.getOrdersAdmin();
 
-        expect(axiosClient.get).toHaveBeenCalledWith("/admin/orders");
+        expect(axiosClient.get).toHaveBeenCalledWith("/admin/orders", { params: undefined });
     });
 
     it("getOrderDetail calls /orders/:id", async () => {

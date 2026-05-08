@@ -2,7 +2,7 @@ import { useOrder } from "@/hooks/useOrder";
 import { OrderDetailResponse, OrderStatus, PaginatedOrderResponse } from "@/type/order.type";
 import { CalendarOutlined, EyeOutlined, FilterOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Card, Flex, Input, Space, Table, Tabs, Tag, Typography, theme } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
@@ -14,15 +14,29 @@ const AdminOrdersPage: React.FC = () => {
     const [pageSize] = useState(10);
     const [activeTab, setActiveTab] = useState<string>("ALL");
 
-    const { useGetOrdersAdmin } = useOrder();
+    const [searchText, setSearchText] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchText);
+            setCurrentPage(0);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchText]);
+
+    const { useGetOrdersAdminPaginated } = useOrder();
+
+    const parsedOrderId = debouncedSearch && !isNaN(Number(debouncedSearch)) ? Number(debouncedSearch) : undefined;
 
     const orderParams = {
         page: currentPage,
         size: pageSize,
-        status: activeTab === "ALL" ? undefined : (activeTab as OrderStatus)
+        status: activeTab === "ALL" ? undefined : (activeTab as OrderStatus),
+        orderId: parsedOrderId
     };
 
-    const { data, isLoading } = useGetOrdersAdmin(orderParams);
+    const { data, isLoading } = useGetOrdersAdminPaginated(orderParams);
     const ordersPage = data as PaginatedOrderResponse;
 
     const handleRowClick = (record: OrderDetailResponse) => {
@@ -184,6 +198,13 @@ const AdminOrdersPage: React.FC = () => {
                                 placeholder="Tìm mã đơn hàng..."
                                 prefix={<SearchOutlined style={{ color: token.colorTextDescription }} />}
                                 style={{ width: 240, borderRadius: 10 }}
+                                value={searchText}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (/^\d*$/.test(value)) {
+                                        setSearchText(value);
+                                    }
+                                }}
                                 allowClear
                             />
                             <Button icon={<FilterOutlined />} style={{ borderRadius: 10 }}>
@@ -206,6 +227,7 @@ const AdminOrdersPage: React.FC = () => {
                 <Table
                     columns={columns}
                     dataSource={ordersPage?.data || []}
+                    rowKey="orderId"
                     onRow={(record) => ({
                         onClick: () => handleRowClick(record)
                     })}

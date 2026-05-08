@@ -33,9 +33,9 @@ const orderApi = {
         return (res as any).data || res;
     },
 
-    getOrdersAdmin: async (): Promise<OrderDetailResponse[]> => {
+    getOrdersAdmin: async (params?: OrderParams): Promise<OrderDetailResponse[]> => {
         const url = "/admin/orders";
-        const res = await axiosClient.get<OrderDetailResponse[]>(url);
+        const res = await axiosClient.get<any>(url, { params });
         return (res as any).data || res;
     },
 
