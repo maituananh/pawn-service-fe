@@ -3,7 +3,7 @@ import DashboardStatsFeature from "@/features/DashboardStatsFeature";
 import { useUsers } from "@/hooks/useUsers";
 import { UserProfile } from "@/type/user.type";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Card, Flex, Space, Spin, Table, theme, Typography, type TableProps } from "antd";
+import { Button, Card, Flex, message, Popconfirm, Space, Spin, Table, theme, Typography, type TableProps } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +11,7 @@ const { Text } = Typography;
 
 const AdminCustomersPage: React.FC = () => {
     const navigate = useNavigate();
-    const { users, isLoading, isError } = useUsers();
+    const { users, isLoading, isError, deleteUser, isDeleting } = useUsers();
     const { token } = theme.useToken();
 
     const columns: TableProps<UserProfile>["columns"] = [
@@ -54,13 +54,34 @@ const AdminCustomersPage: React.FC = () => {
                             navigate(`/admin/customers/${record.id}`);
                         }}
                     />
-                    <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={(e) => {
-                            e.stopPropagation();
+                    <Popconfirm
+                        title="Xóa khách hàng"
+                        description="Bạn có chắc muốn xóa khách hàng này?"
+                        okText="Xóa"
+                        cancelText="Hủy"
+                        onConfirm={(e) => {
+                            e?.stopPropagation();
+
+                            deleteUser(Number(record.id), {
+                                onSuccess: () => {
+                                    message.success("Xóa khách hàng thành công");
+                                },
+
+                                onError: () => {
+                                    message.error("Xóa khách hàng thất bại");
+                                }
+                            });
                         }}
-                    />
+                    >
+                        <Button
+                            danger
+                            loading={isDeleting}
+                            icon={<DeleteOutlined />}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                            }}
+                        />
+                    </Popconfirm>
                 </Space>
             )
         }
