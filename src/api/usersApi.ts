@@ -39,6 +39,10 @@ const usersApi = {
         };
 
         return axiosClient.put(`/users/${id}`, newPayload);
+    },
+
+    delete: async (id: number) => {
+        return axiosClient.delete(`/users/${id}`);
     }
 };
 
